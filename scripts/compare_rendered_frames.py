@@ -18,7 +18,8 @@ def compare(first: Path, second: Path) -> dict:
         changed = sum(1 for pixel in pixels if max(pixel) > 0)
         return {"width": a.width, "height": a.height, "changed_pixels": changed,
             "changed_percent": changed / len(pixels) * 100,
-            "max_channel_delta": max(max(pixel) for pixel in pixels)}
+            "max_channel_delta": max(max(pixel) for pixel in pixels),
+            "mean_channel_delta": sum(sum(pixel) for pixel in pixels) / (len(pixels) * 3)}
 
 
 if __name__ == "__main__":

@@ -173,8 +173,14 @@ export function PitchScene(props: PitchSceneProps) {
   useEffect(()=>{runtime.current?.resetCamera(topDown);},[topDown]);
   useEffect(()=>{
     const changed=()=>setExpanded(document.fullscreenElement===viewport.current);
+    const close=(event:KeyboardEvent)=>{
+      if(event.key==='Escape'&&document.fullscreenElement===viewport.current){
+        event.preventDefault();void document.exitFullscreen().catch(()=>{});
+      }
+    };
     document.addEventListener('fullscreenchange',changed);
-    return()=>document.removeEventListener('fullscreenchange',changed);
+    document.addEventListener('keydown',close);
+    return()=>{document.removeEventListener('fullscreenchange',changed);document.removeEventListener('keydown',close);};
   },[]);
   const toggleFullscreen=()=>{
     if(document.fullscreenElement===viewport.current)void document.exitFullscreen();
