@@ -156,6 +156,9 @@ try {
   // A paused new insight can be inspected without violating its expiry interval.
   await page.getByRole('checkbox', { name: /Pause when a new insight arrives/ }).check();
   await page.getByRole('button', { name: 'Start replay', exact: true }).click();
+  await waitState((state) => state.status === 'playing', 'Replay started');
+  await page.getByLabel('Replay speed', { exact: true }).selectOption('60');
+  await waitState((state) => state.speed === 60, 'Explicit sixty-speed verification replay');
   await expect(page.getByTestId('pitch-scene')).toHaveAttribute('data-stadium-loaded', 'true', { timeout: 20_000 });
   await waitState((state) => state.status === 'playing' && state.events.length > 2, 'Live observed graphics', 10_000);
   const liveCanvas = page.getByTestId('pitch-scene').locator('canvas');
