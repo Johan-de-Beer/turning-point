@@ -41,6 +41,6 @@ docker compose -f docker-compose.production.yml ps
 $remoteCommands = $remoteCommands.Replace('__BASE__', $remoteBase).Replace('__RELEASE__', $remoteRelease).Replace('__TAG__', $ReleaseTag)
 # Send a literal shell program over stdin; no interpolation of source text into
 # shell arguments or credentials. The tag was validated above.
-$remoteCommands.Replace("`r`n", "`n") | & ssh -o BatchMode=yes $SshHost 'sh -s'
+$remoteCommands.Replace("`r`n", "`n") | & ssh -o BatchMode=yes $SshHost 'tr -d ''\015'' | sh -s'
 if ($LASTEXITCODE -ne 0) { throw 'Remote deployment failed. Previous release/data are retained; inspect containers before retrying.' }
 Write-Host "Deployed release $ReleaseTag. Frontend upstream: http://192.168.10.58:5177 (Host: football.thedebeer.co.za)."

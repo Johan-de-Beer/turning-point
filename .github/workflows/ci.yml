@@ -2,6 +2,13 @@ name: Verify Turning Point
 on:
   push:
     branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'server_data/**'
+      - 'docker/**'
+      - 'docker-compose*.yml'
+      - '.github/workflows/ci.yml'
   pull_request:
   workflow_dispatch:
 permissions:

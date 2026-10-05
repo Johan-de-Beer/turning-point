@@ -92,6 +92,10 @@ source: https://download.blender.org/release/Blender5.2/.
 
 ## Python runtime and test dependencies
 
+Optional screenshot QA uses Pillow 11.2.1 (MIT-CMU, verified from installed
+distribution metadata). It is not installed in the application containers or
+required for native app startup.
+
 """ + table(python_packages()) + "\n\n## Frontend lockfile (including platform/test/build dependencies)\n\n" + table(npm_packages()) + "\n"
     (ROOT / "docs/licenses.md").write_text(content, encoding="utf-8")
     print("Wrote docs/licenses.md")

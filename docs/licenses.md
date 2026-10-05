@@ -20,6 +20,10 @@ source: https://download.blender.org/release/Blender5.2/.
 
 ## Python runtime and test dependencies
 
+Optional screenshot QA uses Pillow 11.2.1 (MIT-CMU, verified from installed
+distribution metadata). It is not installed in the application containers or
+required for native app startup.
+
 | Package | Version | Metadata license |
 | --- | --- | --- |
 | annotated-types | 0.8.0 | MIT |
