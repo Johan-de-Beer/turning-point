@@ -4,7 +4,7 @@ on:
 permissions: {}
 jobs:
   public-https:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - name: Verify public DNS, trusted HTTPS, frontend and API
@@ -14,20 +14,23 @@ jobs:
           import re
           import urllib.request
           base = 'https://football.thedebeer.co.za'
-          with urllib.request.urlopen(base + '/', timeout=30) as response:
+          def request(path, method='GET'):
+              return urllib.request.Request(base + path, method=method,
+                  headers={'User-Agent': 'TurningPointPublicVerification/0.1'})
+          with urllib.request.urlopen(request('/'), timeout=30) as response:
               assert response.status == 200
               assert response.url.startswith(base)
               page = response.read().decode()
               assert 'Turning Point' in page
               assert "frame-ancestors 'none'" in response.headers.get('Content-Security-Policy', '')
               bundle = re.search(r'/assets/index-[^" ]+\.js', page).group()
-          request = urllib.request.Request(base + bundle, method='HEAD')
-          with urllib.request.urlopen(request, timeout=30) as response:
+          with urllib.request.urlopen(request(bundle), timeout=30) as response:
               assert response.status == 200
-              assert int(response.headers['Content-Length']) > 10000
-          with urllib.request.urlopen(base + '/api/health', timeout=30) as response:
+              assert 'javascript' in response.headers.get('Content-Type', '')
+              assert len(response.read(10001)) > 10000
+          with urllib.request.urlopen(request('/api/health'), timeout=30) as response:
               assert response.status == 200
               assert json.load(response)['status'] == 'ok'
               assert response.headers['Cache-Control'] == 'no-store'
-          print('PASS: public GitHub runner resolved the domain, verified trusted HTTPS, and retrieved the frontend, current bundle and API health.')
+          print('PASS: public DNS resolved, trusted HTTPS verified, frontend/current bundle/API health retrieved.')
           PY
