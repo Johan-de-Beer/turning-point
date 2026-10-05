@@ -26,7 +26,7 @@ export const eventSchema = z.discriminatedUnion('kind', [
   z.strictObject({ ...eventBase, kind: z.literal('POSSESSION'), detail: z.strictObject({ start: point }) }),
   z.strictObject({ ...eventBase, kind: z.literal('PASS'), detail: z.strictObject({ recipient_id: id, completed: z.boolean(), start: point, end: point }) }),
   z.strictObject({ ...eventBase, kind: z.literal('CARRY'), detail: z.strictObject({ start: point, end: point }) }),
-  z.strictObject({ ...eventBase, kind: z.literal('SHOT'), detail: z.strictObject({ position: point, outcome: z.enum(['goal', 'saved', 'blocked', 'off_target']) }) }),
+  z.strictObject({ ...eventBase, kind: z.literal('SHOT'), detail: z.strictObject({ position: point, target: point.nullable().optional(), outcome: z.enum(['goal', 'saved', 'blocked', 'off_target']) }) }),
   z.strictObject({ ...eventBase, kind: z.literal('TACKLE'), detail: z.strictObject({ position: point, successful: z.boolean() }) }),
   z.strictObject({ ...eventBase, kind: z.literal('STOPPAGE'), detail: z.strictObject({ reason: z.enum(['ball_out', 'foul', 'goal', 'interval']) }) }),
 ]).superRefine((event, ctx) => {
@@ -99,7 +99,7 @@ export function eligibleOverlay(state: Session): Overlay | null {
 }
 
 export function canAcceptState(current: Session | null, incoming: Session): boolean {
-  return !current || (incoming.session_id === current.session_id && (incoming.generation > current.generation || (incoming.generation === current.generation && incoming.data_epoch >= current.data_epoch && incoming.preferences_version >= current.preferences_version && incoming.playhead_ms >= current.playhead_ms)));
+  return !current || (incoming.session_id === current.session_id && (incoming.generation > current.generation || (incoming.generation === current.generation && incoming.data_epoch >= current.data_epoch && incoming.preferences_version >= current.preferences_version && incoming.playhead_ms >= current.playhead_ms && incoming.last_delivery_seq >= current.last_delivery_seq && incoming.observed_high_water_ms >= current.observed_high_water_ms)));
 }
 
 export function mergeObservedEvents(current: Session | null, incoming: Session): Session {

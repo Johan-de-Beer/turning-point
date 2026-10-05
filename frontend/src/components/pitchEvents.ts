@@ -1,5 +1,8 @@
 export interface PitchEvent {
   event_id: string;
+  revision?: number;
+  delivery_seq?: number;
+  available_at_ms?: number;
   event_time_ms: number;
   period: number;
   kind: string;
@@ -29,7 +32,7 @@ export function displayEvents(events: readonly PitchEvent[], homeId: string, awa
   const eligible = events.filter(e => e.event_time_ms <= playhead && (selected ? e.event_id === selected : e.period === period && playhead - e.event_time_ms <= 90_000));
   return eligible.slice(-8).flatMap(event => {
     if (event.team_id !== homeId && event.team_id !== awayId) return [];
-    const endpoint = coordinate(event.detail.end) ?? coordinate(event.detail.position) ?? coordinate(event.detail.start);
+    const endpoint = coordinate(event.detail.end) ?? coordinate(event.detail.target) ?? coordinate(event.detail.position) ?? coordinate(event.detail.start);
     if (!endpoint) return []; // No invented positions for events without coordinates.
     const home = event.team_id === homeId;
     const start = coordinate(event.detail.start);

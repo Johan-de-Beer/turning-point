@@ -98,6 +98,9 @@ class CarryDetail(StrictModel):
 class ShotDetail(StrictModel):
     position: Point
     outcome: Literal["goal", "saved", "blocked", "off_target"]
+    # Synthetic recorded endpoint, supplied only once this shot is observed.
+    # Legacy stored shots can remain source-only; never infer a missing target.
+    target: Point | None = None
 
 
 class TackleDetail(StrictModel):

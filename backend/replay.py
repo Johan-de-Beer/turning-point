@@ -78,6 +78,7 @@ class Session:
     created_at: float = field(default_factory=time.time)
     completed_at: float | None = None
     ready_at: float = field(default_factory=time.time)
+    fixture_version: str = "synthetic_v1"
 
     def serialize(self) -> dict:
         return {"session_id": self.session_id, "capability_hash": self.capability_hash, "match_id": self.match_id,
@@ -99,7 +100,8 @@ class Session:
             "job_deadlines": self.job_deadlines,
             "created_at": self.created_at,
             "completed_at": self.completed_at,
-            "ready_at": self.ready_at}
+            "ready_at": self.ready_at,
+            "fixture_version": self.fixture_version}
 
 
 class ReplayService:
@@ -118,6 +120,11 @@ class ReplayService:
 
     def restore(self):
         for raw in sorted(self.storage.sessions(), key=lambda r: r.get("last_access_at", 0), reverse=True):
+            # Sequence IDs belong to one private fixture revision. Mixing a
+            # restored older prefix with new deliveries corrupts paths/facts.
+            if raw.get("fixture_version", "synthetic_v1") != self.match.fixture_version:
+                self.storage.expire_session(raw["session_id"])
+                continue
             raw.setdefault("created_at", raw.get("last_access_at", time.time()))
             # Existing records do not get a fresh unstarted lease merely because
             # the backend was upgraded; restart explicitly renews that lease.
@@ -212,7 +219,8 @@ class ReplayService:
             raise ServiceError("session_limit", "The demo is busy. Please try again shortly.", 429, True)
         sid = secrets.token_urlsafe(18)
         session = Session(session_id=sid, capability_hash=self.capability_hash(capability), match_id=request.match_id,
-                          preferences=request.preferences, speed=request.speed, ingestor=Ingestor(self.match), last_clock=self.clock())
+                          preferences=request.preferences, speed=request.speed, ingestor=Ingestor(self.match), last_clock=self.clock(),
+                          fixture_version=self.match.fixture_version)
         session.snapshot = snapshot(self.match, {}, sid, 1, 1, 0, 1, 0)
         self.storage.save_snapshot(session.snapshot)
         session.recaps = {phase: locked_recap(session, phase) for phase in ("half_time", "full_time")}

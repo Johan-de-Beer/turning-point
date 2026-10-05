@@ -8,7 +8,7 @@ const preferencesKey = 'turning-point:preferences:v1';
 const sessionKey = 'turning-point:session:v1';
 const pendingCreateKey = 'turning-point:pending-create:v1';
 const authSchema = z.strictObject({ session_id: z.string().min(1), capability: z.string().regex(/^[a-f0-9]{64}$/) });
-const pendingCreateSchema = z.strictObject({ capability: z.string().regex(/^[a-f0-9]{64}$/), idempotency_key: z.string().uuid(), body: z.strictObject({ match_id: z.string(), preferences: preferencesSchema, speed: z.literal(60) }) });
+const pendingCreateSchema = z.strictObject({ capability: z.string().regex(/^[a-f0-9]{64}$/), idempotency_key: z.string().uuid(), body: z.strictObject({ match_id: z.string(), preferences: preferencesSchema, speed: z.union([z.literal(12), z.literal(60)]) }) });
 type Auth = z.infer<typeof authSchema>;
 export type ControlAction = 'play' | 'pause' | 'continue_half' | 'restart' | 'set_speed';
 
@@ -51,8 +51,19 @@ export function useMatch() {
     retryRef.current = 0;
   }, []);
 
-  const fail = useCallback((reason: unknown) => {
+  const fail = useCallback((reason: unknown, sessionRequest = false) => {
     const failure = reason instanceof ApiError ? reason : new ApiError(reason instanceof Error ? reason.message : 'Could not validate observed data', 'invalid_response', false);
+    if (sessionRequest && failure.status === 404) {
+      sessionStorage.removeItem(sessionKey);
+      stateRef.current = null;
+      authRef.current = null;
+      setState(null);
+      setAuth(null);
+      setConnection('online');
+      retryRef.current = 0;
+      setError(new ApiError('Your replay session is no longer available. Start a fresh replay; your preferences are saved.', 'expired_session', false, 404));
+      return;
+    }
     setError(failure);
     if (failure.retryable) {
       retryRef.current++;
@@ -89,11 +100,7 @@ export function useMatch() {
           if (!cancelled && !busyRef.current) accept(incoming);
         } catch (reason) {
           if (!cancelled) {
-            if (reason instanceof ApiError && reason.status === 404 && !stateRef.current) {
-              sessionStorage.removeItem(sessionKey);
-              setAuth(null);
-            }
-            fail(reason);
+            fail(reason, true);
           }
         }
       }
@@ -110,7 +117,7 @@ export function useMatch() {
     lock(true);
     try {
       const stored = pendingCreateSchema.safeParse(JSON.parse(sessionStorage.getItem(pendingCreateKey) ?? 'null'));
-      const pending = stored.success && stored.data.body.match_id === match.match_id ? stored.data : { capability: createCapability(), idempotency_key: crypto.randomUUID(), body: { match_id: match.match_id, preferences, speed: 60 as const } };
+      const pending = stored.success && stored.data.body.match_id === match.match_id ? stored.data : { capability: createCapability(), idempotency_key: crypto.randomUUID(), body: { match_id: match.match_id, preferences, speed: 12 as const } };
       sessionStorage.setItem(pendingCreateKey, JSON.stringify(pending));
       const capability = pending.capability;
       const created = await request('/sessions', sessionSchema, { method: 'POST', body: pending.body, capability, idempotencyKey: pending.idempotency_key });
@@ -122,7 +129,7 @@ export function useMatch() {
       accept(created);
       const playing = await request(`/sessions/${created.session_id}/controls`, sessionSchema, { method: 'POST', body: { action: 'play', expected_generation: created.generation }, capability, idempotencyKey: crypto.randomUUID() });
       accept(playing);
-    } catch (reason) { fail(reason); }
+    } catch (reason) { fail(reason, Boolean(authRef.current)); }
     finally { lock(false); }
   }
 
@@ -141,7 +148,7 @@ export function useMatch() {
         incoming = await request(`/sessions/${current.session_id}/controls`, sessionSchema, options);
       }
       accept(incoming);
-    } catch (reason) { fail(reason); }
+    } catch (reason) { fail(reason, true); }
     finally { lock(false); }
   }
 
@@ -158,7 +165,7 @@ export function useMatch() {
     try {
       const incoming = await request(`/sessions/${current.session_id}/preferences`, sessionSchema, { method: 'PATCH', body: { ...next, expected_preferences_version: current.preferences_version }, capability: sessionAuth.capability });
       accept(incoming);
-    } catch (reason) { fail(reason); }
+    } catch (reason) { fail(reason, true); }
     finally { lock(false); }
   }
 
@@ -179,7 +186,7 @@ export function useMatch() {
     const sessionAuth = authRef.current;
     if (!sessionAuth) { setError(null); setConnection('online'); return; }
     try { accept(await request(`/sessions/${sessionAuth.session_id}/state`, sessionSchema, { capability: sessionAuth.capability })); }
-    catch (reason) { fail(reason); }
+    catch (reason) { fail(reason, true); }
   }
 
   return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, retry };

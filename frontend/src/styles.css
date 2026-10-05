@@ -837,3 +837,16 @@ details strong { color: #d5e6ea; }
 @media (prefers-reduced-motion: reduce) {
   *, *:before, *:after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* Put the broadcast story beneath the event replay so it never obscures the ball. */
+.pitch-panel > .overlay-preview {
+  position: static;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #36515a;
+  border-left: 3px solid var(--teal);
+  border-radius: 0;
+  background: #10252e;
+  box-shadow: none;
+  backdrop-filter: none;
+}

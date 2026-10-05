@@ -1,205 +1,237 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Maximize2, MoveUpRight, RotateCcw, Waves } from 'lucide-react';
-import { displayEvents, type DisplayEvent, type PitchEvent } from './pitchEvents';
-import { buildStadium, disposeObject, fieldPosition, glowTexture, PITCH_BACKGROUND } from './stadiumScene';
+import { ChevronLeft, ChevronRight, Maximize2, MoveUpRight, Play, RotateCcw, Waves } from 'lucide-react';
+import { displayEvents, type PitchEvent } from './pitchEvents';
+import { eventDuration, isObserved, PitchPlayback, sampleEvent, type PlaybackFrame } from './pitchPlayback';
+import { buildStadium, disposeObject, fieldPosition, PITCH_BACKGROUND } from './stadiumScene';
 import './pitch.css';
-
 export type { PitchEvent } from './pitchEvents';
+type Player = { player_id: string; display_name: string; shirt_number: number; team_id: string };
 export interface PitchSceneProps {
-  events: readonly PitchEvent[];
-  homeTeamId: string;
-  awayTeamId: string;
-  period: number;
-  playheadMs: number;
-  isPlaying: boolean;
-  selectedEventId?: string | null;
-  onSelectEvent?: (id: string) => void;
+  events: readonly PitchEvent[]; homeTeamId: string; awayTeamId: string;
+  homeTeamName?: string; awayTeamName?: string; players?: readonly Player[];
+  period: number; playheadMs: number; isPlaying: boolean; finishObservedEvents?: boolean; speed?: 1 | 12 | 60; replayKey?: string;
+  selectedEventId?: string | null; selectedEvent?: PitchEvent | null; onSelectEvent?: (id: string) => void;
 }
-
-type Glyph = { root: THREE.Group; ring: THREE.Mesh; ripple: THREE.Mesh; path: THREE.Mesh | null; curve: THREE.QuadraticBezierCurve3 | null; comet: THREE.Sprite | null; glow: THREE.Sprite; age: number; event: PitchEvent };
-type SceneRuntime = { scene: THREE.Scene; renderer: THREE.WebGLRenderer; camera: THREE.PerspectiveCamera; controls: OrbitControls; events: THREE.Group; glyphs: Glyph[]; resetCamera: (top: boolean) => void; };
-const clock = (ms: number) => `${Math.floor(ms / 60000).toString().padStart(2, '0')}:${Math.floor(ms / 1000 % 60).toString().padStart(2, '0')}`;
-const eventLabel = (event: PitchEvent) => event.kind === 'SHOT' ? (event.detail.outcome === 'goal' ? 'Goal' : 'Shot') : event.kind === 'PASS' ? (event.detail.completed ? 'Completed pass' : 'Incomplete pass') : event.kind === 'CARRY' ? 'Ball carry' : event.kind.toLowerCase();
-
-/** Animate a diagram revealing a known event, never a fabricated player or tracking trajectory. */
-function createGlyph({ event, point, start, color }: DisplayEvent, selected: boolean): Glyph {
-  const root = new THREE.Group(), pos = fieldPosition(point), isShot = event.kind === 'SHOT';
-  const ringMaterial = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .85, side: THREE.DoubleSide, depthWrite: false });
-  const ring = new THREE.Mesh(new THREE.RingGeometry(isShot ? 1.05 : .67, isShot ? 1.5 : 1.02, 48), ringMaterial);
-  ring.rotation.x = -Math.PI/2; ring.position.copy(pos); root.add(ring);
-  const ripple = new THREE.Mesh(new THREE.RingGeometry(.95, 1.05, 48), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .4, side: THREE.DoubleSide, depthWrite: false }));
-  ripple.rotation.x = -Math.PI/2; ripple.position.copy(pos).y = .15; root.add(ripple);
-  const light = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color, transparent: true, opacity: .5, depthWrite: false, blending: THREE.AdditiveBlending }));
-  light.position.copy(pos).y = .7; light.scale.set(isShot ? 9 : 5, isShot ? 9 : 5, 1); root.add(light);
-  const bead = new THREE.Mesh(new THREE.SphereGeometry(isShot ? .46 : .3, 14, 10), new THREE.MeshBasicMaterial({ color: '#f7f8f0' })); bead.position.copy(pos).y = .37; root.add(bead);
-  let path: THREE.Mesh | null = null, curve: THREE.QuadraticBezierCurve3 | null = null, comet: THREE.Sprite | null = null;
-  if (start && (event.kind === 'PASS' || event.kind === 'CARRY')) {
-    const from = fieldPosition(start, .25), to = fieldPosition(point, .25), middle = from.clone().lerp(to, .5);
-    middle.y = event.kind === 'CARRY' ? .3 : Math.min(10, from.distanceTo(to)*.19);
-    curve = new THREE.QuadraticBezierCurve3(from, middle, to);
-    path = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, event.kind === 'PASS' ? .13 : .1, 5, false), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .8, depthWrite: false })); root.add(path);
-    const direction = to.clone().sub(curve.getPoint(.94)).normalize();
-    const arrow = new THREE.Mesh(new THREE.ConeGeometry(.55, 1.8, 8), new THREE.MeshBasicMaterial({ color }));
-    arrow.position.copy(to).addScaledVector(direction, -.7); arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction); root.add(arrow);
-    const source = new THREE.Mesh(new THREE.RingGeometry(.35, .55, 20), ringMaterial); source.rotation.x = -Math.PI/2; source.position.copy(from); root.add(source);
-    // A light reveals the recorded arrow; it is a diagram effect, not a ball-position estimate.
-    comet = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color: '#effff8', transparent: true, opacity: .8, depthWrite: false, blending: THREE.AdditiveBlending })); comet.scale.set(3.8,3.8,1); root.add(comet);
+type Runtime = { scene: THREE.Scene; camera: THREE.PerspectiveCamera; playback: PitchPlayback; resetCamera: (top: boolean) => void };
+type View = { event: PitchEvent | null; inspection: boolean; complete: boolean };
+const clock = (ms: number) => Math.floor(ms / 60000).toString().padStart(2, '0') + ':' + Math.floor(ms / 1000 % 60).toString().padStart(2, '0');
+function action(event: PitchEvent): string {
+  if (event.kind === 'PASS') return event.detail.completed ? 'Completed pass' : 'Incomplete pass';
+  if (event.kind === 'CARRY') return 'Ball carry';
+  if (event.kind === 'SHOT') return event.detail.outcome === 'goal' ? 'Goal' : 'Shot · ' + String(event.detail.outcome).replace('_', ' ');
+  if (event.kind === 'POSSESSION') return 'Possession';
+  if (event.kind === 'TACKLE') return event.detail.successful ? 'Successful tackle' : 'Tackle attempt';
+  if (event.kind === 'STOPPAGE') return 'Play stopped · ' + String(event.detail.reason).replace('_', ' ');
+  if (event.kind === 'PERIOD_END') return event.period === 1 ? 'Half-time' : 'Full-time';
+  return event.period === 1 ? 'Kick-off' : 'Second-half kick-off';
+}
+const playerName = (id: unknown, props: PitchSceneProps) => props.players?.find(player => player.player_id === id)?.display_name ?? '';
+function eventTitle(event: PitchEvent, props: PitchSceneProps): string {
+  const actor = playerName(event.player_id, props) || (event.team_id === props.homeTeamId ? props.homeTeamName : props.awayTeamName) || event.team_id || 'Match';
+  const recipient = playerName(event.detail.recipient_id, props);
+  return event.kind === 'PASS' && recipient ? actor + ' → ' + recipient : actor;
+}
+function football(): THREE.Mesh {
+  const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 256;
+  const c = canvas.getContext('2d')!; c.fillStyle = '#fffdf5'; c.fillRect(0, 0, 512, 256);
+  for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) {
+    const x = col * 64 + (row % 2 ? 32 : 0), y = row * 70; c.beginPath();
+    for (let corner = 0; corner < 5; corner++) {
+      const angle = corner * Math.PI * 2 / 5 - Math.PI / 2, px = x + Math.cos(angle) * 15, py = y + Math.sin(angle) * 15;
+      if (!corner) c.moveTo(px, py); else c.lineTo(px, py);
+    }
+    c.closePath(); c.fillStyle = '#15232a'; c.fill(); c.strokeStyle = '#8b9696'; c.stroke();
   }
-  if (isShot) {
-    const beam = new THREE.Mesh(new THREE.CylinderGeometry(.06, .3, selected ? 8 : 5, 12, 1, true), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .5, depthWrite: false, side: THREE.DoubleSide }));
-    beam.position.copy(pos).y = selected ? 4 : 2.5; root.add(beam);
-    const target = new THREE.Mesh(new THREE.RingGeometry(2.15, 2.23, 48), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .45, side: THREE.DoubleSide, depthWrite: false })); target.rotation.x = -Math.PI/2; target.position.copy(pos).y=.16; root.add(target);
-  }
-  root.traverse(object => { object.userData.eventId = event.event_id; });
-  return { root, ring, ripple, path, curve, comet, glow: light, age: 0, event };
+  const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.Mesh(new THREE.SphereGeometry(.9, 24, 16), new THREE.MeshStandardMaterial({ map: texture, roughness: .65, emissive: '#fffdf5', emissiveIntensity: .15 }));
 }
-
-function PitchFallback({ markers }: { markers: DisplayEvent[] }) {
-  return <svg className="pitch-fallback" viewBox="0 0 120 80" role="img" aria-label="Schematic football pitch with observed event markers">
-    <defs><pattern id="pitch-turf" width="12" height="80" patternUnits="userSpaceOnUse"><rect width="6" height="80" fill="#26713f"/><rect x="6" width="6" height="80" fill="#2d7a46"/></pattern></defs>
-    <rect x="5" y="5" width="110" height="70" rx="1" fill="url(#pitch-turf)"/>
-    <g stroke="#d7e7cf" opacity=".8" strokeWidth=".35" fill="none"><rect x="8" y="8" width="104" height="64"/><path d="M60 8v64"/><circle cx="60" cy="40" r="9"/><path d="M8 21h16v38H8M112 21H96v38h16M8 31h5v18H8M112 31h-5v18h5"/></g>
-    {markers.map(({ event, point, start, color }) => <g key={event.event_id} stroke={color} fill={color}>{start && <path fill="none" strokeWidth=".6" d={`M${8+start.x*1.04},${8+start.y*.64} Q${8+(start.x+point.x)*.52},${8+(start.y+point.y)*.32-4} ${8+point.x*1.04},${8+point.y*.64}`}/>}<circle cx={8+point.x*1.04} cy={8+point.y*.64} r={event.kind==='SHOT'?1.8:1}/></g>)}
-  </svg>;
+function actorMarker(): THREE.Group {
+  const group = new THREE.Group();
+  const disc = new THREE.Mesh(new THREE.RingGeometry(1.4, 1.9, 32), new THREE.MeshBasicMaterial({ color: '#38bdf8', side: THREE.DoubleSide }));
+  disc.name = 'disc'; disc.rotation.x = -Math.PI / 2; disc.position.y = .18; group.add(disc);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(.7, .95, 1.5, 12), new THREE.MeshStandardMaterial({ color: '#38bdf8', roughness: .8 }));
+  body.name = 'shirt'; body.position.y = 1.35; group.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.46, 12, 8), new THREE.MeshStandardMaterial({ color: '#e9c7a4', roughness: 1 }));
+  head.position.y = 2.55; group.add(head);
+  const legs = new THREE.Mesh(new THREE.CylinderGeometry(.48, .48, .8, 8), new THREE.MeshStandardMaterial({ color: '#132630' }));
+  legs.position.y = .5; group.add(legs); return group;
 }
-
+function selected(props: PitchSceneProps): PitchEvent | null {
+  const event = props.selectedEventId ? props.selectedEvent ?? props.events.find(record => record.event_id === props.selectedEventId) : null;
+  return event && event.event_id === props.selectedEventId && isObserved(event, props.playheadMs) ? event : null;
+}
 export function PitchScene(props: PitchSceneProps) {
-  const host = useRef<HTMLDivElement>(null), viewport = useRef<HTMLDivElement>(null), current = useRef(props), runtime = useRef<SceneRuntime | null>(null);
+  const host = useRef<HTMLDivElement>(null), viewport = useRef<HTMLDivElement>(null), runtime = useRef<Runtime | null>(null);
+  const actorLabel = useRef<HTMLSpanElement>(null), recipientLabel = useRef<HTMLSpanElement>(null), progressBar = useRef<HTMLSpanElement>(null);
+  const current = useRef(props); current.current = props;
   const [webgl, setWebgl] = useState(false), [topDown, setTopDown] = useState(false), [assetReady, setAssetReady] = useState(false), [expanded, setExpanded] = useState(false);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const settings = useRef({ motion, topDown }); settings.current = { motion, topDown }; current.current = props;
-  const markerData = useMemo(() => displayEvents(props.events, props.homeTeamId, props.awayTeamId, props.period, props.playheadMs, props.selectedEventId), [props.events, props.homeTeamId, props.awayTeamId, props.period, props.playheadMs, props.selectedEventId]);
-  // Polling does not continually rebuild geometry or restart arrival animations.
-  const markerKey = JSON.stringify(markerData.map(m => [m.event.event_id, m.event.kind, m.point, m.start, m.event.detail, m.color]));
-  const markers = useMemo(() => markerData, [markerKey]);
-
+  const [view, setView] = useState<View>({ event: null, inspection: false, complete: false }), [preview, setPreview] = useState(false);
+  const settings = useRef({ motion, topDown }); settings.current = { motion, topDown };
+  const previewToken = useRef(0), previewRunning = useRef(false);
   useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const change = () => setMotion(!query.matches); query.addEventListener('change', change);
-    return () => query.removeEventListener('change', change);
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)'), change = () => setMotion(!query.matches);
+    query.addEventListener('change', change); return () => query.removeEventListener('change', change);
   }, []);
-
   useEffect(() => {
     const container = host.current; if (!container) return;
     let renderer: THREE.WebGLRenderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch { return; }
-    let disposed = false, visible = true;
+    let disposed = false, visible = true, previousView = '', visualEvent = '', inspectionKey = '', inspectionElapsed = 0, token = 0;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setClearColor(PITCH_BACKGROUND, 1);
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
-    renderer.domElement.setAttribute('aria-hidden', 'true'); renderer.domElement.style.touchAction = 'pan-y'; container.appendChild(renderer.domElement);
+    renderer.domElement.setAttribute('aria-hidden', 'true'); container.appendChild(renderer.domElement);
     const scene = new THREE.Scene(); scene.fog = new THREE.Fog(PITCH_BACKGROUND, 260, 520);
-    const camera = new THREE.PerspectiveCamera(38, 2, .3, 700); camera.position.set(0, 126, 136);
-    const controls = new OrbitControls(camera, renderer.domElement);
-    renderer.domElement.style.touchAction = 'pan-y';
-    controls.target.set(0, 1, 0); controls.enableDamping = true; controls.dampingFactor = .12; controls.enablePan = false; controls.enableZoom = false;
-    controls.minPolarAngle = .06; controls.maxPolarAngle = 1.05; controls.rotateSpeed = .4;
+    const camera = new THREE.PerspectiveCamera(38, 2, .3, 700), controls = new OrbitControls(camera, renderer.domElement);
+    renderer.domElement.style.touchAction = 'pan-y'; controls.target.set(0, 1, 0); controls.dampingFactor = .12;
+    controls.enablePan = false; controls.enableZoom = false; controls.minPolarAngle = .06; controls.maxPolarAngle = 1.05; controls.rotateSpeed = .4;
     controls.touches.ONE = THREE.TOUCH.PAN; controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
-    const events = new THREE.Group(); scene.add(events);
     const resetCamera = (top: boolean) => {
-      const tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-      const distance = Math.max(168/(2*tangent*camera.aspect), (top?126:116)/(2*tangent))*1.04;
-      if (top) camera.position.set(0, distance, .1);
-      else camera.position.set(distance*.16, distance*.78, distance*.61);
+      const tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const distance = Math.max(168 / (2 * tangent * camera.aspect), (top ? 126 : 116) / (2 * tangent)) * 1.04;
+      camera.position.set(top ? 0 : distance * .16, top ? distance : distance * .78, top ? .1 : distance * .61);
       controls.target.set(0, 1, 0); controls.update();
     };
-    runtime.current = { scene, renderer, camera, controls, events, glyphs: [], resetCamera };
-    buildStadium(scene, () => !disposed, loaded => { setAssetReady(loaded); });
-    const resize = () => { const w = container.clientWidth, h = container.clientHeight; if (!w || !h) return; camera.aspect=w/h; camera.updateProjectionMatrix(); resetCamera(settings.current.topDown); renderer.setSize(w,h); };
+    const playback = new PitchPlayback(current.current.homeTeamId, current.current.awayTeamId);
+    playback.ingest(current.current.events, current.current.playheadMs, current.current.period, current.current.replayKey ?? 'stadium');
+    const ball = football(), actor = actorMarker(), recipient = actorMarker(); ball.castShadow = true;
+    const shadow = new THREE.Mesh(new THREE.CircleGeometry(1.15, 24), new THREE.MeshBasicMaterial({ color: '#071b13', opacity: .4, transparent: true, depthWrite: false }));
+    shadow.rotation.x = -Math.PI / 2;
+    const route = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: '#38bdf8', transparent: true, opacity: .45 }));
+    const target = new THREE.Mesh(new THREE.RingGeometry(1.3, 1.65, 32), new THREE.MeshBasicMaterial({ color: '#38bdf8', side: THREE.DoubleSide, transparent: true, opacity: .75 }));
+    target.rotation.x = -Math.PI / 2;
+    const interactive = [ball, actor, recipient, target, route]; scene.add(...interactive, shadow);
+    for (const object of [...interactive, shadow]) object.visible = false;
+    runtime.current = { scene, camera, playback, resetCamera };
+    buildStadium(scene, () => !disposed, loaded => setAssetReady(loaded));
+    const resize = () => {
+      const w = container.clientWidth, h = container.clientHeight; if (!w || !h) return;
+      camera.aspect = w / h; camera.updateProjectionMatrix(); resetCamera(settings.current.topDown); renderer.setSize(w, h);
+    };
     const observer = new ResizeObserver(resize); observer.observe(container); resize();
-    const intersection = new IntersectionObserver(entries => { visible=entries[0]?.isIntersecting??true; }); intersection.observe(container);
+    const intersection = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? true; }); intersection.observe(container);
     const ray = new THREE.Raycaster(); let pointerStart = { x: 0, y: 0 };
-    const down = (e: PointerEvent) => { pointerStart = { x:e.clientX, y:e.clientY }; };
-    const select = (e: PointerEvent) => {
-      if (!current.current.onSelectEvent || Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>5) return;
-      const bounds=container.getBoundingClientRect(); ray.setFromCamera(new THREE.Vector2((e.clientX-bounds.left)/bounds.width*2-1,-(e.clientY-bounds.top)/bounds.height*2+1),camera);
-      const hit=ray.intersectObjects(events.children,true).find(h=>h.object.userData.eventId);
-      if(hit) current.current.onSelectEvent(hit.object.userData.eventId as string);
+    const down = (event: PointerEvent) => { pointerStart = { x: event.clientX, y: event.clientY }; };
+    const selectEvent = (event: PointerEvent) => {
+      if (!current.current.onSelectEvent || Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 5) return;
+      const bounds = container.getBoundingClientRect();
+      ray.setFromCamera(new THREE.Vector2((event.clientX - bounds.left) / bounds.width * 2 - 1, -(event.clientY - bounds.top) / bounds.height * 2 + 1), camera);
+      const hit = ray.intersectObjects(interactive.filter(object => object.visible), true).find(item => item.object.userData.eventId);
+      if (hit) current.current.onSelectEvent(hit.object.userData.eventId as string);
     };
-    container.addEventListener('pointerdown',down); container.addEventListener('pointerup',select);
-    let frame=0,lastFrame=0,visualClock=0;
-    const render=(now:number)=>{
-      if(disposed)return; frame=requestAnimationFrame(render); if(now-lastFrame<32)return;
-      const dt=Math.min((now-lastFrame)/1000,.06); lastFrame=now;
-      if (!visible || document.hidden) return;
-      const animated=settings.current.motion && current.current.isPlaying;
-      if(animated) visualClock+=dt;
-      const context=runtime.current; if(!context)return;
-      for(const glyph of context.glyphs){
-        if(animated)glyph.age+=dt;
-        const reveal=settings.current.motion ? Math.min(1,glyph.age/.52) : 1;
-        const historical=current.current.selectedEventId!=null;
-        const age=Math.max(0,current.current.playheadMs-glyph.event.event_time_ms);
-        const opacity=historical?1:Math.max(.24,1-age/110000);
-        (glyph.ring.material as THREE.MeshBasicMaterial).opacity=opacity;
-        (glyph.glow.material as THREE.SpriteMaterial).opacity=opacity*(.25+(animated?Math.sin(visualClock*2.5)*.08:0));
-        glyph.ring.scale.setScalar(historical?1.25:1);
-        if(glyph.path){
-          const indexCount=glyph.path.geometry.index?.count??0;
-          glyph.path.geometry.setDrawRange(0, Math.floor(indexCount*(current.current.isPlaying?reveal:1)/30)*30);
-          (glyph.path.material as THREE.MeshBasicMaterial).opacity=opacity*.9;
+    container.addEventListener('pointerdown', down); container.addEventListener('pointerup', selectEvent);
+    const placeLabel = (element: HTMLSpanElement | null, marker: THREE.Group, label: string, offset: number) => {
+      if (!element) return; element.hidden = !marker.visible || !label; element.textContent = label;
+      if (!element.hidden) {
+        const point = marker.position.clone(); point.y = 3.5; point.project(camera);
+        element.style.left = ((point.x + 1) * container.clientWidth / 2) + 'px';
+        element.style.top = ((1 - point.y) * container.clientHeight / 2 + offset) + 'px';
+      }
+    };
+    let animation = 0, lastFrame = 0;
+    const render = (now: number) => {
+      if (disposed) return; animation = requestAnimationFrame(render); if (now - lastFrame < 32) return;
+      const dt = Math.min((now - lastFrame) / 1000, .075); lastFrame = now; if (!visible || document.hidden) return;
+      const p = current.current, inspected = selected(p), ctx = runtime.current; if (!ctx) return;
+      let frame: PlaybackFrame | null;
+      if (inspected) {
+        const key = JSON.stringify([p.replayKey, inspected.event_id, inspected.revision, inspected.detail]);
+        if (key !== inspectionKey) { inspectionKey = key; inspectionElapsed = eventDuration(inspected); previewRunning.current = false; setPreview(false); token = previewToken.current; }
+        if (token !== previewToken.current) { token = previewToken.current; inspectionElapsed = 0; }
+        if (previewRunning.current && settings.current.motion) inspectionElapsed += dt;
+        if (!settings.current.motion) inspectionElapsed = eventDuration(inspected);
+        frame = sampleEvent(inspected, inspectionElapsed / eventDuration(inspected), p.homeTeamId, p.awayTeamId);
+        if (frame.progress >= 1 && previewRunning.current) { previewRunning.current = false; setPreview(false); }
+      } else {
+        frame = ctx.playback.advance(dt, p.isPlaying || !!p.finishObservedEvents, settings.current.motion, p.speed ?? 12);
+      }
+      const eventKey = frame ? JSON.stringify([frame.event.event_id, frame.event.revision, frame.event.detail, !!inspected]) : '';
+      const color = frame?.event.team_id === p.awayTeamId ? '#fbbf24' : '#38bdf8', eventChanged = eventKey !== visualEvent;
+      if (eventChanged) {
+        visualEvent = eventKey;
+        if (frame?.from && frame.to) {
+          route.geometry.dispose(); route.geometry = new THREE.BufferGeometry().setFromPoints([fieldPosition(frame.from, .2), fieldPosition(frame.to, .2)]);
+          (route.material as THREE.LineBasicMaterial).color.set(color); (target.material as THREE.MeshBasicMaterial).color.set(color);
+          target.position.copy(fieldPosition(frame.to, .2));
+          for (const marker of [actor, recipient]) for (const name of ['disc', 'shirt']) ((marker.getObjectByName(name) as THREE.Mesh).material as THREE.MeshBasicMaterial).color.set(color);
         }
-        if(glyph.comet&&glyph.curve){glyph.comet.visible=animated&&reveal<1;glyph.comet.position.copy(glyph.curve.getPoint(reveal));}
-        const rippleAge=glyph.age%1.7;
-        glyph.ripple.visible=animated&&glyph.age<3.4;
-        glyph.ripple.scale.setScalar(1+rippleAge*3);
-        (glyph.ripple.material as THREE.MeshBasicMaterial).opacity=Math.max(0,.45*(1-rippleAge/1.7))*opacity;
+        for (const object of interactive) object.traverse(child => { child.userData.eventId = frame?.event.event_id ?? ''; });
       }
-      controls.autoRotate=settings.current.motion&&!settings.current.topDown&&context.glyphs.length===0&&current.current.events.length===0;
-      controls.autoRotateSpeed=.18;
-      controls.enableDamping=settings.current.motion&&(current.current.isPlaying||current.current.events.length===0);
-      // Pointer and reset handlers update the camera directly. Avoid recomputing
-      // its matrices on frozen frames, which can jitter antialiased shadow edges.
-      if(controls.autoRotate||controls.enableDamping)controls.update(dt);
-      renderer.render(scene,camera);
+      const old = ball.position.clone();
+      ball.visible = !!frame?.position; shadow.visible = ball.visible;
+      actor.visible = !!frame?.from && !!frame.event.player_id;
+      recipient.visible = !!frame?.to && frame.event.kind === 'PASS' && frame.event.detail.completed === true && !!frame.event.detail.recipient_id;
+      route.visible = !!frame?.moving; target.visible = !!frame?.moving;
+      if (frame?.position) {
+        const height = frame.moving && frame.event.kind !== 'CARRY' ? Math.sin(Math.PI * frame.progress) * (frame.event.kind === 'SHOT' ? 2.8 : 1.8) : 0;
+        ball.position.copy(fieldPosition(frame.position, .95 + height));
+        if (!eventChanged && frame.progress > 0 && frame.progress < 1) { ball.rotation.z -= (ball.position.x - old.x) / .9; ball.rotation.x += (ball.position.z - old.z) / .9; }
+        shadow.position.copy(fieldPosition(frame.position, .13));
+      }
+      if (frame?.from && frame.to) { actor.position.copy(fieldPosition(frame.event.kind === 'CARRY' ? frame.position! : frame.from, 0)); recipient.position.copy(fieldPosition(frame.to, 0)); }
+      controls.autoRotate = settings.current.motion && !settings.current.topDown && p.events.length === 0; controls.autoRotateSpeed = .18;
+      controls.enableDamping = settings.current.motion && (p.isPlaying || p.events.length === 0);
+      if (controls.autoRotate || controls.enableDamping) controls.update(dt);
+      placeLabel(actorLabel.current, actor, frame ? playerName(frame.event.player_id, p) : '', -10);
+      placeLabel(recipientLabel.current, recipient, frame ? playerName(frame.event.detail.recipient_id, p) : '', 12);
+      if (viewport.current) {
+        const from = frame?.from ? fieldPosition(frame.from) : null, to = frame?.to ? fieldPosition(frame.to) : null;
+        const values: Record<string, string | number> = {
+          'active-event-id': frame?.event.event_id ?? '', 'active-event-kind': frame?.event.kind ?? '', 'active-event-team': frame?.event.team_id ?? '',
+          'active-event-time': frame?.event.event_time_ms ?? '', 'active-event-period': frame?.event.period ?? '', 'active-event-revision': frame?.event.revision ?? 1, 'replay-key': p.replayKey ?? 'stadium',
+          'observed-cutoff-ms': p.playheadMs, 'observed-period': p.period, 'ball-x': ball.position.x.toFixed(6), 'ball-z': ball.position.z.toFixed(6),
+          'ball-visible': String(ball.visible), 'animation-progress': frame?.progress.toFixed(6) ?? '',
+          'route-start-x': from?.x.toFixed(6) ?? '', 'route-start-z': from?.z.toFixed(6) ?? '', 'route-end-x': to?.x.toFixed(6) ?? '', 'route-end-z': to?.z.toFixed(6) ?? '',
+          'queued-events': ctx.playback.queuedCount, 'played-count': ctx.playback.completedCount, 'last-completed-event-id': ctx.playback.lastCompletedId, 'playback-mode': inspected ? 'inspection' : 'live',
+        };
+        for (const [key, value] of Object.entries(values)) viewport.current.setAttribute('data-' + key, String(value));
+      }
+      if (progressBar.current) progressBar.current.style.width = ((frame?.progress ?? 0) * 100) + '%';
+      const nextView = eventKey + ':' + (frame?.progress === 1);
+      if (nextView !== previousView) { previousView = nextView; setView({ event: frame?.event ?? null, inspection: !!inspected, complete: frame?.progress === 1 }); }
+      renderer.render(scene, camera);
     };
-    frame=requestAnimationFrame(render); setWebgl(true);
-    const lost=(e:Event)=>{e.preventDefault();setWebgl(false);};
-    renderer.domElement.addEventListener('webglcontextlost',lost);
-    return()=>{disposed=true;cancelAnimationFrame(frame);observer.disconnect();intersection.disconnect();controls.dispose();container.removeEventListener('pointerdown',down);container.removeEventListener('pointerup',select);renderer.domElement.removeEventListener('webglcontextlost',lost);disposeObject(scene);renderer.dispose();runtime.current=null;renderer.domElement.remove();};
+    animation = requestAnimationFrame(render); setWebgl(true);
+    const lost = (event: Event) => { event.preventDefault(); setWebgl(false); };
+    renderer.domElement.addEventListener('webglcontextlost', lost);
+    return () => {
+      disposed = true; cancelAnimationFrame(animation); observer.disconnect(); intersection.disconnect(); controls.dispose();
+      container.removeEventListener('pointerdown', down); container.removeEventListener('pointerup', selectEvent); renderer.domElement.removeEventListener('webglcontextlost', lost);
+      disposeObject(scene); renderer.dispose(); renderer.domElement.remove(); runtime.current = null;
+    };
   }, []);
-
+  useEffect(() => { runtime.current?.playback.ingest(props.events, props.playheadMs, props.period, props.replayKey ?? 'stadium'); }, [props.events, props.playheadMs, props.period, props.replayKey, webgl]);
+  useEffect(() => { runtime.current?.resetCamera(topDown); }, [topDown]);
   useEffect(() => {
-    const context=runtime.current;if(!context)return;
-    const existing=new Map(context.glyphs.map(g=>[g.event.event_id,g]));
-    while(context.events.children.length){const child=context.events.children[0];context.events.remove(child);disposeObject(child);}
-    context.glyphs=markers.map(marker=>{
-      const glyph=createGlyph(marker,!!props.selectedEventId);glyph.age=existing.get(marker.event.event_id)?.age??(props.selectedEventId?5:0);context.events.add(glyph.root);return glyph;
-    });
-  }, [markers, props.selectedEventId, webgl]);
-
-  useEffect(()=>{runtime.current?.resetCamera(topDown);},[topDown]);
-  useEffect(()=>{
-    const changed=()=>setExpanded(document.fullscreenElement===viewport.current);
-    const close=(event:KeyboardEvent)=>{
-      if(event.key==='Escape'&&document.fullscreenElement===viewport.current){
-        event.preventDefault();void document.exitFullscreen().catch(()=>{});
-      }
-    };
-    document.addEventListener('fullscreenchange',changed);
-    document.addEventListener('keydown',close);
-    return()=>{document.removeEventListener('fullscreenchange',changed);document.removeEventListener('keydown',close);};
-  },[]);
-  const toggleFullscreen=()=>{
-    if(document.fullscreenElement===viewport.current)void document.exitFullscreen();
-    else if(viewport.current?.requestFullscreen)void viewport.current.requestFullscreen().catch(()=>{});
-  };
-
-  const latest=markers.at(-1)?.event;
-  return <div className={`pitch-viewport ${expanded?'pitch-expanded':''}`} ref={viewport} data-testid="pitch-scene" data-stadium-loaded={assetReady}>
-    {!webgl&&<PitchFallback markers={markers}/>}
-    <div className={`pitch-canvas ${webgl?'is-ready':''}`} ref={host}/>
-    <div className="pitch-vignette" aria-hidden="true"/>
-    <div className="pitch-top-label"><span className="pitch-status-dot"/> Schematic event view</div>
+    const changed = () => setExpanded(document.fullscreenElement === viewport.current);
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape' && document.fullscreenElement === viewport.current) { event.preventDefault(); void document.exitFullscreen().catch(() => {}); } };
+    document.addEventListener('fullscreenchange', changed); document.addEventListener('keydown', close);
+    return () => { document.removeEventListener('fullscreenchange', changed); document.removeEventListener('keydown', close); };
+  }, []);
+  const toggleFullscreen = () => { if (document.fullscreenElement === viewport.current) void document.exitFullscreen(); else if (viewport.current?.requestFullscreen) void viewport.current.requestFullscreen().catch(() => {}); };
+  const records = props.events.filter(event => isObserved(event, props.playheadMs) && ['PASS', 'CARRY', 'SHOT', 'TACKLE', 'POSSESSION'].includes(event.kind));
+  const index = records.findIndex(event => event.event_id === (props.selectedEventId ?? view.event?.event_id));
+  const inspectedRecord = selected(props);
+  const fallback = displayEvents(inspectedRecord ? [inspectedRecord] : props.events.filter(event => isObserved(event, props.playheadMs)), props.homeTeamId, props.awayTeamId, props.period, props.playheadMs, props.selectedEventId);
+  const shown = webgl ? view.event : selected(props) ?? fallback.at(-1)?.event ?? null;
+  return <div className={'pitch-viewport ' + (expanded ? 'pitch-expanded' : '')} ref={viewport} data-testid="pitch-scene" data-stadium-loaded={assetReady}>
+    {!webgl && <svg className="pitch-fallback" viewBox="0 0 120 80" role="img" aria-label="Football pitch with recorded event endpoints"><rect x="5" y="5" width="110" height="70" fill="#26713f" /><g stroke="#d7e7cf" strokeWidth=".35" fill="none"><rect x="8" y="8" width="104" height="64" /><path d="M60 8v64" /><circle cx="60" cy="40" r="9" /></g>{fallback.map(({ event, point, start, color }) => <g key={event.event_id} fill={color} stroke={color}>{start && <line x1={8 + start.x * 1.04} y1={8 + start.y * .64} x2={8 + point.x * 1.04} y2={8 + point.y * .64} strokeWidth=".6" />}<circle cx={8 + point.x * 1.04} cy={8 + point.y * .64} r="1.2" /></g>)}</svg>}
+    <div className={'pitch-canvas ' + (webgl ? 'is-ready' : '')} ref={host} /><div className="pitch-vignette" aria-hidden="true" />
+    <span className="pitch-player-label" ref={actorLabel} hidden /><span className="pitch-player-label recipient" ref={recipientLabel} hidden />
+    <div className="pitch-top-label"><span className="pitch-status-dot" />{view.inspection ? 'Recorded event' : 'Event replay'}</div>
     <div className="pitch-view-controls">
-      <button type="button" onClick={()=>setTopDown(!topDown)} aria-pressed={topDown} title="Change pitch camera"><MoveUpRight size={14}/><span>{topDown?'Broadcast':'Top view'}</span></button>
-      <button type="button" onClick={()=>setMotion(!motion)} aria-pressed={motion} title="Toggle event animation"><Waves size={14}/><span>Motion {motion?'on':'off'}</span></button>
-      <button type="button" onClick={()=>runtime.current?.resetCamera(topDown)} title="Reset pitch camera" aria-label="Reset pitch camera"><RotateCcw size={14}/></button>
-      <button type="button" onClick={toggleFullscreen} title={expanded?'Close expanded pitch':'Expand pitch'} aria-label={expanded?'Close expanded pitch':'Expand pitch'} aria-pressed={expanded}><Maximize2 size={14}/></button>
+      <button type="button" onClick={() => setTopDown(!topDown)} aria-pressed={topDown} title="Change pitch camera"><MoveUpRight size={14} /><span>{topDown ? 'Broadcast' : 'Top view'}</span></button>
+      <button type="button" onClick={() => setMotion(!motion)} aria-pressed={motion} title="Toggle event animation"><Waves size={14} /><span>Motion {motion ? 'on' : 'off'}</span></button>
+      <button type="button" onClick={() => runtime.current?.resetCamera(topDown)} aria-label="Reset pitch camera" title="Reset pitch camera"><RotateCcw size={14} /></button>
+      <button type="button" onClick={toggleFullscreen} aria-label={expanded ? 'Close expanded pitch' : 'Expand pitch'} aria-pressed={expanded}><Maximize2 size={14} /></button>
     </div>
-    <div className="pitch-bottom-label"><span><i className="pitch-team-dot home"/>{props.homeTeamId} <i className="pitch-team-dot away"/>{props.awayTeamId}</span><span>{props.period===2?'Second half · ends switched':'First half'}<b>Drag to explore</b></span></div>
-    <p className="pitch-event-equivalent">{latest?`${props.selectedEventId?'Selected':'Latest'}: ${eventLabel(latest)} · ${clock(latest.event_time_ms)}`:'Stadium view · event locations appear during replay'}</p>
+    <div className="pitch-bottom-label"><span><i className="pitch-team-dot home" />{props.homeTeamName ?? props.homeTeamId}<i className="pitch-team-dot away" />{props.awayTeamName ?? props.awayTeamId}</span><span>{(shown?.period ?? props.period) === 2 ? 'Second half · ends switched' : 'First half'}<b>Drag to explore</b></span></div>
+    <div className="pitch-action" data-testid="pitch-action"><div className="pitch-action-copy"><span>{shown ? clock(shown.event_time_ms) + ' · ' + action(shown) : 'Waiting for kick-off'}</span><strong>{shown ? eventTitle(shown, props) : 'Recorded movements appear as play begins'}</strong></div><div className="pitch-event-controls">
+      {props.onSelectEvent && <><button type="button" aria-label="Previous observed event" disabled={index <= 0} onClick={() => props.onSelectEvent!(records[index - 1].event_id)}><ChevronLeft size={15} /></button><button type="button" aria-label="Next observed event" disabled={index < 0 || index >= records.length - 1} onClick={() => props.onSelectEvent!(records[index + 1].event_id)}><ChevronRight size={15} /></button></>}
+      {view.inspection && <button type="button" className="pitch-replay-event" disabled={!motion} onClick={() => { if (previewRunning.current) { previewRunning.current = false; setPreview(false); } else { previewToken.current++; previewRunning.current = true; setPreview(true); } }}><Play size={12} />{preview ? 'Pause event' : 'Replay this event'}</button>}
+    </div><div className="pitch-action-progress" aria-hidden="true"><span ref={progressBar} /></div></div>
   </div>;
 }

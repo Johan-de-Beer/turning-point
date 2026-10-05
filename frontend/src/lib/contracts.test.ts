@@ -24,6 +24,14 @@ describe('versioned runtime network boundary', () => {
     expect(sessionSchema.safeParse({ ...state, snapshot: { ...state.snapshot, generation: 2 } }).success).toBe(false);
     expect(() => validateSessionReferences({ ...state, events: [{ ...event, payload: { ...event.payload!, player_id: 'vale_08' } }] }, match)).toThrow('actor');
   });
+  it('accepts observed shot targets only on shots and keeps older no-target records valid', () => {
+    const shot = { ...event.payload!, kind: 'SHOT', detail: { position: { x: 83, y: 42 }, outcome: 'saved' } };
+    expect(eventSchema.safeParse(shot).success).toBe(true);
+    expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, target: null } }).success).toBe(true);
+    expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, target: { x: 99, y: 51 } } }).success).toBe(true);
+    expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, target: { x: 101, y: 51 } } }).success).toBe(false);
+    expect(eventSchema.safeParse({ ...event.payload!, detail: { ...event.payload!.detail, target: { x: 99, y: 51 } } }).success).toBe(false);
+  });
 });
 
 describe('cutoff-safe replay state', () => {
@@ -49,6 +57,13 @@ describe('cutoff-safe replay state', () => {
     expect(canAcceptState({ ...state, preferences_version: 2 }, state)).toBe(false);
     expect(canAcceptState(state, { ...state, playhead_ms: 179999 })).toBe(false);
     expect(canAcceptState(state, { ...state, generation: 2, playhead_ms: 0 })).toBe(true);
+  });
+  it('rejects a transport cursor rollback at the same match clock', () => {
+    const delivered = { ...state, last_delivery_seq: 12 };
+    expect(canAcceptState(delivered, { ...state, last_delivery_seq: 11 })).toBe(false);
+    expect(canAcceptState(delivered, { ...state, last_delivery_seq: 12 })).toBe(true);
+    expect(canAcceptState(delivered, { ...state, last_delivery_seq: 13 })).toBe(true);
+    expect(canAcceptState({ ...state, observed_high_water_ms: 180000 }, { ...state, observed_high_water_ms: 179000 })).toBe(false);
   });
   it('enforces strict overlay expiry and every session/presentation version', () => {
     const overlay: Overlay = { overlay_id: 'overlay_a', insight_id: null, session_id: state.session_id, generation: 1, data_epoch: 1, mode: 'casual', language: 'en', valid_from_ms: 180000, valid_until_ms: 270000, priority: 50, display: { headline: 'Observed window', subline: 'Synthetic test' }, fact_ids: [], status: 'active' };
