@@ -1,0 +1,5 @@
+# Optional; the default mock environment never imports or activates these.
+-r requirements.txt
+azure-ai-projects==2.7.0
+azure-identity==1.26.0
+openai==3.24.0

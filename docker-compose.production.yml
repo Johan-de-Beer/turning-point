@@ -1,0 +1,101 @@
+name: turning-point
+services:
+  backend:
+    image: turning-point-backend:${RELEASE_TAG:-local}
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      PUBLIC_DEMO: "true"
+      PROVIDER: mock
+      MICROSOFT_INFERENCE_APPROVED: "false"
+      MICROSOFT_MAX_CALLS: "0"
+      DATABASE_PATH: /data/turning-point.sqlite3
+      ALLOWED_ORIGINS: https://football.thedebeer.co.za
+      ALLOWED_HOSTS: football.thedebeer.co.za,localhost,127.0.0.1,backend
+      TRUSTED_PROXY_NETWORKS: 10.203.77.2/32
+      MAX_SESSIONS: "32"
+      MAX_PLAYING_SESSIONS: "4"
+      SESSION_IDLE_SECONDS: "1800"
+      SESSION_MAX_AGE_SECONDS: "21600"
+      SESSION_READY_SECONDS: "120"
+      SESSION_ENDED_SECONDS: "900"
+      DISCONNECTED_PAUSE_SECONDS: "30"
+      IDEMPOTENCY_TTL_SECONDS: "3600"
+      MAX_IDEMPOTENCY_ENTRIES: "2048"
+      MAX_IDEMPOTENCY_PER_SCOPE: "64"
+      MODEL_TIMEOUT_SECONDS: "3"
+      MOCK_FAILURE: none
+      FIXTURE_CORRECTION: "0"
+    command: ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--no-access-log", "--no-proxy-headers", "--limit-concurrency", "64", "--timeout-keep-alive", "5", "--h11-max-incomplete-event-size", "16384"]
+    volumes:
+      - replay-data:/data
+    networks:
+      replay:
+        ipv4_address: 10.203.77.3
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    cpus: "1.0"
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: "2"}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 15s
+  frontend:
+    image: turning-point-frontend:${RELEASE_TAG:-local}
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.production.Dockerfile
+    ports:
+      - "${APP_BIND_IP:-192.168.10.58}:${APP_PORT:-5177}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      replay:
+        ipv4_address: 10.203.77.2
+      ingress:
+        ipv4_address: 10.203.78.2
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    cpus: "0.5"
+    mem_limit: 128m
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: "2"}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
+networks:
+  replay:
+    name: turning-point-private
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.203.77.0/28
+  ingress:
+    name: turning-point-ingress
+    ipam:
+      config:
+        - subnet: 10.203.78.0/28
+volumes:
+  replay-data:
+    name: turning-point-replay-data

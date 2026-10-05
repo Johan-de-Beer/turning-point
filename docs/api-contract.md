@@ -1,0 +1,15 @@
+# Contract v1.0 — integration contract
+
+Backend Pydantic models are authoritative. Frontend mirrors response schemas with runtime validation. All session data responses include `session_id`, `generation`, `data_epoch`, `playhead_ms`, and `next_cursor`. FastAPI `/docs` and exported JSON Schema provide executable detail.
+
+Metadata `GET /api/matches`: `{matches: [{match_id, schema_version, provenance, home:{team_id,display_name,short_name,color}, away:{...}, roster:[{player_id,team_id,display_name,shirt_number,position}], period_lengths_ms:[2700000,2700000]}]}`.
+
+`POST /api/sessions`: Bearer browser-generated capability and Idempotency-Key. Body `{match_id,preferences:{mode,favorite_team_id,favorite_player_id,language,pause_on_insight},speed}`. Returns initial state. Only `casual|analyst`, `en`, speeds `1|12|60`.
+
+State routes `GET /api/sessions/{id}/state` and `/updates?cursor=...` return authoritative current state: identity/version keys, `status`, `period`, `speed`, `preferences_version`, `preferences`, `score` keyed by team_id, `events` (observed envelopes), `snapshot`, `insights`, `overlay`, `recaps`, `player_stats`, `diagnostics`. Snapshot contains window, coverage, team_metrics keyed by team_id, baseline or null, evidence_refs. Insights contain facts, observed_window, limitations, status, variants keyed by mode, interpretation and anchor_snapshot_id. Envelope payload uses discriminated event kind with kind-specific detail, not text positions.
+
+`/state` returns the canonical observed event prefix, including retained deletion envelopes. With a valid cursor, `/updates` returns only event envelopes delivered since that cursor; all other state fields remain authoritative current values. Merge envelopes by `event_id`, accepting only higher revisions, and retain tombstones to prevent older data from resurfacing. Replace the event cache when the generation changes or `resync_required` is true. A malformed, expired, or differently bound cursor triggers a cutoff-safe full resync. Cursors are opaque and signed, bound to session and generation; they do not permit changing the replay cutoff.
+
+`POST .../controls`: `{action:play|pause|continue_half|restart|set_speed,expected_generation,speed?}`, Idempotency-Key. `PATCH .../preferences`: preference fields and expected_preferences_version. Both return state. `GET .../insights/{insight_id}/evidence` returns snapshot/conditions/facts/supporting event envelopes. `GET .../recaps/{half_time|full_time}` returns locked/pending/ready/corrected recap. `GET .../overlay` returns currently eligible overlay or explicit empty status.
+
+Errors `{code,message,retryable,correlation_id}`. Wrong/missing capability uniformly 404, conflicts 409, invalid input 422. No arbitrary cutoff, public ingestion or future seek endpoint. Coordinates 0–100, team relative; display flips away in period 1 and home in period 2. HALF begins period 2 only after Continue despite shared boundary timestamps.
