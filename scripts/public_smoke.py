@@ -23,7 +23,7 @@ class SNITransport(httpx.HTTPTransport):
         return super().handle_request(request)
 
 
-def run(base_url: str, connect_ip: str | None) -> dict:
+def run(base_url: str, connect_ip: str | None, routing_only: bool = False) -> dict:
     target = urlsplit(base_url)
     assert target.scheme == "https", "Public smoke requires HTTPS"
     endpoint = urlunsplit((target.scheme, connect_ip, target.path, "", "")) if connect_ip else base_url
@@ -60,6 +60,12 @@ def run(base_url: str, connect_ip: str | None) -> dict:
         assert oversize.status_code == 413
         checks.append("safe fixture metadata, foreign-origin rejection, bounded request body")
 
+        if routing_only:
+            return {"status": "passed", "base_url": base_url, "connection_override": connect_ip,
+                "checks": checks, "http_requests": len(durations),
+                "mean_http_ms": round(sum(durations) / len(durations), 2), "max_http_ms": round(max(durations), 2),
+                "scope": "HTTPS/SNI routing, headers and public request bounds; business replay checked separately"}
+
         capability_a, capability_b = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
         owner_a, owner_b = {"Authorization": f"Bearer {capability_a}"}, {"Authorization": f"Bearer {capability_b}"}
         payload = {"match_id": match["match_id"], "preferences": {"mode": "casual"}, "speed": 60}
@@ -74,12 +80,12 @@ def run(base_url: str, connect_ip: str | None) -> dict:
         path_a, path_b = f'/api/sessions/{a["session_id"]}', f'/api/sessions/{b["session_id"]}'
         assert call("GET", path_a + "/state", headers=owner_b).status_code == 404
         assert call("GET", path_a + "/state").status_code == 404
-        played = call("POST", path_a + "/controls", headers=owner_a, json={"action": "play", "expected_generation": a["generation"]})
+        played = call("POST", path_a + "/controls", headers={**owner_a, "Idempotency-Key": secrets.token_urlsafe(20)}, json={"action": "play", "expected_generation": a["generation"]})
         assert played.status_code == 200
         time.sleep(.3)
         advanced = call("GET", path_a + "/state", headers=owner_a).json()
         assert advanced["playhead_ms"] > 0
-        paused = call("POST", path_a + "/controls", headers=owner_a, json={"action": "pause", "expected_generation": a["generation"]})
+        paused = call("POST", path_a + "/controls", headers={**owner_a, "Idempotency-Key": secrets.token_urlsafe(20)}, json={"action": "pause", "expected_generation": a["generation"]})
         assert paused.status_code == 200
         still_b = call("GET", path_b + "/state", headers=owner_b).json()
         assert still_b["playhead_ms"] == 0
@@ -96,8 +102,9 @@ if __name__ == "__main__":
     parser.add_argument("--base-url", default="https://football.thedebeer.co.za")
     parser.add_argument("--connect-ip")
     parser.add_argument("--output", default=".runtime/public-smoke.json")
+    parser.add_argument("--routing-only", action="store_true")
     args = parser.parse_args()
-    result = run(args.base_url, args.connect_ip)
+    result = run(args.base_url, args.connect_ip, args.routing_only)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2), encoding="utf-8")

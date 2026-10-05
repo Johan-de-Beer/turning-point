@@ -1,8 +1,12 @@
 # Turning Point
 
+[Live demo](https://football.thedebeer.co.za/) · [Public source on Johan de Beer's personal profile](https://github.com/Johan-de-Beer/turning-point)
+
 A second screen for a fictional football match. A deterministic replay engine measures observed events; separate Football Analyst and Evidence Editor roles turn verified facts into explanations. React + TypeScript presents an interactive Blender stadium, animated observed event diagrams, the score, evidence, personalization, timed overlay JSON, and marker-gated recaps.
 
-The default provider is a deterministic mock. It needs no account and makes no model calls. The optional Microsoft Foundry adapter stays disabled until existing resources, authentication, and a cost limit are explicitly approved. Public mock hosting at `football.thedebeer.co.za` and a personal GitHub repository are authorized; [deployment](docs/deployment.md) and [verification](docs/verification.md) record their actual status. Competition submission remains separate work.
+The default provider is a deterministic mock. It needs no account and makes no model calls. The optional Microsoft Foundry adapter stays disabled until existing resources, authentication, and a cost limit are explicitly approved. The public mock demo runs behind NGINX Proxy Manager with trusted HTTPS, a private backend network and bounded replay capacity. [Deployment](docs/deployment.md) and [verification](docs/verification.md) record its configuration and measured checks. Competition submission remains separate work.
+
+The interface gives the pitch a wide broadcast view with a short match story alongside it. The original Blender stadium has a seating bowl, canopies, crowds, floodlights and LED boards. Recorded passes reveal animated arrows; shots flash at their observed locations. Drag the view, switch to Top view, reset the camera or expand it to fullscreen. Motion can be disabled, and reduced-motion preferences are respected. The editable Blender source and regeneration script are included.
 
 ## Run on Windows
 

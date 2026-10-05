@@ -14,6 +14,7 @@ if (connectIP && !/^\d{1,3}(\.\d{1,3}){3}$/.test(connectIP)) throw new Error('TP
 const browserArgs = ['--enable-unsafe-swiftshader', ...(connectIP ? [`--host-resolver-rules=MAP ${new URL(baseURL).hostname} ${connectIP}`] : [])];
 const resultName = publicRun ? 'browser-qa-public' : 'browser-qa';
 const quick = process.argv.includes('--quick');
+const captureZoom = process.argv.includes('--capture-zoom');
 await fs.mkdir(output, { recursive: true });
 await fs.mkdir(path.join(root, '.runtime'), { recursive: true });
 let browser;
@@ -23,6 +24,8 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1000
 const page = await context.newPage();
 const pageErrors = [];
 const responseErrors = [];
+const navigationBodyEvictions = [];
+let navigationInProgress = false;
 const checks = [];
 const screenshots = [];
 const patterns = new Set();
@@ -70,21 +73,67 @@ page.on('response', (response) => {
         for (const envelope of data.events) assert(envelope.available_at_ms <= data.playhead_ms, 'Future evidence record');
       }
       if (response.status() >= 400) responseErrors.push(`${response.status()} ${new URL(response.url()).pathname}: ${data.code ?? 'unknown'}`);
-    } catch (error) { responseErrors.push(error.message); }
+    } catch (error) {
+      if (navigationInProgress && error.message.includes('response that was navigated away from')) {
+        navigationBodyEvictions.push('Chromium discarded an in-flight response body during the intentional reload; successor state is checked');
+      } else responseErrors.push(error.message);
+    }
   })();
   pendingResponses.add(promise);
   promise.finally(() => pendingResponses.delete(promise));
 });
 
-async function shot(name) {
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.screenshot({ path: path.join(output, name), fullPage: true, animations: 'disabled' });
+async function shot(name, targetPage = page) {
+  // The renderer sleeps outside the viewport. Full-page CDP capture does not
+  // scroll each section, so wake the actual pitch before taking the image.
+  const scene = targetPage.getByTestId('pitch-scene');
+  if (await scene.count()) {
+    await scene.scrollIntoViewIfNeeded();
+    await targetPage.waitForTimeout(300);
+    await targetPage.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  }
+  await targetPage.screenshot({ path: path.join(output, name), fullPage: true, animations: 'disabled' });
   screenshots.push(name);
 }
 
-async function noOverflow() {
-  const dimensions = await page.evaluate(() => ({ width: innerWidth, body: document.documentElement.scrollWidth }));
+async function noOverflow(targetPage = page) {
+  const dimensions = await targetPage.evaluate(() => ({ width: innerWidth, body: document.documentElement.scrollWidth }));
   assert(dimensions.body <= dimensions.width + 1, `Page overflows horizontally: ${dimensions.body}/${dimensions.width}`);
+}
+
+async function emulate200PercentLayout() {
+  // A 1440x1000 physical display at 200% gives 720x500 CSS pixels.
+  // This tests that reflow explicitly; it does not claim browser UI zoom.
+  const zoomContext = await browser.newContext({
+    viewport: { width: 720, height: 500 }, deviceScaleFactor: 2,
+    storageState: await context.storageState(),
+  });
+  // Session capabilities deliberately live in tab sessionStorage. Transfer
+  // them only in memory to the QA tab; never write auth state to a file.
+  const sessionEntries = await page.evaluate(() => Object.entries(sessionStorage));
+  await zoomContext.addInitScript(({ origin, entries }) => {
+    if (location.origin === origin) for (const [key, value] of entries) sessionStorage.setItem(key, value);
+  }, { origin: new URL(baseURL).origin, entries: sessionEntries });
+  try {
+    const zoomPage = await zoomContext.newPage();
+    zoomPage.on('pageerror', (error) => pageErrors.push(`Zoom context: ${error.message}`));
+    await zoomPage.goto(baseURL, { waitUntil: 'domcontentloaded' });
+    await expect(zoomPage.getByRole('button', { name: 'Play replay', exact: true })).toBeVisible();
+    await expect(zoomPage.getByTestId('pitch-scene')).toHaveAttribute('data-stadium-loaded', 'true', { timeout: 20_000 });
+    assert.equal(await zoomPage.evaluate(() => innerWidth), 720);
+    assert.equal(await zoomPage.evaluate(() => devicePixelRatio), 2);
+    assert(await zoomPage.evaluate(() => matchMedia('(max-width: 960px)').matches), 'Responsive zoom media query');
+    await expect(zoomPage.locator('.insight-explanation')).toBeVisible();
+    assert.equal(await zoomPage.locator('.insight-explanation').evaluate((element) => getComputedStyle(element).fontSize), '16px');
+    await noOverflow(zoomPage);
+    await expect(zoomPage.locator('.metric-values')).toHaveCount(4);
+    const valuesDoNotOverlap = await zoomPage.locator('.metric-values').evaluateAll((rows) => rows.every((row) => {
+      const values = [...row.querySelectorAll('strong')].map((value) => value.getBoundingClientRect());
+      return values.length < 2 || values[0].right <= values[1].left;
+    }));
+    assert(valuesDoNotOverlap, 'Metric values overlap at emulated 200% layout');
+    await shot('desktop-1440-200-percent.png', zoomPage);
+  } finally { await zoomContext.close(); }
 }
 
 async function waitState(predicate, description, timeout = 60_000) {
@@ -99,7 +148,7 @@ function composedPixelDifference(first, second) {
 
 try {
   console.log('Browser QA: loading start screen');
-  await page.goto(baseURL, { waitUntil: 'networkidle' });
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('button', { name: 'Start replay', exact: true })).toBeVisible();
   await expect(page.getByTestId('pitch-scene')).toHaveAttribute('data-stadium-loaded', 'true', { timeout: 20_000 });
   await noOverflow();
@@ -127,6 +176,20 @@ try {
   assert(latestState.overlay, 'Pause-on-insight should preserve eligible overlay');
   await shot('desktop-1440-match.png');
   checks.push('Start -> 60x server replay -> reviewed insight -> pause-on-insight');
+  if (captureZoom) {
+    await emulate200PercentLayout();
+    await Promise.all([...pendingResponses]);
+    assert.deepEqual(pageErrors, []);
+    assert.deepEqual(responseErrors, []);
+    const result = { status: 'passed', base_url: baseURL, css_viewport: '720x500', device_pixel_ratio: 2,
+      scope: 'Emulated 200% layout on a 1440x1000 physical display; not native browser UI zoom',
+      checks: ['No horizontal page overflow', 'Percentage metric values do not overlap', 'Core insight prose is 16px'],
+      api_responses_checked: responseCount, page_errors: pageErrors, response_errors: responseErrors };
+    await fs.writeFile(path.join(root, '.runtime', `${resultName}-zoom.json`), JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(result, null, 2));
+    await browser.close();
+    process.exit(0);
+  }
   const pitch = page.getByTestId('pitch-scene');
   const canvas = pitch.locator('canvas');
   await pitch.getByRole('button', { name: 'Motion on', exact: true }).click();
@@ -225,28 +288,38 @@ try {
     assert.equal(await page.locator('.insight-explanation').evaluate((element) => getComputedStyle(element).fontSize), '16px', `Core explanation at ${width}px`);
     await noOverflow();
     await shot(`${width === 360 ? 'mobile' : 'tablet'}-${width}-match.png`);
+    if (width === 360) {
+      await pitch.scrollIntoViewIfNeeded();
+      await expect(pitch).toHaveAttribute('data-stadium-loaded', 'true');
+      await page.waitForTimeout(300);
+      await pitch.screenshot({ path: path.join(output, 'mobile-360-pitch.png'), animations: 'disabled' });
+      screenshots.push('mobile-360-pitch.png');
+    }
   }
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches));
   await expect(pitch.getByRole('button', { name: 'Motion off', exact: true })).toHaveAttribute('aria-pressed', 'false');
   await shot('mobile-360-reduced-motion.png');
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.evaluate(() => { document.body.style.zoom = '2'; });
-  await noOverflow();
-  await shot('desktop-1440-200-percent.png');
-  await page.evaluate(() => { document.body.style.zoom = ''; });
-  checks.push('1440/768/360px layouts have no page horizontal overflow; reduced-motion preference; 200% zoom layout');
+  await emulate200PercentLayout();
+  checks.push('1440/768/360px layouts have no page horizontal overflow; reduced-motion preference; emulated 200% layout at 720 CSS pixels/2x device pixels');
 
   const sessionBeforeReload = latestState.session_id;
-  await page.reload({ waitUntil: 'networkidle' });
+  navigationInProgress = true;
+  await Promise.all([...pendingResponses]);
+  latestState = null;
+  // Replay polling can keep a public connection busy indefinitely. Wait for
+  // the document and authoritative reconnected state, not network silence.
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await waitState((state) => state.session_id === sessionBeforeReload && state.status === 'paused', 'Reconnect same session');
+  navigationInProgress = false;
   await expect(page.getByRole('button', { name: 'Play replay', exact: true })).toBeVisible();
   if (quick) {
     await Promise.all([...pendingResponses]);
     assert.deepEqual(pageErrors, []);
     assert.deepEqual(responseErrors, []);
     checks.push('Core insight explanation computes to 16px; same-session reconnect stays paused');
-    const result = { status: 'passed', base_url: baseURL, checks, screenshots, paused_framebuffer: pausedFramebuffer, core_prose_font_size: insightFontSize, api_responses_checked: responseCount, page_errors: pageErrors, response_errors: responseErrors, scope: 'Quick browser regression after visual refinement; original complete replay result retained separately' };
+    const result = { status: 'passed', base_url: baseURL, checks, screenshots, paused_framebuffer: pausedFramebuffer, core_prose_font_size: insightFontSize, api_responses_checked: responseCount, navigation_body_evictions: navigationBodyEvictions, page_errors: pageErrors, response_errors: responseErrors, scope: 'Quick browser regression after visual refinement; original complete replay result retained separately' };
     await fs.writeFile(path.join(root, '.runtime', `${resultName}-quick.json`), JSON.stringify(result, null, 2));
     console.log(JSON.stringify(result, null, 2));
     await browser.close();
@@ -283,11 +356,11 @@ try {
   assert.deepEqual(pageErrors, [], 'Browser uncaught errors');
   assert.deepEqual(responseErrors, [], 'Network/cutoff failures');
   checks.push('Complete working replay confirms all three patterns; fulltime recap unlocks only after final marker; no eligible overlay after end');
-  const result = { status: 'passed', browser: browser.browserType().name(), base_url: baseURL, connection_override: connectIP ?? null, checks, screenshots, paused_framebuffer: pausedFramebuffer, core_prose_font_size: insightFontSize, observed_patterns: [...patterns], api_responses_checked: responseCount, page_errors: pageErrors, response_errors: responseErrors, scope: `${publicRun ? 'HTTPS public-serving' : 'Local'} mock browser integration; automated responsive checks and screenshots; human visual/accessibility review remains separate` };
+  const result = { status: 'passed', browser: browser.browserType().name(), base_url: baseURL, connection_override: connectIP ?? null, checks, screenshots, paused_framebuffer: pausedFramebuffer, core_prose_font_size: insightFontSize, observed_patterns: [...patterns], api_responses_checked: responseCount, navigation_body_evictions: navigationBodyEvictions, page_errors: pageErrors, response_errors: responseErrors, scope: `${publicRun ? 'HTTPS public-serving' : 'Local'} mock browser integration; automated responsive checks and screenshots; human visual/accessibility review remains separate` };
   await fs.writeFile(path.join(root, '.runtime', `${resultName}.json`), JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result, null, 2));
 } catch (error) {
   await shot('browser-qa-failure.png').catch(() => {});
-  await fs.writeFile(path.join(root, '.runtime', `${resultName}-failure.json`), JSON.stringify({ status: 'failed', error: error.message, checks, screenshots, page_errors: pageErrors, response_errors: responseErrors, last_cutoff: latestState?.playhead_ms }, null, 2));
+  await fs.writeFile(path.join(root, '.runtime', `${resultName}-failure.json`), JSON.stringify({ status: 'failed', error: error.message, checks, screenshots, api_responses_checked: responseCount, navigation_body_evictions: navigationBodyEvictions, observed_patterns: [...patterns], page_errors: pageErrors, response_errors: responseErrors, last_cutoff: latestState?.playhead_ms }, null, 2));
   throw error;
 } finally { await browser.close(); }
