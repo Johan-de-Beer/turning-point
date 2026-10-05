@@ -31,3 +31,16 @@ Screenshots are saved under `docs/screenshots/` at desktop 1440px, tablet 768px 
 Generated result JSON and delivered-event samples remain in ignored `.runtime/` and exclude capabilities. Small HTTP timings do not establish a one-second UI guarantee, a 90-second visual completion guarantee at 60×, or production load capacity. Playing polls are around 450 ms; rendered action queues may trail that server clock, especially under software WebGL. The public fixture does not inject corrections: revision/retraction handling is covered by backend/frontend tests rather than claimed from this ordinary public replay. Real provider latency is separate. The web crawler could not access the domain; no crawler success is claimed. Trusted normal-DNS HTTPS and the independently executed external workflow are current evidence.
 
 Full manual accessibility and football-expert review, clean Windows machine setup, live Microsoft inference, and competition submission remain unverified. Generated football plausibility is not expert validation. Clean Ubuntu CI does not establish clean Windows installation. No model calls or competition submission were performed.
+
+## Analysis-desk refresh branch (`claude/ui-ux-modernize-2bw8t3`, 5 October 2026)
+
+Checked in a Linux cloud container (Python 3.11.15, Node 22.22.0, headless Chromium 141 with software WebGL), not the Windows development host above. The deployed public demo is unchanged by this branch.
+
+| Check | Result |
+| --- | --- |
+| Backend tests | PASS: 88 tests (backend code unchanged on this branch). |
+| Frontend tests/typecheck/build | PASS: **53 tests / 8 files**. New: player-focused feed and essential-context rules, casual fact cues, timeline markers, and a WCAG contrast test that reads the real `:root` tokens from `styles.css`. Build splits the WebGL stadium into its own chunk: main `index` JS 406 kB / 121 kB gzip (was 1,054 kB / 285 kB), `PitchScene` 662 kB / 168 kB gzip loaded after first paint. |
+| Client no-spoiler audit | PASS: 5 built text artifacts, no private fixture fields, paths or event IDs. |
+| Local browser replay | PASS: `scripts/browser-qa.mjs` complete real-clock 60× replay,  187 API responses, zero page/response errors, all three patterns, half/full boundaries, locked recaps, evidence/overlay/personalization, reduced motion, 768/360px no-overflow and emulated 200% reflow. Screenshots in `docs/screenshots/` were regenerated from this run. One check was observed but not enforced in this container: the first live-frame pixel-difference assertion returned zero changed pixels under headless software WebGL. It fails identically on unmodified `main` in the same container, so it is recorded as an environment limitation, not a pass; it should be rerun on the Windows host. |
+
+Full-page screenshots of a page with a sticky header can show the header painted part-way down the image; that is a capture artefact of Chromium full-page mode, not the live layout.

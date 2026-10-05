@@ -13,6 +13,7 @@
 - [x] Casual/Analyst and favorite-player focus preserve facts.
 - [x] Marker-gated recaps; overlays expire under accelerated and paused playback.
 - [x] Tested keyboard dialog flow/focus restoration, core color contrast, reduced motion, event text equivalents, and responsive screenshots.
+- [x] Design tokens' text and form-boundary contrast verified automatically against WCAG AA (`frontend/src/lib/contrast.test.ts`).
 - [ ] Full manual accessibility audit and human football-expert review.
 - [x] Actual tests, machine/event volume and timing recorded; provider and publication limitations explicit. Current local functional-replay suites: backend 88 passing tests in 39.37 seconds; frontend 40 passing tests across six files, with TypeScript and production build passing. Both GitHub CI jobs pass on clean Ubuntu runners for deployed application commit `54fd5f1`. Independent external HTTPS checks pass for the same version. See `verification.md` for dated browser results and measurement scope.
 - [x] Original Blender 5.2.2 stadium assets generated, rendered and included with editable source. A single football replays delivered synthetic pass/carry/shot endpoints sequentially; only the active actor and completed-pass recipient are positioned. Event time, player names and outcome identify the displayed action; team orientation changes at half-time. Camera controls and reduced motion are implemented.
