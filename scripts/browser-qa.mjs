@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'docs', 'screenshots');
@@ -90,37 +91,10 @@ async function waitState(predicate, description, timeout = 60_000) {
   await expect.poll(() => !!latestState && predicate(latestState), { timeout, message: description }).toBeTruthy();
 }
 
-async function stationaryFramebuffer(canvas) {
-  return canvas.evaluate(async (element) => {
-    const gl = element.getContext('webgl2');
-    if (!gl) throw new Error('Expected the loaded WebGL2 stadium');
-    const read = async () => {
-      for (let attempt = 0; attempt < 40; attempt++) {
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-        const pixels = new Uint8Array(element.width * element.height * 4);
-        gl.readPixels(0, 0, element.width, element.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-        // The renderer does not preserve its buffer after browser composition;
-        // sample a freshly rendered opaque frame, never the cleared buffer.
-        if (pixels[3] === 255) return pixels;
-      }
-      throw new Error('Could not sample the rendered framebuffer');
-    };
-    const first = await read();
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    const second = await read();
-    let changedPixels = 0, maxChannelDelta = 0;
-    for (let index = 0; index < first.length; index += 4) {
-      let changed = false;
-      for (let channel = 0; channel < 3; channel++) {
-        const delta = Math.abs(first[index + channel] - second[index + channel]);
-        maxChannelDelta = Math.max(maxChannelDelta, delta);
-        changed ||= delta !== 0;
-      }
-      if (changed) changedPixels++;
-    }
-    return { width: element.width, height: element.height, changed_pixels: changedPixels,
-      changed_percent: changedPixels / (element.width * element.height) * 100, max_channel_delta: maxChannelDelta };
-  });
+function composedPixelDifference(first, second) {
+  const output = execFileSync(process.env.TP_IMAGE_PYTHON ?? 'python',
+    [path.join(root, 'scripts', 'compare_rendered_frames.py'), first, second], { encoding: 'utf8' });
+  return JSON.parse(output);
 }
 
 try {
@@ -139,7 +113,10 @@ try {
   const liveFrameA = await liveCanvas.screenshot();
   await page.waitForTimeout(250);
   const liveFrameB = await liveCanvas.screenshot();
-  assert(!liveFrameA.equals(liveFrameB), 'Playing observed graphics must visibly change');
+  await fs.writeFile(path.join(root, '.runtime', 'pitch-live-a.png'), liveFrameA);
+  await fs.writeFile(path.join(root, '.runtime', 'pitch-live-b.png'), liveFrameB);
+  const livePixels = composedPixelDifference(path.join(root, '.runtime', 'pitch-live-a.png'), path.join(root, '.runtime', 'pitch-live-b.png'));
+  assert(livePixels.max_channel_delta > 2 || livePixels.changed_percent > .05, 'Playing observed graphics must visibly change');
   await waitState((state) => state.insights.some((insight) => insight.status === 'ready'), 'First evidence-backed insight', 30_000);
   await waitState((state) => state.status === 'paused', 'Pause on insight');
   await expect(page.getByRole('button', { name: 'Why this insight?', exact: true })).toBeVisible();
@@ -161,10 +138,10 @@ try {
   const pausedFrameB = await canvas.screenshot();
   await fs.writeFile(path.join(root, '.runtime', 'pitch-paused-a.png'), pausedFrameA);
   await fs.writeFile(path.join(root, '.runtime', 'pitch-paused-b.png'), pausedFrameB);
-  const pausedFramebuffer = await stationaryFramebuffer(canvas);
+  const pausedFramebuffer = composedPixelDifference(path.join(root, '.runtime', 'pitch-paused-a.png'), path.join(root, '.runtime', 'pitch-paused-b.png'));
   assert(pausedFramebuffer.max_channel_delta <= 2 && pausedFramebuffer.changed_percent <= .05,
     `Paused motion-off stadium has visible motion: ${JSON.stringify(pausedFramebuffer)}`);
-  await fs.writeFile(path.join(root, '.runtime', 'pitch-paused-measurement.json'), JSON.stringify(pausedFramebuffer, null, 2));
+  await fs.writeFile(path.join(root, '.runtime', 'pitch-paused-measurement.json'), JSON.stringify({ live: livePixels, paused: pausedFramebuffer, method: 'Browser-composed PNG pixels; tolerate <=0.05% changed pixels and <=2/255 channel delta when paused' }, null, 2));
   await pitch.getByRole('button', { name: 'Top view', exact: true }).click();
   await expect(pitch.getByRole('button', { name: 'Broadcast', exact: true })).toHaveAttribute('aria-pressed', 'true');
   const topFrame = await canvas.screenshot();

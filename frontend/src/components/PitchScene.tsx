@@ -150,7 +150,10 @@ export function PitchScene(props: PitchSceneProps) {
       controls.autoRotate=settings.current.motion&&!settings.current.topDown&&context.glyphs.length===0&&current.current.events.length===0;
       controls.autoRotateSpeed=.18;
       controls.enableDamping=settings.current.motion&&(current.current.isPlaying||current.current.events.length===0);
-      controls.update(dt); renderer.render(scene,camera);
+      // Pointer and reset handlers update the camera directly. Avoid recomputing
+      // its matrices on frozen frames, which can jitter antialiased shadow edges.
+      if(controls.autoRotate||controls.enableDamping)controls.update(dt);
+      renderer.render(scene,camera);
     };
     frame=requestAnimationFrame(render); setWebgl(true);
     const lost=(e:Event)=>{e.preventDefault();setWebgl(false);};
