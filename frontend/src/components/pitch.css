@@ -13,6 +13,7 @@
 @media(prefers-reduced-motion:reduce){.pitch-canvas{transition:none}}
 
 .pitch-bottom-label{bottom:82px}
+.pitch-bottom-label>span:first-child{padding:4px 6px;border-radius:3px;background:#08161eeb;border:1px solid #ffffff20;color:#d3e1e7}
 .pitch-player-label{position:absolute;z-index:2;pointer-events:none;transform:translate(-50%,-100%);padding:3px 6px;border-radius:3px;background:#08161ee8;color:#f2f2ec;font-size:10px;white-space:nowrap;border:1px solid #ffffff33;max-width:160px;overflow:hidden;text-overflow:ellipsis}
 .pitch-player-label[hidden]{display:none}
 .pitch-action{position:absolute;bottom:12px;left:14px;right:14px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:54px;padding:9px 12px 12px;background:#0b1823ed;border:1px solid #ffffff20;border-radius:3px}
