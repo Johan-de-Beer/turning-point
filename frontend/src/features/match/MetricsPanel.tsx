@@ -17,8 +17,8 @@ export function MetricsPanel({ state, match }: { state: Session; match: Match })
   const coverage = state.snapshot.coverage;
   return <section className="panel metrics-panel" id="metrics" aria-labelledby="metrics-title" style={{ '--home': match.home.color, '--away': match.away.color } as CSSProperties}>
     <div className="section-heading">
-      <div><span className="eyebrow">Match numbers</span><h2 id="metrics-title">Last three minutes</h2></div>
-      <span className="window-tag">{windowLabel(state.snapshot.window)}</span>
+      <h2 id="metrics-title">Match numbers</h2>
+      <span className="section-count">Last three minutes · {windowLabel(state.snapshot.window)}</span>
     </div>
     <div className="metric-legend"><span><i className="legend-home" aria-hidden="true" />{match.home.short_name}</span><span>{match.away.short_name}<i className="legend-away" aria-hidden="true" /></span></div>
     <dl className="metric-rows">{rows.map((row) => {
@@ -43,7 +43,7 @@ export function MetricsPanel({ state, match }: { state: Session; match: Match })
       <div><span>Unknown state</span><strong>{Math.round(coverage.unknown_state_ms / 1000)}s</strong></div>
     </div>}
     <div className="metric-footnote">
-      <span className={`coverage-chip ${coverage.eligible ? 'is-ok' : ''}`}>{coverage.eligible ? 'Complete observed window' : humanize(coverage.status)}</span>
+      <span className={`coverage-note ${coverage.eligible ? 'is-ok' : ''}`}>{coverage.eligible ? 'Complete observed window' : humanize(coverage.status)}</span>
       {analyst && <span>{state.snapshot.baseline ? `${match.home.short_name} shots ${relativeDelta(home.shots, state.snapshot.baseline.team_metrics[match.home.team_id]?.shots)}` : 'Prior window unavailable'}</span>}
     </div>
   </section>;

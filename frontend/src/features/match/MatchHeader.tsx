@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Info, Layers3, LoaderCircle, Pause, Play, RotateCcw, Settings2, ShieldCheck, UsersRound, Workflow } from 'lucide-react';
-import { Brand, TeamMark } from '../../components/Brand';
+import { LoaderCircle, Pause, Play, RotateCcw, Settings2, ShieldCheck, Workflow } from 'lucide-react';
+import { Brand } from '../../components/Brand';
 import { patternLabel } from '../../components/EventDescription';
 import type { Match, Session } from '../../lib/contracts';
 import { HALF_MS, MATCH_MS, percentOfMatch, teamFor, timelineMarkers } from '../../lib/events';
@@ -16,18 +16,29 @@ function statusLabel(state: Session): string {
   return humanize(state.status);
 }
 
+/** Broadcast abbreviation for the clock box: 1H, 2H, HT, FT. */
+function statusShort(state: Session): string {
+  if (state.status === 'half_time') return 'HT';
+  if (state.status === 'ended') return 'FT';
+  return state.period === 1 ? '1H' : '2H';
+}
+
+/** Visual TV score bug. Callers provide the accessible description. */
+function ScoreBug({ match, state }: { match: Match; state: Session }) {
+  const favorite = state.preferences.favorite_team_id;
+  return <span className="scorebug" aria-hidden="true">
+    {[match.home, match.away].map((team, index) => <span key={team.team_id} className={`bug-team ${index ? 'away' : 'home'} ${favorite === team.team_id ? 'is-favorite' : ''}`} style={{ '--team-color': team.color } as CSSProperties} title={team.display_name}>{team.short_name}</span>)}
+    <span className="bug-score">{state.score[match.home.team_id] ?? 0}<i>–</i>{state.score[match.away.team_id] ?? 0}</span>
+    <span className={`bug-clock ${state.status === 'playing' ? 'is-running' : ''}`}><span className="clock">{matchClock(state.playhead_ms)}</span><span className="clock-status">{statusShort(state)}</span></span>
+  </span>;
+}
+
 export function Scoreboard({ match, state }: { match: Match; state: Session }) {
   const home = state.score[match.home.team_id] ?? 0;
   const away = state.score[match.away.team_id] ?? 0;
-  const status = statusLabel(state);
-  const favorite = state.preferences.favorite_team_id;
-  return <section className="scoreboard" aria-label={`${match.home.display_name} ${home}, ${match.away.display_name} ${away}. ${status}. ${matchClock(state.playhead_ms)}`}>
-    <div className="score-team home"><TeamMark team={match.home} /><div><span className="team-name"><span className="name-full">{match.home.display_name}</span><span className="name-short" aria-hidden="true">{match.home.short_name}</span></span><span className="team-sub">{favorite === match.home.team_id ? 'Your club' : 'Home'}</span></div></div>
-    <div className="score-center">
-      <span className="score-figures" aria-hidden="true">{home}<em>–</em>{away}</span>
-      <span className="clock" aria-hidden="true"><span className={`clock-dot ${state.status === 'playing' ? '' : 'paused'}`} />{matchClock(state.playhead_ms)}<span className="clock-status">{status}</span></span>
-    </div>
-    <div className="score-team away"><div><span className="team-name"><span className="name-full">{match.away.display_name}</span><span className="name-short" aria-hidden="true">{match.away.short_name}</span></span><span className="team-sub">{favorite === match.away.team_id ? 'Your club' : 'Away'}</span></div><TeamMark team={match.away} /></div>
+  const favorite = [match.home, match.away].find((team) => team.team_id === state.preferences.favorite_team_id);
+  return <section className="scoreboard" aria-label={`${match.home.display_name} ${home}, ${match.away.display_name} ${away}. ${statusLabel(state)}. ${matchClock(state.playhead_ms)}${favorite ? `. Your club: ${favorite.display_name}` : ''}`}>
+    <ScoreBug match={match} state={state} />
   </section>;
 }
 
@@ -48,12 +59,12 @@ export function ReplayToolbar({ controller, onRestart }: { controller: Controlle
           <option value={1}>1×</option><option value={12}>12×</option><option value={60}>60×</option>
         </select>
       </label>
-      <span className={`speed-chip ${state.speed > 1 ? 'is-accelerated' : ''}`}>Synthetic replay{state.speed > 1 ? ` · ${state.speed}× accelerated` : ' · real time'}</span>
+      <span className="speed-note">{state.speed > 1 ? `${state.speed}× faster than real time` : 'Real time'}</span>
     </div>
     <div className="lens-controls">
       <div className="segmented-control" role="group" aria-label="Audience mode">
-        <button aria-pressed={state.preferences.mode === 'casual'} disabled={busy} className={state.preferences.mode === 'casual' ? 'active' : ''} onClick={() => void updatePreferences({ ...state.preferences, mode: 'casual' })}><UsersRound size={14} />Casual</button>
-        <button aria-pressed={state.preferences.mode === 'analyst'} disabled={busy} className={state.preferences.mode === 'analyst' ? 'active' : ''} onClick={() => void updatePreferences({ ...state.preferences, mode: 'analyst' })}><Layers3 size={14} />Analyst</button>
+        <button aria-pressed={state.preferences.mode === 'casual'} disabled={busy} className={state.preferences.mode === 'casual' ? 'active' : ''} onClick={() => void updatePreferences({ ...state.preferences, mode: 'casual' })}>Casual</button>
+        <button aria-pressed={state.preferences.mode === 'analyst'} disabled={busy} className={state.preferences.mode === 'analyst' ? 'active' : ''} onClick={() => void updatePreferences({ ...state.preferences, mode: 'analyst' })}>Analyst</button>
       </div>
     </div>
   </section>;
@@ -71,14 +82,14 @@ export function MatchTimeline({ match, state, onInsight, onGoal }: { match: Matc
       <ul className="timeline-markers" aria-label="Observed insights and goals">
         {insights.map((marker) => {
           const team = teamFor(match, marker.teamId);
-          return <li key={marker.id} className="timeline-insight" style={{ left: `${percentOfMatch(marker.start)}%`, width: `max(10px, ${percentOfMatch(marker.end) - percentOfMatch(marker.start)}%)`, '--marker-color': team?.color ?? 'var(--teal)' } as CSSProperties}>
+          return <li key={marker.id} className="timeline-insight" style={{ left: `${percentOfMatch(marker.start)}%`, width: `max(10px, ${percentOfMatch(marker.end) - percentOfMatch(marker.start)}%)`, '--marker-color': team?.color ?? 'var(--text-2)' } as CSSProperties}>
             <button className={marker.status === 'retracted' ? 'is-retracted' : ''} onClick={() => onInsight(marker.id)} aria-label={`${patternLabel[marker.pattern]}${team ? `, ${team.display_name}` : ', both teams'}, ${windowLabel({ start_ms: marker.start, end_ms: marker.end })}${marker.status === 'retracted' ? ', retracted' : ''}. Open evidence`} title={`${patternLabel[marker.pattern]} · ${windowLabel({ start_ms: marker.start, end_ms: marker.end })}`} />
           </li>;
         })}
         {goals.map((goal) => {
           const team = teamFor(match, goal.teamId);
           const scorer = match.roster.find((player) => player.player_id === goal.playerId)?.display_name;
-          return <li key={goal.id} className="timeline-goal" style={{ left: `${percentOfMatch(goal.at)}%`, '--marker-color': team?.color ?? 'var(--teal)' } as CSSProperties}>
+          return <li key={goal.id} className="timeline-goal" style={{ left: `${percentOfMatch(goal.at)}%`, '--marker-color': team?.color ?? 'var(--text-2)' } as CSSProperties}>
             <button onClick={() => onGoal(goal.id)} aria-label={`Goal, ${team?.display_name ?? 'team'}${scorer ? `, ${scorer}` : ''}, ${matchClock(goal.at)}. Show on pitch`} title={`Goal · ${scorer ?? team?.short_name} · ${matchClock(goal.at)}`}><span>{team?.short_name.charAt(0)}</span></button>
           </li>;
         })}
@@ -105,21 +116,17 @@ export function MatchHeader({ controller, match, state, onRestart, onPreferences
     return () => observer.disconnect();
   }, []);
   return <>
-  {/* Visual-only duplicate of the scoreboard for small screens; the full scoreboard remains the accessible source. */}
-  <div className={`score-strip ${stripVisible ? 'is-visible' : ''}`} aria-hidden="true">
-    <span>{match.home.short_name}</span>
-    <strong>{state.score[match.home.team_id] ?? 0} – {state.score[match.away.team_id] ?? 0}<small>{matchClock(state.playhead_ms)} · {statusLabel(state)}</small></strong>
-    <span>{match.away.short_name}</span>
-  </div>
+  {/* Visual-only duplicate of the score bug for small screens; the header scoreboard remains the accessible source. */}
+  <div className={`score-strip ${stripVisible ? 'is-visible' : ''}`} aria-hidden="true"><ScoreBug match={match} state={state} /></div>
   <header className="match-header" ref={header}>
     <div className="match-header-inner">
       <div className="header-top">
         <Brand />
         <Scoreboard match={match} state={state} />
         <div className="header-actions">
-          <button className="synthetic-badge" onClick={onProvenance}><ShieldCheck size={14} /> Synthetic match <Info size={13} aria-hidden="true" /></button>
-          <button className={`status-pill ${connection === 'online' ? '' : 'is-warning'}`} onClick={onDiagnostics} aria-label={`Pipeline diagnostics: ${connection === 'online' ? provider : humanize(connection)}`}>
-            <Workflow size={14} aria-hidden="true" /><span>{connection === 'online' ? provider : humanize(connection)}</span>
+          <button className="synthetic-badge" onClick={onProvenance}><ShieldCheck size={14} aria-hidden="true" />Synthetic match</button>
+          <button className={`icon-button status-pill ${connection === 'online' ? '' : 'is-warning'}`} onClick={onDiagnostics} aria-label={`Pipeline diagnostics: ${connection === 'online' ? provider : humanize(connection)}`} title={`Pipeline diagnostics · ${connection === 'online' ? provider : humanize(connection)}`}>
+            <Workflow size={16} aria-hidden="true" />
           </button>
           <button className="icon-button" aria-label="Open preferences" title="Preferences" onClick={onPreferences}><Settings2 size={18} /></button>
         </div>

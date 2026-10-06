@@ -3,6 +3,11 @@ export function matchClock(ms: number): string {
   return `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
 }
 
+/** Broadcast-style match minute: 22:30 is the 23rd minute, shown as 23′. */
+export function matchMinute(ms: number): number {
+  return Math.max(1, Math.ceil(Math.max(0, ms) / 60000));
+}
+
 export function windowLabel(window: { start_ms: number; end_ms: number }): string {
   return `${matchClock(window.start_ms)} – ${matchClock(window.end_ms)}`;
 }

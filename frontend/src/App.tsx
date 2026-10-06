@@ -94,7 +94,7 @@ export default function App() {
           <div className="match-main">
             <InsightCard insight={currentInsight} state={state} match={match} onEvidence={(id) => void openEvidence(id)} />
             <section className="pitch-panel" id="pitch-panel" aria-label="Observed event replay">
-              <div className="pitch-heading"><span className="eyebrow">Schematic event view</span><span className={`live-chip ${state.status !== 'playing' ? 'is-paused' : ''}`}><span aria-hidden="true" />{state.status === 'playing' ? 'Replaying' : state.status === 'half_time' ? 'Half-time' : state.status === 'ended' ? 'Full-time' : 'Paused'}</span></div>
+              <div className="pitch-heading"><h2 className="pitch-title">Event view</h2><span className={`live-chip ${state.status !== 'playing' ? 'is-paused' : ''}`}><span aria-hidden="true" />{state.status === 'playing' ? 'Replaying' : state.status === 'half_time' ? 'Half-time' : state.status === 'ended' ? 'Full-time' : 'Paused'}</span><button className="text-button" disabled={!overlay} onClick={() => setSurface('overlay')}><Braces size={15} /> Overlay JSON</button></div>
               <LazyPitch events={pitchProjection.events} replayKey={pitchProjection.replayKey} speed={state.speed} players={match.roster} homeTeamId={match.home.team_id} awayTeamId={match.away.team_id} homeTeamName={match.home.display_name} awayTeamName={match.away.display_name} period={state.period} playheadMs={state.playhead_ms} isPlaying={state.status === 'playing'} finishObservedEvents={state.status === 'half_time' || state.status === 'ended'} selectedEventId={selectedEventId} selectedEvent={pitchProjection.selectedEvent} onSelectEvent={selectEvent} />
               {overlay && <div className="overlay-preview" aria-label="Eligible lower-third overlay" style={{ '--overlay-progress': `${Math.max(0, Math.min(1, (overlay.valid_until_ms - state.playhead_ms) / (overlay.valid_until_ms - overlay.valid_from_ms))) * 100}%` } as CSSProperties}>
                 <div className="overlay-brand"><Brand compact /></div>
@@ -103,7 +103,6 @@ export default function App() {
                 <span className="overlay-countdown" aria-hidden="true" />
               </div>}
               {selectedEventId && <div className="selected-event-banner"><Target size={15} aria-hidden="true" /><span>Highlighting <code>{selectedEventId}{selectedRecord ? `@${selectedRecord.revision}` : ''}</code></span><button className="icon-button" aria-label="Clear highlighted event" onClick={() => { setSelectedRecord(null); setSelectedEventId(null); }}><X size={15} /></button></div>}
-              <div className="pitch-footer"><span>Synthetic events · Only the active players are drawn</span><button className="text-button" disabled={!overlay} onClick={() => setSurface('overlay')}><Braces size={15} /> Overlay JSON</button></div>
             </section>
           </div>
           <aside className="activity-rail" aria-label="Match activity">
@@ -116,7 +115,7 @@ export default function App() {
           <MetricsPanel state={state} match={match} />
           <PlayerFocus state={state} match={match} busy={busy} onChange={(id) => void controller.updatePreferences({ ...preferences, favorite_player_id: id })} onEvidence={(id) => void openEvidence(id)} />
         </div>
-        <footer className="match-footer"><span>Observed through {matchClock(state.observed_high_water_ms)} · synthetic fixture, fictional clubs and players</span><button className="text-button" onClick={() => setSurface('diagnostics')}>Provider & pipeline diagnostics</button></footer>
+        <footer className="match-footer"><span>Synthetic fixture with fictional clubs and players. The event view draws only the active players from recorded endpoints, not tracking data. Observed through {matchClock(state.observed_high_water_ms)}.</span><button className="text-button" onClick={() => setSurface('diagnostics')}>Provider & pipeline diagnostics</button></footer>
       </main>
     </div>}
     {surface === 'preferences' && match && <Dialog title="Make the match yours." eyebrow="Your preferences" onClose={() => setSurface(null)}><PreferencesFields match={match} value={draft} onChange={setDraft} /><div className="dialog-actions"><button className="button button-ghost" onClick={() => setSurface(null)}>Cancel</button><button className="button button-primary" disabled={busy} onClick={async () => { await controller.updatePreferences(draft); setSurface(null); }}>Save preferences <Check size={16} /></button></div></Dialog>}

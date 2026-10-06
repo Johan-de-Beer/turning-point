@@ -15,7 +15,7 @@ export function PlayerFocus({ state, match, busy, onChange, onEvidence }: { stat
   const team = player ? teamFor(match, player.team_id) : undefined;
   return <section className="panel player-focus" id="player-focus" aria-labelledby="player-title">
     <div className="section-heading">
-      <div><span className="eyebrow">Player focus</span><h2 id="player-title">{player ? player.display_name : 'Follow a player'}</h2></div>
+      <h2 id="player-title">Player focus</h2>
       {player && team && <TeamMark team={team} size="small" />}
     </div>
     <div className="player-controls">
@@ -27,7 +27,7 @@ export function PlayerFocus({ state, match, busy, onChange, onEvidence }: { stat
       {player && <button className="icon-button" aria-label="Clear player focus" title="Clear player focus" disabled={busy} onClick={() => onChange(null)}><X size={16} /></button>}
     </div>
     {player && stats ? <>
-      <p className="player-identity"><span className="player-number" style={{ color: team?.color }}>#{player.shirt_number}</span><span>{team?.display_name} · {player.position}</span></p>
+      <p className="player-identity"><span className="player-number" style={{ color: team?.color }}>{player.shirt_number}</span><span><strong>{player.display_name}</strong>{team?.display_name} · {player.position}</span></p>
       <dl className="player-stat-grid">
         <div><dt>Involvements</dt><dd>{stats.involvement}</dd></div>
         <div><dt>Modeled touches</dt><dd>{stats.touches}</dd></div>
