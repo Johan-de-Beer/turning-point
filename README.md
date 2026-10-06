@@ -82,7 +82,7 @@ Start a replay in Casual mode at the default 12× speed to read the individual a
 
 Each push to `main` runs the backend, frontend and Linux deployment checks on GitHub-hosted Ubuntu runners. After they pass, the dedicated `server-1-turning-point` runner deploys that tested commit to the existing server. Pull requests run hosted checks only. The workflow skips a queued deployment when a newer `main` commit exists. To retry manually, open **Actions → Verify and deploy Turning Point → Run workflow** and select `main`.
 
-Automatic deployment retains the named replay volume, takes a consistent private SQLite backup, checks container/API health and the served release, and restores the previous images on failure. Automatic and Windows manual deployment share one application lock. Successful automatic releases serve their commit and release identity at `/release.json`. See [deployment](docs/deployment.md) for the runner, release procedure and recorded verification; introducing this workflow does not itself establish a successful automatic deployment.
+Automatic deployment retains the named replay volume, takes a consistent private SQLite backup, checks container/API health and the served release, and restores the previous images on failure. Automatic and Windows manual deployment share one application lock. Successful automatic releases serve their commit and release identity at `/release.json`. The [automatic release on 6 October 2026](https://github.com/Johan-de-Beer/turning-point/actions/runs/37425062412) passed and was verified through the public site. See [deployment](docs/deployment.md) for the runner, release procedure and recorded verification.
 
 ## Project notes
 

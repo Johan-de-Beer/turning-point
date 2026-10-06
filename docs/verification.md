@@ -1,6 +1,8 @@
 # Measured verification
 
-Checked on 5 October 2026. Development host: Windows 11 Pro 10.0.26200, AMD Ryzen 5 3600 (six cores), 31.9 GiB RAM, Python 3.12.3, Node 24.13.0, npm 11.6.2. The current event-driven ball replay is deployed from personal public GitHub commit `54fd5f168a855ccbe627c2542c3aaba4e4c6ccc0`, release `20261005-215011-54fd5f1`. Current checks use the 754-envelope `synthetic_v2` fixture. Historical v1 measurements are identified separately.
+Automatic deployment was additionally verified on **6 October 2026** through [GitHub run 37425062412](https://github.com/Johan-de-Beer/turning-point/actions/runs/37425062412): 88 backend tests, 56 frontend tests, the production build and 10 Linux deployment tests passed before server-1 deployed commit `340967afa49d7612973ba967f8178a9f654e1ace`. Public HTTPS served the exact release; a fresh browser confirmed the default 2D view, loaded the 3D stadium, and observed 28 delivered replay actions with 35 ball positions and a working pause, with zero page/API errors. See [deployment verification](deployment.md#automatic-deployment-verification--6-october-2026) for the runner and observed rollback. The following measurements retain their original scope and date.
+
+Earlier deployment measurements were recorded on 5 October 2026. Development host: Windows 11 Pro 10.0.26200, AMD Ryzen 5 3600 (six cores), 31.9 GiB RAM, Python 3.12.3, Node 24.13.0, npm 11.6.2. That event-driven ball replay was deployed from personal public GitHub commit `54fd5f168a855ccbe627c2542c3aaba4e4c6ccc0`, release `20261005-215011-54fd5f1`. Replay checks use the 754-envelope `synthetic_v2` fixture. Historical v1 measurements are identified separately.
 
 | Check | Result |
 | --- | --- |
