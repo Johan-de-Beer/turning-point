@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { ArrowRight, Info, LoaderCircle, Play, RotateCcw, ShieldCheck, WifiOff } from 'lucide-react';
 import { Brand } from '../../components/Brand';
 import { LazyPitch } from '../../components/LazyPitch';
+import { PitchViewToggle } from '../../components/PitchViewToggle';
 import type { Team } from '../../lib/contracts';
 import type { useMatch } from '../../lib/useMatch';
 import { PreferencesFields } from '../preferences/PreferencesFields';
@@ -52,9 +53,10 @@ export function StartScreen({ controller, onProvenance }: { controller: Controll
       </section>
     </section>
     {error && <div className="error-banner" role="alert"><Info size={18} /><p>{error.message}</p><button className="text-button" onClick={() => void retry()}>Retry</button></div>}
-    <section className="start-stadium" aria-label="Stadium preview">
+    <section className="start-stadium" aria-labelledby="preview-title">
+      <div className="start-stadium-bar"><h2 id="preview-title">Pitch preview</h2><PitchViewToggle /></div>
       <LazyPitch events={[]} homeTeamId={match.home.team_id} awayTeamId={match.away.team_id} homeTeamName={match.home.display_name} awayTeamName={match.away.display_name} players={match.roster} period={1} playheadMs={0} isPlaying={false} />
     </section>
-    <footer className="start-footer"><span>Synthetic data and fictional clubs. The stadium view replays recorded event endpoints, not tracking data. No account needed.</span><button className="text-button" onClick={onProvenance}>About the data</button></footer>
+    <footer className="start-footer"><span>Synthetic data and fictional clubs. The pitch replays recorded event endpoints, not tracking data. No account needed.</span><button className="text-button" onClick={onProvenance}>About the data</button></footer>
   </main>;
 }

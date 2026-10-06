@@ -3,6 +3,7 @@ import { ArrowRight, Braces, Check, Clock3, Download, Flag, Info, LoaderCircle, 
 import { Brand, EmptyState } from './components/Brand';
 import { Dialog } from './components/Dialog';
 import { LazyPitch } from './components/LazyPitch';
+import { PitchViewToggle } from './components/PitchViewToggle';
 import { Diagnostics } from './features/diagnostics/Diagnostics';
 import { EvidenceInspector } from './features/evidence/EvidenceInspector';
 import { EventFeed, InsightTimeline, RecapLinks } from './features/match/ActivityRail';
@@ -94,7 +95,7 @@ export default function App() {
           <div className="match-main">
             <InsightCard insight={currentInsight} state={state} match={match} onEvidence={(id) => void openEvidence(id)} />
             <section className="pitch-panel" id="pitch-panel" aria-label="Observed event replay">
-              <div className="pitch-heading"><h2 className="pitch-title">Event view</h2><span className={`live-chip ${state.status !== 'playing' ? 'is-paused' : ''}`}><span aria-hidden="true" />{state.status === 'playing' ? 'Replaying' : state.status === 'half_time' ? 'Half-time' : state.status === 'ended' ? 'Full-time' : 'Paused'}</span><button className="text-button" disabled={!overlay} onClick={() => setSurface('overlay')}><Braces size={15} /> Overlay JSON</button></div>
+              <div className="pitch-heading"><h2 className="pitch-title">Event view</h2><span className={`live-chip ${state.status !== 'playing' ? 'is-paused' : ''}`}><span aria-hidden="true" />{state.status === 'playing' ? 'Replaying' : state.status === 'half_time' ? 'Half-time' : state.status === 'ended' ? 'Full-time' : 'Paused'}</span><PitchViewToggle /><button className="text-button" disabled={!overlay} onClick={() => setSurface('overlay')}><Braces size={15} /> Overlay JSON</button></div>
               <LazyPitch events={pitchProjection.events} replayKey={pitchProjection.replayKey} speed={state.speed} players={match.roster} homeTeamId={match.home.team_id} awayTeamId={match.away.team_id} homeTeamName={match.home.display_name} awayTeamName={match.away.display_name} period={state.period} playheadMs={state.playhead_ms} isPlaying={state.status === 'playing'} finishObservedEvents={state.status === 'half_time' || state.status === 'ended'} selectedEventId={selectedEventId} selectedEvent={pitchProjection.selectedEvent} onSelectEvent={selectEvent} />
               {overlay && <div className="overlay-preview" aria-label="Eligible lower-third overlay" style={{ '--overlay-progress': `${Math.max(0, Math.min(1, (overlay.valid_until_ms - state.playhead_ms) / (overlay.valid_until_ms - overlay.valid_from_ms))) * 100}%` } as CSSProperties}>
                 <div className="overlay-brand"><Brand compact /></div>

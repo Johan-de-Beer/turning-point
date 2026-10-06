@@ -54,4 +54,6 @@ System sans-serif for reading text at 16px; self-hosted Barlow Condensed (OFL) f
 
 **Evidence inspector.** Opens with a summary (pattern, team, window, rule checks passed, fact and record counts, coverage gate), then separately tagged Measured facts, Heuristic rule checks and Limitations sections, coverage/baseline and the supporting event-version table.
 
-**Performance.** The Three.js stadium is code-split and loaded after first paint, with a labelled placeholder, so the main bundle no longer carries WebGL code.
+**2D and 3D pitch.** The event view opens on a flat, top-down 2D pitch (SVG, true 105 × 68 m markings). It draws the same recorded endpoints as the stadium: one ball, the active player and a completed-pass recipient as club-colour discs with shirt numbers, the current route and target, and a faint trail of the last few observed actions. A key under the pitch states which way each club attacks and switches at half-time. Markers and labels are sized in screen pixels, so they stay readable at 360px. A 2D / 3D toggle in the event-view heading (and on the start screen preview) switches to the WebGL stadium; the choice is remembered in the browser. Both views share the playback queue, highlighted-event inspection, previous/next stepping, motion toggle and fullscreen.
+
+**Performance.** The Three.js stadium is code-split and only downloaded when someone picks 3D, with a labelled placeholder, so the main bundle carries no WebGL code and the default 2D view needs none.

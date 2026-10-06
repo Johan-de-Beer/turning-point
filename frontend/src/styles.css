@@ -187,8 +187,11 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .fixture-details dd { color: var(--text); }
 .start-button { width: 100%; min-height: 56px; font-size: 17px; justify-content: space-between; padding: 0 20px; }
 .start-button > span { flex: 1; text-align: left; }
-.start-stadium { overflow: hidden; border-radius: var(--radius); background: var(--bg-raised); }
-.start-stadium .pitch-viewport { height: 440px; border-radius: 0; }
+.start-stadium { display: grid; gap: var(--space-3); }
+.start-stadium-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.start-stadium-bar h2 { font-family: var(--display); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: .01em; }
+.start-stadium .pitch-viewport { height: 440px; }
+.start-stadium .pitch-flat { max-width: 960px; width: 100%; justify-self: center; }
 .start-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--border); color: var(--text-3); font-size: 14px; }
 .start-screen > .error-banner { margin-bottom: var(--space-5); }
 
@@ -304,12 +307,15 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ---------- Pitch panel & overlay ---------- */
 .pitch-panel { position: relative; }
-.pitch-heading { display: flex; align-items: center; gap: var(--space-4); padding-bottom: var(--space-3); }
-.pitch-heading .text-button { margin-left: auto; }
+.pitch-heading { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-4); padding-bottom: var(--space-3); }
+.pitch-heading .view-toggle { margin-left: auto; }
 .live-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-2); }
 .live-chip > span { width: 8px; height: 8px; border-radius: 50%; background: #f87171; animation: pulse 1.6s ease-in-out infinite; }
 .live-chip.is-paused > span { background: var(--text-3); animation: none; }
 .pitch-panel > .pitch-viewport { height: clamp(360px, 38vw, 520px); border-radius: var(--radius); }
+.pitch-panel > .pitch-viewport.pitch-flat, .start-stadium .pitch-viewport.pitch-flat { height: auto; }
+.segmented-control.view-toggle { width: auto; }
+.segmented-control.view-toggle button { flex: none; min-height: 34px; padding: 0 12px; font-size: 13px; }
 .pitch-loading { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-3); font-size: 14px; background: var(--bg-raised); }
 .pitch-loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); animation: pulse 1.2s ease-in-out infinite; }
 /* Lower third: a flat broadcast graphic, not a card. */
@@ -562,7 +568,7 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
   .match-main { gap: var(--space-5); }
   .insight-window { margin-left: 0; width: 100%; }
   .insight-card h2 { font-size: 32px; }
-  .fact-cues { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: var(--space-3) 0; }
+  .fact-cues { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--space-3) 0; }
   .fact-cues li { min-width: 0; padding-right: var(--space-2); }
   .fact-cues strong { font-size: 34px; }
   .fact-cues li + li { margin-left: 0; }

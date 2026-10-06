@@ -26,6 +26,21 @@
 .pitch-event-controls button:hover:not(:disabled){background:#22324c}
 .pitch-event-controls button:disabled{opacity:.35;cursor:default}
 .pitch-action-progress{position:absolute;bottom:0;left:0;right:0;height:3px;background:#22324c}.pitch-action-progress>span{display:block;width:0;height:100%;background:#cbd5e1}
+/* Flat 2D pitch: an aspect-locked field with the action bar beneath rather than over it. */
+.pitch-viewport.pitch-flat{height:auto;display:grid;background:none;overflow:visible}
+.flat-field{position:relative;width:100%;aspect-ratio:111/74;overflow:hidden;border-radius:var(--radius,4px);background:#1a4a30}
+.flat-field>svg{display:block;width:100%;height:100%}
+.flat-grass,.flat-stripe-alt{fill:#1a4a30}.flat-stripe{fill:#1d5235}
+.flat-lines{stroke:#e2ece4;stroke-opacity:.7}.flat-spots circle{fill:#e2ece4;stroke:none}
+.flat-trail{opacity:.4}
+.flat-players{cursor:pointer}.flat-players text{fill:#0b1220;font-family:var(--display,system-ui);font-weight:700;text-anchor:middle}
+.flat-ball{fill:#fffdf5;stroke:#0b1220}
+.flat-label{transform:translate(-50%,calc(-100% - 16px))}.flat-label.recipient{transform:translate(-50%,16px)}
+.flat-key{display:flex;justify-content:space-between;gap:8px;padding:8px 0 6px;color:#cbd5e1;font-size:13px;font-weight:600}
+.flat-key span:nth-child(2){color:#94a3b8;font-weight:500;text-align:center}.flat-key span:last-child{text-align:right}
+.pitch-action.flat-action{position:relative;inset:auto}
+.pitch-flat.pitch-expanded{align-content:center;justify-items:center;padding:24px;background:#0b1220}
+.pitch-flat.pitch-expanded .flat-field,.pitch-flat.pitch-expanded .flat-key,.pitch-flat.pitch-expanded .flat-action{width:min(100%,calc((100dvh - 170px) * 1.5))}
 @media(max-width:1024px){.pitch-viewport{height:380px}.pitch-bottom-label b{display:none}}
 @media(max-width:600px){
   .pitch-viewport{height:300px}
@@ -39,5 +54,6 @@
   .pitch-action-copy strong{font-size:13px}.pitch-action-copy>span{font-size:11px}
   .pitch-event-controls .pitch-replay-event{max-width:84px;line-height:1.2}
   .pitch-player-label{font-size:11px;max-width:110px;padding:2px 6px}
+  .flat-key{font-size:12px}.flat-key span:nth-child(2){display:none}
 }
 @media(prefers-reduced-motion:reduce){.pitch-canvas{transition:none}}
