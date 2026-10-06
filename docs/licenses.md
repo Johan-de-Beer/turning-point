@@ -8,9 +8,14 @@ Preserve the corresponding upstream LICENSE/NOTICE texts when redistributing pac
 metadata alone does not complete license compliance. Packages marked unverified need review.
 
 Application assets: fictional names, synthetic fixtures, original Blender stadium and code-built pitch geometry,
-and system fonts. No match footage, club marks, player likenesses, external font downloads,
+system fonts and self-hosted Barlow Condensed. No match footage, club marks, player likenesses, external font downloads,
 or copyrighted music are included. Lucide icons retain their upstream ISC license. A project
 source license remains the owner's choice; this inventory grants no rights beyond upstream terms.
+
+Barlow Condensed 500/600/700 (latin subset, WOFF2) is copied from the `@fontsource/barlow-condensed` 5.3.0
+npm package into `frontend/public/fonts/` and served from the app's own origin. Copyright 2017 The Barlow
+Project Authors (https://github.com/jpt/barlow), SIL Open Font License 1.1; the full licence text ships
+alongside the files as `frontend/public/fonts/OFL.txt`. It is not an npm dependency.
 
 The original stadium was generated with Blender 5.2.2 LTS (GPL-3.0-or-later tool).
 Blender is a development tool and is not shipped with the application. Its license does

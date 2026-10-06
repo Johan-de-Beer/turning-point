@@ -23,8 +23,37 @@ Empty/warming up: explain why a full observed window is required. Loading: retai
 ## Accessibility and animation
 Semantic buttons and labels, keyboard dialogs with focus restoration, non-color identifiers, text equivalents to graphics, reduced-motion preference, no audio or rapid flashing, 200% zoom, 360/768/1440px checks. The 3D pitch uses an original Blender stadium, lit turf, goals and one textured football that follows delivered pass, carry and shot endpoints. Active participant names, event time and outcome identify the action; a current route and progress strip accompany the ball. With motion enabled, each queued movement reaches a visible intermediate point and endpoint, including dense deliveries on slow render frames. Animation illustrates synthetic recorded events and does not represent continuous measured ball or player tracking. An SVG pitch remains available if WebGL fails. See `stadium-assets.md` for source assets and regeneration.
 
-## Public-demo visual refinement
+## Analysis-desk refresh (October 2026)
 
-The overview now gives the pitch roughly seventy percent of the desktop match-room width, with a compact editorial narrative beside it. Statistics form a short band beneath the pitch. Player focus, the latest four events and an episode timeline use fine rules and spacing rather than repeated nested cards. Provenance and full metric/evidence detail remain available in dedicated inspectors. The landing page uses a large typographic introduction and an exploratory stadium view.
+The interface returns to the original prompt's palette and is rebuilt as feature components under `frontend/src/features/` (start, match, evidence, recap, diagnostics, preferences). Tokens live once, on `:root` in `frontend/src/styles.css`; `src/lib/contrast.test.ts` reads that file and fails if any text token drops below WCAG 4.5:1 on any surface, or form borders below 3:1.
 
-The refined palette is near-black `#0d151c`, surface `#111f2a`, off-white `#f2f2ec`, secondary `#a5b3bd`, and borders `#2b3942`. Mint/cyan/amber retain their existing meaning. Main prose remains 16px. Public deployment uses the same functional interface and clearly labels synthetic data and mock narratives.
+| Token | Value | Use |
+| --- | --- | --- |
+| `--bg` / `--bg-raised` | `#0B1220` / `#0F1829` | Page, inset wells |
+| `--surface` / `--surface-2` / `--surface-3` | `#152033` / `#1B2940` / `#22324C` | Cards, raised rows, tracks |
+| `--text` / `--text-2` / `--text-3` | `#F8FAFC` / `#CBD5E1` / `#94A3B8` | Primary, secondary, tertiary text |
+| `--teal` / `--teal-soft` / `--teal-ink` | `#5EEAD4` / `#0F3A3D` / `#042F2E` | Emphasis, secondary buttons, text on teal |
+| `--home` / `--away` | `#38BDF8` / `#FBBF24` | Fictional team colours (always paired with initials or names) |
+| `--border-input` | `#64748B` | Form-control boundaries (≥3:1) |
+
+System sans-serif for reading text at 16px; self-hosted Barlow Condensed (OFL) for scores, clocks, headlines, minute numerals and big figures; tabular numerals throughout; 8px spacing scale; 2px teal focus outline.
+
+**Broadcast pass.** A second pass removed the generic "dashboard" look. Surfaces are flat: no shadows, gradients, blur or nested cards; sections are separated by 1–2px rules and white space, and corners are 2–4px. Club colours lead (score bug blocks, insight kickers, minute numerals, metric figures, feed team bars) and teal is reserved for things you can press (primary and secondary buttons, links, selected states, focus). Decorative chips, uppercase eyebrow-plus-title pairs and icon tiles were cut; the "Synthetic match" badge stays, and the honesty notes (synthetic fixture, schematic event view, not tracking data) are consolidated into one footer line per screen. The provider label stays as plain text on the insight.
+
+**Match room, 1440px.** A sticky header carries a TV score bug (solid club-colour blocks with short names, a white score box, then the clock with 1H/2H/HT/FT in its own box; the full names, score and status are its accessible label), the synthetic badge, a diagnostics icon, preferences, the replay toolbar (play/pause/continue, restart, speed with a plain "60× faster than real time" note, Casual/Analyst) and a 90-minute match timeline. The timeline shows observed progress, a half-time divider, every confirmed insight window at its original match time (opens its evidence) and goals (highlight the shot on the pitch). Below, the main column holds the current insight as the lead story (club-colour rule and kicker, condensed headline, explanation, large fact figures) above the schematic pitch and a flat white lower-third overlay; the right activity rail holds a live-blog insight timeline (a big condensed minute such as "14′" in the club colour, then pattern and headline), a 12-event feed with a club-colour bar per row, and recap links. Match numbers and player focus sit beneath.
+
+**768px.** Single main column; the activity rail becomes two columns (timeline, events) above the recap links; metrics and player focus stack.
+
+**Start screen.** A match-programme fixture card: two solid club-colour panels with the short names set large and full names beneath, a plain Format/Pace/Clubs list, preferences and Start replay. The previous three-icon "how it works" list is gone.
+
+**360px.** Score bug, controls, current explanation, pitch, insight timeline, events, recaps, numbers, player focus. The header is not pinned on phones; a slim score strip appears once it scrolls away. Dialogs become bottom sheets with a drag-handle cue. Wide tables scroll inside their own region. The header also stops pinning on short viewports (≤600px tall), so 200% zoom never hides content under it.
+
+**Casual vs Analyst.** Both use the same insight and fact IDs. Casual adds up to three plain-language fact figures built only from computed facts (for example "67% of the ball · HBR"), a one-line pattern glossary, and keeps the evidence one button away. Analyst shows the metric grid, metric definitions, coverage and the prior-window comparison by default, and analyst recaps lead with the measured facts before the story beats.
+
+**Player focus.** The feed can be narrowed to the favourite player (actor or completed-pass recipient, matching the server's involvement definition). Goals and period markers stay visible and are labelled "match context". The insight card states whether the selected player appears in the insight's evidence or is shown only as match context. Player stats show involvements, modelled touches, passes, passes received, shots and goals or tackles, with the server's own definitions.
+
+**Evidence inspector.** Opens with a summary (pattern, team, window, rule checks passed, fact and record counts, coverage gate), then separately tagged Measured facts, Heuristic rule checks and Limitations sections, coverage/baseline and the supporting event-version table.
+
+**2D and 3D pitch.** The event view opens on a flat, top-down 2D pitch (SVG, true 105 × 68 m markings). It draws the same recorded endpoints as the stadium: one ball, the active player and a completed-pass recipient as club-colour discs with shirt numbers, the current route and target, and a faint trail of the last few observed actions. A key under the pitch states which way each club attacks and switches at half-time. Markers and labels are sized in screen pixels, so they stay readable at 360px. A 2D / 3D toggle in the event-view heading (and on the start screen preview) switches to the WebGL stadium; the choice is remembered in the browser. Both views share the playback queue, highlighted-event inspection, previous/next stepping, motion toggle and fullscreen.
+
+**Performance.** The Three.js stadium is code-split and only downloaded when someone picks 3D, with a labelled placeholder, so the main bundle carries no WebGL code and the default 2D view needs none.

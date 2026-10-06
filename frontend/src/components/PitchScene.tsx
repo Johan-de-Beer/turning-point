@@ -5,34 +5,12 @@ import { ChevronLeft, ChevronRight, Maximize2, MoveUpRight, Play, RotateCcw, Wav
 import { displayEvents, type PitchEvent } from './pitchEvents';
 import { eventDuration, isObserved, PitchPlayback, sampleEvent, type PlaybackFrame } from './pitchPlayback';
 import { buildStadium, disposeObject, fieldPosition, PITCH_BACKGROUND } from './stadiumScene';
+import { action, clock, eventTitle, playerName, selected, steppableRecords, type PitchSceneProps } from './pitchShared';
 import './pitch.css';
 export type { PitchEvent } from './pitchEvents';
-type Player = { player_id: string; display_name: string; shirt_number: number; team_id: string };
-export interface PitchSceneProps {
-  events: readonly PitchEvent[]; homeTeamId: string; awayTeamId: string;
-  homeTeamName?: string; awayTeamName?: string; players?: readonly Player[];
-  period: number; playheadMs: number; isPlaying: boolean; finishObservedEvents?: boolean; speed?: 1 | 12 | 60; replayKey?: string;
-  selectedEventId?: string | null; selectedEvent?: PitchEvent | null; onSelectEvent?: (id: string) => void;
-}
+export type { PitchSceneProps } from './pitchShared';
 type Runtime = { scene: THREE.Scene; camera: THREE.PerspectiveCamera; playback: PitchPlayback; resetCamera: (top: boolean) => void };
 type View = { event: PitchEvent | null; inspection: boolean; complete: boolean };
-const clock = (ms: number) => Math.floor(ms / 60000).toString().padStart(2, '0') + ':' + Math.floor(ms / 1000 % 60).toString().padStart(2, '0');
-function action(event: PitchEvent): string {
-  if (event.kind === 'PASS') return event.detail.completed ? 'Completed pass' : 'Incomplete pass';
-  if (event.kind === 'CARRY') return 'Ball carry';
-  if (event.kind === 'SHOT') return event.detail.outcome === 'goal' ? 'Goal' : 'Shot · ' + String(event.detail.outcome).replace('_', ' ');
-  if (event.kind === 'POSSESSION') return 'Possession';
-  if (event.kind === 'TACKLE') return event.detail.successful ? 'Successful tackle' : 'Tackle attempt';
-  if (event.kind === 'STOPPAGE') return 'Play stopped · ' + String(event.detail.reason).replace('_', ' ');
-  if (event.kind === 'PERIOD_END') return event.period === 1 ? 'Half-time' : 'Full-time';
-  return event.period === 1 ? 'Kick-off' : 'Second-half kick-off';
-}
-const playerName = (id: unknown, props: PitchSceneProps) => props.players?.find(player => player.player_id === id)?.display_name ?? '';
-function eventTitle(event: PitchEvent, props: PitchSceneProps): string {
-  const actor = playerName(event.player_id, props) || (event.team_id === props.homeTeamId ? props.homeTeamName : props.awayTeamName) || event.team_id || 'Match';
-  const recipient = playerName(event.detail.recipient_id, props);
-  return event.kind === 'PASS' && recipient ? actor + ' → ' + recipient : actor;
-}
 function football(): THREE.Mesh {
   const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 256;
   const c = canvas.getContext('2d')!; c.fillStyle = '#fffdf5'; c.fillRect(0, 0, 512, 256);
@@ -57,10 +35,6 @@ function actorMarker(): THREE.Group {
   head.position.y = 2.55; group.add(head);
   const legs = new THREE.Mesh(new THREE.CylinderGeometry(.48, .48, .8, 8), new THREE.MeshStandardMaterial({ color: '#132630' }));
   legs.position.y = .5; group.add(legs); return group;
-}
-function selected(props: PitchSceneProps): PitchEvent | null {
-  const event = props.selectedEventId ? props.selectedEvent ?? props.events.find(record => record.event_id === props.selectedEventId) : null;
-  return event && event.event_id === props.selectedEventId && isObserved(event, props.playheadMs) ? event : null;
 }
 export function PitchScene(props: PitchSceneProps) {
   const host = useRef<HTMLDivElement>(null), viewport = useRef<HTMLDivElement>(null), runtime = useRef<Runtime | null>(null);
@@ -212,7 +186,7 @@ export function PitchScene(props: PitchSceneProps) {
     return () => { document.removeEventListener('fullscreenchange', changed); document.removeEventListener('keydown', close); };
   }, []);
   const toggleFullscreen = () => { if (document.fullscreenElement === viewport.current) void document.exitFullscreen(); else if (viewport.current?.requestFullscreen) void viewport.current.requestFullscreen().catch(() => {}); };
-  const records = props.events.filter(event => isObserved(event, props.playheadMs) && ['PASS', 'CARRY', 'SHOT', 'TACKLE', 'POSSESSION'].includes(event.kind));
+  const records = steppableRecords(props);
   const index = records.findIndex(event => event.event_id === (props.selectedEventId ?? view.event?.event_id));
   const inspectedRecord = selected(props);
   const fallback = displayEvents(inspectedRecord ? [inspectedRecord] : props.events.filter(event => isObserved(event, props.playheadMs)), props.homeTeamId, props.awayTeamId, props.period, props.playheadMs, props.selectedEventId);

@@ -180,6 +180,8 @@ try {
   console.log('Functional pitch QA: waiting for instrumented live event renderer');
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('button', { name: 'Start replay', exact: true })).toBeVisible();
+  // These checks instrument the WebGL meshes, so select the 3D stadium (2D is the default).
+  await page.getByRole('button', { name: '3D stadium', exact: true }).click();
   await page.getByRole('checkbox', { name: /Pause when a new insight arrives/ }).uncheck();
   await page.getByRole('button', { name: 'Start replay', exact: true }).click();
   await waitState((state) => state.status === 'playing', 'Playback starts');

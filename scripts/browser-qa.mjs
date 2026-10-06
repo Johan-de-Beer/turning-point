@@ -150,9 +150,15 @@ try {
   console.log('Browser QA: loading start screen');
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('button', { name: 'Start replay', exact: true })).toBeVisible();
-  await expect(page.getByTestId('pitch-scene')).toHaveAttribute('data-stadium-loaded', 'true', { timeout: 20_000 });
+  // The flat 2D pitch is the default; the WebGL stadium is one toggle away and the choice persists.
+  await expect(page.getByTestId('pitch-2d')).toBeVisible();
+  await expect(page.getByRole('button', { name: '2D pitch', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await noOverflow();
   await shot('desktop-1440-start.png');
+  await page.getByRole('button', { name: '3D stadium', exact: true }).click();
+  await expect(page.getByTestId('pitch-scene')).toHaveAttribute('data-stadium-loaded', 'true', { timeout: 20_000 });
+  await noOverflow();
+  checks.push('2D pitch is the default; the 3D stadium toggle loads the WebGL scene');
   // A paused new insight can be inspected without violating its expiry interval.
   await page.getByRole('checkbox', { name: /Pause when a new insight arrives/ }).check();
   await page.getByRole('button', { name: 'Start replay', exact: true }).click();
@@ -354,6 +360,17 @@ try {
   await expect(full).toBeVisible();
   await expect(full).toContainText('Observed through 90:00');
   await shot('desktop-1440-fulltime.png');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: '2D pitch', exact: true }).click();
+  const flat = page.getByTestId('pitch-2d');
+  await expect(flat).toBeVisible();
+  await expect(page.getByTestId('pitch-scene')).toHaveCount(0);
+  await expect(flat).not.toHaveAttribute('data-active-event-id', '');
+  await noOverflow();
+  await flat.scrollIntoViewIfNeeded();
+  await flat.screenshot({ path: path.join(output, 'desktop-1440-pitch-2d.png'), animations: 'disabled' });
+  screenshots.push('desktop-1440-pitch-2d.png');
+  checks.push('Switching back to 2D replaces the WebGL stadium and shows the last observed action');
   for (const pattern of ['sustained_pressure', 'sterile_possession', 'end_to_end']) assert(patterns.has(pattern), `Missing ${pattern} during working replay`);
   await Promise.all([...pendingResponses]);
   assert.deepEqual(pageErrors, [], 'Browser uncaught errors');
