@@ -147,7 +147,9 @@ archive=$base/archives/source-$release_tag.tar.gz
 [[ ! -e $archive && ! -L $archive ]] || die 'source archive already exists'
 python3 "$source_dir/scripts/package_deploy.py" "$archive"
 mkdir -- "$release"
-tar -xzf "$archive" -C "$release"
+# Archive contains only regular filtered source paths. Implicit parent folders
+# need readable/traversable modes in non-root images, independent of runner umask.
+(umask 022; tar --no-same-owner -xzf "$archive" -C "$release")
 printf '%s\n' "$release_tag" > "$release/release-tag"
 python3 - "$release/frontend/public/release.json" "$commit" "$release_tag" <<'PY'
 import json, pathlib, sys
@@ -155,6 +157,7 @@ path = pathlib.Path(sys.argv[1])
 path.parent.mkdir(parents=True, exist_ok=True)
 path.write_text(json.dumps({'commit': sys.argv[2], 'release': sys.argv[3]}) + '\n', encoding='utf-8')
 PY
+chmod 644 -- "$release/frontend/public/release.json"
 compose "$release" "$release_tag" config --quiet
 compose "$release" "$release_tag" build
 

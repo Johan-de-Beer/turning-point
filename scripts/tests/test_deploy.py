@@ -107,6 +107,9 @@ class DeploymentTests(unittest.TestCase):
             path = self.source / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content)
+        (self.source / 'backend/main.py').chmod(0o600)
+        for relative in ('backend', 'server_data', 'frontend', 'frontend/public'):
+            (self.source / relative).chmod(0o700)
         subprocess.run(['git', 'init', '-q', str(self.source)], check=True)
         subprocess.run(['git', '-C', str(self.source), 'add', '.'], check=True)
         subprocess.run(['git', '-C', str(self.source), '-c', 'user.name=Deployment test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'fixture'], check=True)
@@ -166,9 +169,16 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual((self.base / 'current').resolve(), release)
         self.assertEqual((release / 'deployed-commit').read_text().strip(), self.commit)
         self.assertEqual(json.loads((release / 'frontend/public/release.json').read_text()), {'commit': self.commit, 'release': self.candidate})
+        self.assertEqual(stat.S_IMODE((release / 'frontend/public/release.json').stat().st_mode), 0o644)
+        self.assertEqual(stat.S_IMODE((release / 'backend/main.py').stat().st_mode), 0o644)
+        for relative in ('backend', 'server_data', 'frontend', 'frontend/public'):
+            self.assertEqual(stat.S_IMODE((release / relative).stat().st_mode), 0o755, relative)
         archive = self.base / 'archives' / f'source-{self.candidate}.tar.gz'
+        self.assertEqual(stat.S_IMODE(archive.stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(release.stat().st_mode), 0o700)
         with tarfile.open(archive) as bundle:
             self.assertFalse(any('.env' in name or '.sqlite' in name or 'node_modules' in name for name in bundle.getnames()))
+            self.assertTrue(all(info.mode == 0o644 for info in bundle.getmembers() if info.isfile()))
         commands = self.commands()
         build = next(i for i, c in enumerate(commands) if 'build' in c['args'])
         backup = next(i for i, c in enumerate(commands) if c['args'][0] == 'exec')

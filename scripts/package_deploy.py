@@ -28,9 +28,16 @@ def package(output: Path) -> dict:
             continue
         files.append((path, relative.as_posix()))
     output.parent.mkdir(parents=True, exist_ok=True)
+    def public_source_mode(info: tarfile.TarInfo) -> tarfile.TarInfo:
+        # Checkout permissions may come from a runner with umask 077. These
+        # filtered source files enter non-root application images and must be
+        # readable there; private archives/backups retain their outer modes.
+        if info.isfile():
+            info.mode = 0o644
+        return info
     with tarfile.open(output, "w:gz") as archive:
         for path, relative in files:
-            archive.add(path, arcname=relative, recursive=False)
+            archive.add(path, arcname=relative, recursive=False, filter=public_source_mode)
     return {"file_count": len(files), "sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "bytes": output.stat().st_size}
 
 
