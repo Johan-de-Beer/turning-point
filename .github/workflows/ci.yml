@@ -1,21 +1,15 @@
-name: Verify Turning Point
+name: Verify and deploy Turning Point
 on:
   push:
     branches: [main]
-    paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'server_data/**'
-      - 'docker/**'
-      - 'docker-compose*.yml'
-      - '.github/workflows/ci.yml'
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
   group: verify-${{ github.ref }}
-  cancel-in-progress: true
+  # A newer push must not interrupt a deployment that is replacing containers.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   backend:
     runs-on: ubuntu-latest
@@ -29,6 +23,7 @@ jobs:
           cache-dependency-path: backend/requirements.lock.txt
       - run: python -m pip install -r backend/requirements.txt -c backend/requirements.lock.txt
       - run: python -m pytest backend/tests -q
+      - run: python -m unittest discover -s scripts/tests -p 'test_deploy*.py' -v
   frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -45,3 +40,39 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+  deploy:
+    name: Deploy to server-1
+    needs: [backend, frontend]
+    if: >-
+      github.repository == 'Johan-de-Beer/turning-point' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: [self-hosted, linux, x64, server-1, turning-point]
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: https://football.thedebeer.co.za
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check this is still the current main revision
+        id: current
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest="$(git ls-remote https://github.com/Johan-de-Beer/turning-point.git refs/heads/main | cut -f1)"
+          if [ "$latest" = "$GITHUB_SHA" ]; then
+            printf 'deploy=true\n' >> "$GITHUB_OUTPUT"
+          else
+            printf 'deploy=false\n' >> "$GITHUB_OUTPUT"
+            printf 'A newer main commit exists; leaving production for its validated deployment.\n'
+          fi
+      - name: Release tested source and verify production
+        if: steps.current.outputs.deploy == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          release="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA:0:7}"
+          bash scripts/deploy.sh "$GITHUB_WORKSPACE" "$GITHUB_SHA" "$release"

@@ -78,6 +78,12 @@ The browser check uses installed Microsoft Edge or Playwright Chromium, covers a
 
 Start a replay in Casual mode at the default 12× speed to read the individual actions. Select 60× for a short demonstration: the full match takes about 90 seconds, excluding pauses. Pause on a new insight, open “Why this insight?”, switch to Analyst, select a fictional player, and inspect the overlay JSON. Use Previous/Next observed event and Replay this event to inspect a recorded action while preserving the live replay queue. Drag the stadium camera, switch to Top view, or enter native fullscreen; reduced motion and a Motion toggle are supported. An ordinary pause freezes the ball's current progress. At half-time and full-time, remaining delivered actions finish without moving the server cutoff. Continue explicitly at half-time. The full-time recap stays locked before the final marker.
 
+## Automatic deployment
+
+Each push to `main` runs the backend, frontend and Linux deployment checks on GitHub-hosted Ubuntu runners. After they pass, the dedicated `server-1-turning-point` runner deploys that tested commit to the existing server. Pull requests run hosted checks only. The workflow skips a queued deployment when a newer `main` commit exists. To retry manually, open **Actions → Verify and deploy Turning Point → Run workflow** and select `main`.
+
+Automatic deployment retains the named replay volume, takes a consistent private SQLite backup, checks container/API health and the served release, and restores the previous images on failure. Automatic and Windows manual deployment share one application lock. Successful automatic releases serve their commit and release identity at `/release.json`. See [deployment](docs/deployment.md) for the runner, release procedure and recorded verification; introducing this workflow does not itself establish a successful automatic deployment.
+
 ## Project notes
 
 - [Product and interaction design](docs/design.md)

@@ -21,6 +21,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Remote release directory failed.' }
 if ($LASTEXITCODE -ne 0) { throw 'Upload failed.' }
 $remoteCommands = @'
 set -eu
+exec 9>'__BASE__/.deploy.lock'
+flock -w 600 9
 chmod 700 '__BASE__/backups'
 existing_backend=$(docker ps --filter label=com.docker.compose.project=turning-point --filter label=com.docker.compose.service=backend --format '{{.ID}}')
 if [ -n "$existing_backend" ]; then

@@ -10,7 +10,30 @@ The dedicated `turning-point-private` Docker network is internal: `10.203.77.0/2
 
 The football NPM host overrides inherited real-IP behavior with only Cloudflare's freshly fetched [IPv4](https://www.cloudflare.com/ips-v4) and [IPv6](https://www.cloudflare.com/ips-v6) ranges and `CF-Connecting-IP`. NPM then replaces `X-Real-IP` with that verified peer identity. Direct connections use their socket address and ignore forged Cloudflare headers. Cloudflare documents the [client-IP header behavior](https://developers.cloudflare.com/fundamentals/reference/http-headers/). `docker/npm-football.conf` records this host's Advanced configuration; it is applied only to football, preserving global settings and other hosts. A direct HTTPS check with seven idempotent creates and changing forged headers yielded six successes then 429, confirming the direct quota was not reset by those headers. One session was reused.
 
-## Release and persistence
+## Automatic deployment
+
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on every push to `main`, on pull requests, and through manual `workflow_dispatch`. The backend and frontend jobs use GitHub-hosted `ubuntu-latest` runners. They install locked dependencies, run the application tests and frontend production build, and exercise the deployment scripts with Linux tests. The deployment job depends on both jobs passing.
+
+Deployment is restricted to `Johan-de-Beer/turning-point`, `refs/heads/main`, and `push` or `workflow_dispatch` events. The deployment job does not run for pull requests; application verification jobs use hosted runners. External-fork workflows require approval under the repository's `all_external_contributors` policy. The deployment labels are `[self-hosted, linux, x64, server-1, turning-point]`; the dedicated repository runner is named `server-1-turning-point`, installed at `/home/balanceworx/turning-point-runner` and operated by `balanceworx` through user systemd with existing `Linger=yes`. The existing GVK organization runner remains unchanged.
+
+The verified runner service is `/home/balanceworx/.config/systemd/user/turning-point-runner.service`, enabled and running as `balanceworx`; its runner directory has mode 700. Existing user lingering keeps it available after logout and at boot without a system-wide service or sudo changes. GitHub reports the repository runner online with labels `self-hosted`, `Linux`, `X64`, `server-1`, and `turning-point`. Runner availability verifies setup, not execution of a deployment. Inspect it as `balanceworx`:
+
+```sh
+systemctl --user status turning-point-runner.service
+journalctl --user -u turning-point-runner.service --no-pager -n 50
+```
+
+Restart only this runner when needed with `systemctl --user restart turning-point-runner.service`.
+
+Future pushes to `main` deploy automatically after these checks. To retry a failed run manually, select **Actions → Verify and deploy Turning Point → Run workflow → main**. Dispatching a different branch runs verification but does not deploy. Before deployment, the workflow compares its checked-out SHA with the current `main` SHA and skips an obsolete queued commit. Main runs do not cancel a deployment while containers are being replaced; pull-request checks can be canceled by newer changes.
+
+The runner executes `bash scripts/deploy.sh SOURCE SHA RELEASE`, with the checked-out workspace, tested commit SHA and a release identity derived from the Actions run ID, attempt and abbreviated commit. It stages filtered source and a public `/release.json` commit/release marker, builds the same two production images, and operates only Compose project `turning-point`. The runner does not require SSH deployment credentials: it runs on server-1 itself.
+
+The Bash script and Windows manual path serialize deployment with `/home/balanceworx/turning-point/.deploy.lock` using `flock`. Automatic deployment retains `turning-point-replay-data`, takes a consistent SQLite backup before replacing the backend, waits for healthy containers, checks Nginx configuration and API health through the LAN gateway, and compares the served `/release.json` with its staged commit/release marker. It advances `current` only after verification. If deployment or health checks fail after replacement, it restores the previous release's images while retaining the previous release pointer. Image rollback preserves the data volume; database-schema recovery is a separate operation requiring a compatible schema and the private backup. These LAN gateway checks do not establish an external DNS/TLS check; public HTTPS verification remains separately recorded.
+
+The new automatic pipeline's execution result must be recorded after an actual GitHub Actions run. The historical release evidence below does not validate the newly introduced workflow or runner.
+
+## Manual release and persistence
 
 Run from Windows with the configured SSH alias and Docker permissions:
 
@@ -43,10 +66,10 @@ Capacity is 32 retained sessions and four playing sessions. Ready sessions expir
 
 NPM adds a dedicated host, disables caching and access logging for it, and uses a certificate covering only the requested domain. Discovery found no existing covering wildcard/domain certificate, so a new free Let's Encrypt certificate was issued. [NPM's official setup](https://nginxproxymanager.com/setup/) documents its existing data and certificate storage. Certificate issuance depends on DNS and inbound challenge routing; no DNS change is performed by these scripts.
 
-## Verification status
+## Previously verified release
 
-Release `20261005-215011-54fd5f1` is running on server-1. Both read-only/non-root containers are healthy. Backend image ID: `f46576018d7065675a97421d60a2bcb7611c9b77c81ded4356019084502b79ea`; frontend image ID: `b5d178d39f9d93aa0d8678020dc8644030b0f094722b3d5b6624a8672d8336de`. The source bundle contains 65 filtered files (754,846 bytes), SHA256 `3e87260d1f7aae7bd71b8f988f25622df33de53ce322e7d21f90f0b82dba7871`, independently checked on the server. Application code matches public GitHub commit `54fd5f168a855ccbe627c2542c3aaba4e4c6ccc0`; the deployed JavaScript is `index-NJz0WD-2.js`. The repeat deployment retained the named SQLite volume and created a consistent 7,634,944-byte backup with mode 600 in the private backup directory.
+Release `20261005-215011-54fd5f1` was verified running on server-1 with both read-only/non-root containers healthy. Backend image ID: `f46576018d7065675a97421d60a2bcb7611c9b77c81ded4356019084502b79ea`; frontend image ID: `b5d178d39f9d93aa0d8678020dc8644030b0f094722b3d5b6624a8672d8336de`. The source bundle contained 65 filtered files (754,846 bytes), SHA256 `3e87260d1f7aae7bd71b8f988f25622df33de53ce322e7d21f90f0b82dba7871`, independently checked on the server. Application code matched public GitHub commit `54fd5f168a855ccbe627c2542c3aaba4e4c6ccc0`; the deployed JavaScript was `index-NJz0WD-2.js`. The repeat deployment retained the named SQLite volume and created a consistent 7,634,944-byte backup with mode 600 in the private backup directory.
 
 This release upgrades the synthetic fixture to `synthetic_v2`. Saved v1 replays are retired by the backend rather than mixing different event sequences and coordinates; the browser returns to a fresh replay while retaining local preferences. This is temporary demo-session expiry, not deletion of the retained volume or unrelated data.
 
-NPM Proxy Host ID 37 points to the LAN upstream; certificate ID 59 covers `football.thedebeer.co.za`, expires 3 January 2027 at 19:24:38 UTC, and has forced HTTPS and nginx online. During the original host/TLS/real-IP setup, the prior 36 proxy-host records retained the same SHA256: `6027af2f85dc0c4ea53eef0a91f77818b13934c4744d04c766d9462af268a344`. The v2 application upgrade did not modify NPM, certificates or DNS. Direct domain-SNI TLS passed during initial hosting verification; current normal-DNS trusted HTTPS, exact new bundle and API health pass, including an independently executed GitHub-hosted check. Read `verification.md` for measured browser/API results and remaining limitations.
+NPM Proxy Host ID 37 points to the LAN upstream; certificate ID 59 covers `football.thedebeer.co.za`, expires 3 January 2027 at 19:24:38 UTC, and has forced HTTPS and nginx online. During the original host/TLS/real-IP setup, the prior 36 proxy-host records retained the same SHA256: `6027af2f85dc0c4ea53eef0a91f77818b13934c4744d04c766d9462af268a344`. The v2 application upgrade did not modify NPM, certificates or DNS. Direct domain-SNI TLS passed during initial hosting verification; normal-DNS trusted HTTPS, the exact bundle and API health passed for this recorded release, including an independently executed GitHub-hosted check. Read `verification.md` for measured browser/API results and remaining limitations.

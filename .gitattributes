@@ -2,3 +2,4 @@
 *.png binary
 *.glb binary
 *.blend binary
+*.sh text eol=lf
