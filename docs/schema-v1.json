@@ -1951,6 +1951,17 @@
             ],
             "default": null,
             "title": "Body Part"
+          },
+          "placement": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ShotPlacement"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           }
         },
         "required": [
@@ -1958,6 +1969,37 @@
           "outcome"
         ],
         "title": "ShotDetail",
+        "type": "object"
+      },
+      "ShotPlacement": {
+        "additionalProperties": false,
+        "description": "Where an on-target shot crossed the goal line, from the shooter's view, and how hard it was hit.",
+        "properties": {
+          "y_m": {
+            "maximum": 3.66,
+            "minimum": -3.66,
+            "title": "Y M",
+            "type": "number"
+          },
+          "z_m": {
+            "maximum": 2.44,
+            "minimum": 0,
+            "title": "Z M",
+            "type": "number"
+          },
+          "speed_mps": {
+            "maximum": 45,
+            "minimum": 0,
+            "title": "Speed Mps",
+            "type": "number"
+          }
+        },
+        "required": [
+          "y_m",
+          "z_m",
+          "speed_mps"
+        ],
+        "title": "ShotPlacement",
         "type": "object"
       },
       "Stoppage": {
@@ -3638,6 +3680,17 @@
             ],
             "default": null,
             "title": "Body Part"
+          },
+          "placement": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ShotPlacement"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           }
         },
         "required": [
@@ -3645,6 +3698,37 @@
           "outcome"
         ],
         "title": "ShotDetail",
+        "type": "object"
+      },
+      "ShotPlacement": {
+        "additionalProperties": false,
+        "description": "Where an on-target shot crossed the goal line, from the shooter's view, and how hard it was hit.",
+        "properties": {
+          "y_m": {
+            "maximum": 3.66,
+            "minimum": -3.66,
+            "title": "Y M",
+            "type": "number"
+          },
+          "z_m": {
+            "maximum": 2.44,
+            "minimum": 0,
+            "title": "Z M",
+            "type": "number"
+          },
+          "speed_mps": {
+            "maximum": 45,
+            "minimum": 0,
+            "title": "Speed Mps",
+            "type": "number"
+          }
+        },
+        "required": [
+          "y_m",
+          "z_m",
+          "speed_mps"
+        ],
+        "title": "ShotPlacement",
         "type": "object"
       },
       "Stoppage": {
@@ -6039,6 +6123,350 @@
         "title": "DefensiveLine",
         "type": "object"
       },
+      "GameState": {
+        "additionalProperties": false,
+        "properties": {
+          "score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Score",
+            "type": "object"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/$defs/ScoreSegment"
+            },
+            "title": "Segments",
+            "type": "array"
+          },
+          "teams": {
+            "additionalProperties": {
+              "$ref": "#/$defs/TeamGameState"
+            },
+            "title": "Teams",
+            "type": "object"
+          }
+        },
+        "required": [
+          "score",
+          "segments",
+          "teams"
+        ],
+        "title": "GameState",
+        "type": "object"
+      },
+      "GameStateRow": {
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "enum": [
+              "winning",
+              "drawing",
+              "losing"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "number"
+          },
+          "possession_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Possession Share"
+          },
+          "field_tilt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Tilt"
+          },
+          "passes": {
+            "title": "Passes",
+            "type": "integer"
+          },
+          "shots": {
+            "title": "Shots",
+            "type": "integer"
+          },
+          "xg": {
+            "title": "Xg",
+            "type": "number"
+          },
+          "xg_per_shot": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Xg Per Shot"
+          },
+          "goals": {
+            "title": "Goals",
+            "type": "integer"
+          },
+          "box_touches": {
+            "title": "Box Touches",
+            "type": "integer"
+          },
+          "xova": {
+            "title": "Xova",
+            "type": "number"
+          },
+          "vaep": {
+            "title": "Vaep",
+            "type": "number"
+          },
+          "vaep_per_action": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vaep Per Action"
+          },
+          "ppda": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ppda"
+          },
+          "vertical_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vertical Mps"
+          },
+          "directness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directness"
+          },
+          "back_four_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Back Four M"
+          }
+        },
+        "required": [
+          "state",
+          "minutes",
+          "possession_share",
+          "field_tilt",
+          "passes",
+          "shots",
+          "xg",
+          "xg_per_shot",
+          "goals",
+          "box_touches",
+          "xova",
+          "vaep",
+          "vaep_per_action",
+          "ppda",
+          "vertical_mps",
+          "directness",
+          "back_four_m"
+        ],
+        "title": "GameStateRow",
+        "type": "object"
+      },
+      "Goalkeeping": {
+        "additionalProperties": false,
+        "properties": {
+          "keepers": {
+            "items": {
+              "$ref": "#/$defs/KeeperRow"
+            },
+            "title": "Keepers",
+            "type": "array"
+          },
+          "shooting": {
+            "additionalProperties": {
+              "$ref": "#/$defs/TeamShooting"
+            },
+            "title": "Shooting",
+            "type": "object"
+          }
+        },
+        "required": [
+          "keepers",
+          "shooting"
+        ],
+        "title": "Goalkeeping",
+        "type": "object"
+      },
+      "Heatmap": {
+        "additionalProperties": false,
+        "properties": {
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "touches",
+              "tracking",
+              "received",
+              "defensive"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "cells": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Cells",
+            "type": "array"
+          }
+        },
+        "required": [
+          "subject_id",
+          "team_id",
+          "kind",
+          "total",
+          "cells"
+        ],
+        "title": "Heatmap",
+        "type": "object"
+      },
+      "Heatmaps": {
+        "additionalProperties": false,
+        "properties": {
+          "grid_x": {
+            "title": "Grid X",
+            "type": "integer"
+          },
+          "grid_y": {
+            "title": "Grid Y",
+            "type": "integer"
+          },
+          "maps": {
+            "items": {
+              "$ref": "#/$defs/Heatmap"
+            },
+            "title": "Maps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "grid_x",
+          "grid_y",
+          "maps"
+        ],
+        "title": "Heatmaps",
+        "type": "object"
+      },
+      "KeeperRow": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "shots_on_target": {
+            "title": "Shots On Target",
+            "type": "integer"
+          },
+          "saves": {
+            "title": "Saves",
+            "type": "integer"
+          },
+          "goals_conceded": {
+            "title": "Goals Conceded",
+            "type": "integer"
+          },
+          "xg_faced": {
+            "title": "Xg Faced",
+            "type": "number"
+          },
+          "xgot_faced": {
+            "title": "Xgot Faced",
+            "type": "number"
+          },
+          "xg_prevented": {
+            "title": "Xg Prevented",
+            "type": "number"
+          },
+          "save_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Save Pct"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "shots_on_target",
+          "saves",
+          "goals_conceded",
+          "xg_faced",
+          "xgot_faced",
+          "xg_prevented",
+          "save_pct"
+        ],
+        "title": "KeeperRow",
+        "type": "object"
+      },
       "LineFigures": {
         "additionalProperties": false,
         "properties": {
@@ -6161,6 +6589,184 @@
         "title": "LineInterval",
         "type": "object"
       },
+      "PackingAction": {
+        "additionalProperties": false,
+        "properties": {
+          "event_ref": {
+            "title": "Event Ref",
+            "type": "string"
+          },
+          "time_ms": {
+            "title": "Time Ms",
+            "type": "integer"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "pass",
+              "carry"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "packed": {
+            "title": "Packed",
+            "type": "integer"
+          },
+          "defenders_packed": {
+            "title": "Defenders Packed",
+            "type": "integer"
+          },
+          "start": {
+            "$ref": "#/$defs/Point"
+          },
+          "end": {
+            "$ref": "#/$defs/Point"
+          }
+        },
+        "required": [
+          "event_ref",
+          "time_ms",
+          "team_id",
+          "player_id",
+          "action",
+          "packed",
+          "defenders_packed",
+          "start",
+          "end"
+        ],
+        "title": "PackingAction",
+        "type": "object"
+      },
+      "PlayerCreation": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "box_touches": {
+            "title": "Box Touches",
+            "type": "integer"
+          },
+          "zone14_touches": {
+            "title": "Zone14 Touches",
+            "type": "integer"
+          },
+          "key_passes": {
+            "title": "Key Passes",
+            "type": "integer"
+          },
+          "assists": {
+            "title": "Assists",
+            "type": "integer"
+          },
+          "xa": {
+            "title": "Xa",
+            "type": "number"
+          },
+          "shots": {
+            "title": "Shots",
+            "type": "integer"
+          },
+          "xg": {
+            "title": "Xg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "box_touches",
+          "zone14_touches",
+          "key_passes",
+          "assists",
+          "xa",
+          "shots",
+          "xg"
+        ],
+        "title": "PlayerCreation",
+        "type": "object"
+      },
+      "PlayerPacking": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "passes": {
+            "title": "Passes",
+            "type": "integer"
+          },
+          "packed_by_passes": {
+            "title": "Packed By Passes",
+            "type": "integer"
+          },
+          "carries": {
+            "title": "Carries",
+            "type": "integer"
+          },
+          "packed_by_carries": {
+            "title": "Packed By Carries",
+            "type": "integer"
+          },
+          "passing_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passing Rate"
+          },
+          "dribbling_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dribbling Rate"
+          },
+          "defenders_packed": {
+            "title": "Defenders Packed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "passes",
+          "packed_by_passes",
+          "carries",
+          "packed_by_carries",
+          "passing_rate",
+          "dribbling_rate",
+          "defenders_packed"
+        ],
+        "title": "PlayerPacking",
+        "type": "object"
+      },
       "PlayerValue": {
         "additionalProperties": false,
         "properties": {
@@ -6194,6 +6800,14 @@
               }
             ],
             "title": "Best Ref"
+          },
+          "vaep": {
+            "title": "Vaep",
+            "type": "number"
+          },
+          "defensive_vaep": {
+            "title": "Defensive Vaep",
+            "type": "number"
           }
         },
         "required": [
@@ -6202,7 +6816,9 @@
           "actions",
           "pv",
           "positive_actions",
-          "best_ref"
+          "best_ref",
+          "vaep",
+          "defensive_vaep"
         ],
         "title": "PlayerValue",
         "type": "object"
@@ -6343,6 +6959,100 @@
         "title": "Point",
         "type": "object"
       },
+      "Pressing": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "ppda": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ppda"
+          },
+          "opponent_passes": {
+            "title": "Opponent Passes",
+            "type": "integer"
+          },
+          "defensive_actions": {
+            "title": "Defensive Actions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "team_id",
+          "ppda",
+          "opponent_passes",
+          "defensive_actions"
+        ],
+        "title": "Pressing",
+        "type": "object"
+      },
+      "ScoreSegment": {
+        "additionalProperties": false,
+        "properties": {
+          "start_ms": {
+            "title": "Start Ms",
+            "type": "integer"
+          },
+          "end_ms": {
+            "title": "End Ms",
+            "type": "integer"
+          },
+          "score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Score",
+            "type": "object"
+          }
+        },
+        "required": [
+          "start_ms",
+          "end_ms",
+          "score"
+        ],
+        "title": "ScoreSegment",
+        "type": "object"
+      },
+      "ShotPlacement": {
+        "additionalProperties": false,
+        "description": "Where an on-target shot crossed the goal line, from the shooter's view, and how hard it was hit.",
+        "properties": {
+          "y_m": {
+            "maximum": 3.66,
+            "minimum": -3.66,
+            "title": "Y M",
+            "type": "number"
+          },
+          "z_m": {
+            "maximum": 2.44,
+            "minimum": 0,
+            "title": "Z M",
+            "type": "number"
+          },
+          "speed_mps": {
+            "maximum": 45,
+            "minimum": 0,
+            "title": "Speed Mps",
+            "type": "number"
+          }
+        },
+        "required": [
+          "y_m",
+          "z_m",
+          "speed_mps"
+        ],
+        "title": "ShotPlacement",
+        "type": "object"
+      },
       "ShotValue": {
         "additionalProperties": false,
         "properties": {
@@ -6412,6 +7122,47 @@
             ],
             "title": "Chance",
             "type": "string"
+          },
+          "xgot": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Xgot"
+          },
+          "placement": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ShotPlacement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "key_passer_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Passer Id"
+          },
+          "game_state": {
+            "enum": [
+              "winning",
+              "drawing",
+              "losing"
+            ],
+            "title": "Game State",
+            "type": "string"
           }
         },
         "required": [
@@ -6425,7 +7176,11 @@
           "angle_deg",
           "assist",
           "body_part",
-          "chance"
+          "chance",
+          "xgot",
+          "placement",
+          "key_passer_id",
+          "game_state"
         ],
         "title": "ShotValue",
         "type": "object"
@@ -6486,6 +7241,248 @@
         "title": "TeamChances",
         "type": "object"
       },
+      "TeamCreation": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "box_touches": {
+            "title": "Box Touches",
+            "type": "integer"
+          },
+          "box_entries": {
+            "title": "Box Entries",
+            "type": "integer"
+          },
+          "zone14_touches": {
+            "title": "Zone14 Touches",
+            "type": "integer"
+          },
+          "zone14_entries": {
+            "title": "Zone14 Entries",
+            "type": "integer"
+          },
+          "key_passes": {
+            "title": "Key Passes",
+            "type": "integer"
+          },
+          "first_time_key_passes": {
+            "title": "First Time Key Passes",
+            "type": "integer"
+          },
+          "assists": {
+            "title": "Assists",
+            "type": "integer"
+          },
+          "xa": {
+            "title": "Xa",
+            "type": "number"
+          },
+          "key_pass_types": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Key Pass Types",
+            "type": "object"
+          },
+          "key_pass_origins": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Key Pass Origins",
+            "type": "object"
+          },
+          "xg_per_box_touch": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Xg Per Box Touch"
+          }
+        },
+        "required": [
+          "team_id",
+          "box_touches",
+          "box_entries",
+          "zone14_touches",
+          "zone14_entries",
+          "key_passes",
+          "first_time_key_passes",
+          "assists",
+          "xa",
+          "key_pass_types",
+          "key_pass_origins",
+          "xg_per_box_touch"
+        ],
+        "title": "TeamCreation",
+        "type": "object"
+      },
+      "TeamGameState": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "current": {
+            "enum": [
+              "winning",
+              "drawing",
+              "losing"
+            ],
+            "title": "Current",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/$defs/GameStateRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "team_id",
+          "current",
+          "rows"
+        ],
+        "title": "TeamGameState",
+        "type": "object"
+      },
+      "TeamPacking": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "passes": {
+            "title": "Passes",
+            "type": "integer"
+          },
+          "packed_by_passes": {
+            "title": "Packed By Passes",
+            "type": "integer"
+          },
+          "carries": {
+            "title": "Carries",
+            "type": "integer"
+          },
+          "packed_by_carries": {
+            "title": "Packed By Carries",
+            "type": "integer"
+          },
+          "passing_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passing Rate"
+          },
+          "dribbling_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dribbling Rate"
+          },
+          "defenders_packed": {
+            "title": "Defenders Packed",
+            "type": "integer"
+          },
+          "line_breaking": {
+            "title": "Line Breaking",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "team_id",
+          "passes",
+          "packed_by_passes",
+          "carries",
+          "packed_by_carries",
+          "passing_rate",
+          "dribbling_rate",
+          "defenders_packed",
+          "line_breaking"
+        ],
+        "title": "TeamPacking",
+        "type": "object"
+      },
+      "TeamShooting": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "shots_on_target": {
+            "title": "Shots On Target",
+            "type": "integer"
+          },
+          "xg_on_target": {
+            "title": "Xg On Target",
+            "type": "number"
+          },
+          "xgot": {
+            "title": "Xgot",
+            "type": "number"
+          },
+          "placement_added": {
+            "title": "Placement Added",
+            "type": "number"
+          }
+        },
+        "required": [
+          "team_id",
+          "shots_on_target",
+          "xg_on_target",
+          "xgot",
+          "placement_added"
+        ],
+        "title": "TeamShooting",
+        "type": "object"
+      },
+      "TeamTempo": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "match": {
+            "$ref": "#/$defs/TempoFigures"
+          },
+          "intervals": {
+            "items": {
+              "$ref": "#/$defs/TempoInterval"
+            },
+            "title": "Intervals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "team_id",
+          "match",
+          "intervals"
+        ],
+        "title": "TeamTempo",
+        "type": "object"
+      },
       "TeamValue": {
         "additionalProperties": false,
         "properties": {
@@ -6522,6 +7519,17 @@
             },
             "title": "By Action",
             "type": "object"
+          },
+          "vaep": {
+            "title": "Vaep",
+            "type": "number"
+          },
+          "vaep_by_action": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Vaep By Action",
+            "type": "object"
           }
         },
         "required": [
@@ -6530,9 +7538,168 @@
           "possessions",
           "pv",
           "pv_per_action",
-          "by_action"
+          "by_action",
+          "vaep",
+          "vaep_by_action"
         ],
         "title": "TeamValue",
+        "type": "object"
+      },
+      "TempoFigures": {
+        "additionalProperties": false,
+        "properties": {
+          "possessions": {
+            "title": "Possessions",
+            "type": "integer"
+          },
+          "vertical_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vertical Mps"
+          },
+          "final_third_entries": {
+            "title": "Final Third Entries",
+            "type": "integer"
+          },
+          "passes_per_entry": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passes Per Entry"
+          },
+          "forward_passes": {
+            "title": "Forward Passes",
+            "type": "integer"
+          },
+          "lateral_passes": {
+            "title": "Lateral Passes",
+            "type": "integer"
+          },
+          "backward_passes": {
+            "title": "Backward Passes",
+            "type": "integer"
+          },
+          "directness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directness"
+          },
+          "possession_s": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Possession S",
+            "type": "object"
+          },
+          "progressive_passes": {
+            "title": "Progressive Passes",
+            "type": "integer"
+          },
+          "regain_to_progressive_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regain To Progressive S"
+          }
+        },
+        "required": [
+          "possessions",
+          "vertical_mps",
+          "final_third_entries",
+          "passes_per_entry",
+          "forward_passes",
+          "lateral_passes",
+          "backward_passes",
+          "directness",
+          "possession_s",
+          "progressive_passes",
+          "regain_to_progressive_s"
+        ],
+        "title": "TempoFigures",
+        "type": "object"
+      },
+      "TempoInterval": {
+        "additionalProperties": false,
+        "properties": {
+          "start_ms": {
+            "title": "Start Ms",
+            "type": "integer"
+          },
+          "end_ms": {
+            "title": "End Ms",
+            "type": "integer"
+          },
+          "vertical_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vertical Mps"
+          },
+          "directness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directness"
+          },
+          "passes_per_entry": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passes Per Entry"
+          }
+        },
+        "required": [
+          "start_ms",
+          "end_ms",
+          "vertical_mps",
+          "directness",
+          "passes_per_entry"
+        ],
+        "title": "TempoInterval",
         "type": "object"
       },
       "Territory": {
@@ -6642,7 +7809,9 @@
               "carry",
               "shot",
               "lost_pass",
-              "dispossessed"
+              "dispossessed",
+              "tackle_won",
+              "interception"
             ],
             "title": "Action",
             "type": "string"
@@ -6671,6 +7840,18 @@
           "pv": {
             "title": "Pv",
             "type": "number"
+          },
+          "scoring_delta": {
+            "title": "Scoring Delta",
+            "type": "number"
+          },
+          "conceding_delta": {
+            "title": "Conceding Delta",
+            "type": "number"
+          },
+          "vaep": {
+            "title": "Vaep",
+            "type": "number"
           }
         },
         "required": [
@@ -6683,7 +7864,10 @@
           "end",
           "value_before",
           "value_after",
-          "pv"
+          "pv",
+          "scoring_delta",
+          "conceding_delta",
+          "vaep"
         ],
         "title": "ValuedAction",
         "type": "object"
@@ -6712,8 +7896,8 @@
         "type": "string"
       },
       "engine_version": {
-        "const": "analytics_v1",
-        "default": "analytics_v1",
+        "const": "analytics_v2",
+        "default": "analytics_v2",
         "title": "Engine Version",
         "type": "string"
       },
@@ -6775,6 +7959,71 @@
         "title": "Top Actions",
         "type": "array"
       },
+      "top_vaep": {
+        "items": {
+          "$ref": "#/$defs/ValuedAction"
+        },
+        "title": "Top Vaep",
+        "type": "array"
+      },
+      "game_state": {
+        "$ref": "#/$defs/GameState"
+      },
+      "heatmaps": {
+        "$ref": "#/$defs/Heatmaps"
+      },
+      "goalkeeping": {
+        "$ref": "#/$defs/Goalkeeping"
+      },
+      "tempo": {
+        "additionalProperties": {
+          "$ref": "#/$defs/TeamTempo"
+        },
+        "title": "Tempo",
+        "type": "object"
+      },
+      "pressing": {
+        "additionalProperties": {
+          "$ref": "#/$defs/Pressing"
+        },
+        "title": "Pressing",
+        "type": "object"
+      },
+      "creation": {
+        "additionalProperties": {
+          "$ref": "#/$defs/TeamCreation"
+        },
+        "title": "Creation",
+        "type": "object"
+      },
+      "player_creation": {
+        "items": {
+          "$ref": "#/$defs/PlayerCreation"
+        },
+        "title": "Player Creation",
+        "type": "array"
+      },
+      "packing": {
+        "additionalProperties": {
+          "$ref": "#/$defs/TeamPacking"
+        },
+        "title": "Packing",
+        "type": "object"
+      },
+      "player_packing": {
+        "items": {
+          "$ref": "#/$defs/PlayerPacking"
+        },
+        "title": "Player Packing",
+        "type": "array"
+      },
+      "top_packing": {
+        "items": {
+          "$ref": "#/$defs/PackingAction"
+        },
+        "title": "Top Packing",
+        "type": "array"
+      },
       "definitions": {
         "additionalProperties": {
           "type": "string"
@@ -6804,6 +8053,17 @@
       "team_value",
       "player_value",
       "top_actions",
+      "top_vaep",
+      "game_state",
+      "heatmaps",
+      "goalkeeping",
+      "tempo",
+      "pressing",
+      "creation",
+      "player_creation",
+      "packing",
+      "player_packing",
+      "top_packing",
       "definitions",
       "limitations"
     ],
