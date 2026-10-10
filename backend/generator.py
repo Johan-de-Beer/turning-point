@@ -2,6 +2,10 @@
 
 Coordinates describe discrete events, not player tracking. No measured distances or
 expected-goals model exists. The fictional adults and original assets are synthetic.
+
+Tactical additions (corners, presses that force a recycle to the keeper, short
+goal-kick build-up) draw from a separate seeded stream so the open-play stream
+keeps its shape. Their server-only plans feed the synthetic tracking layer.
 """
 from __future__ import annotations
 
@@ -10,6 +14,9 @@ import random
 from pathlib import Path
 
 from .models import EventEnvelope, Match, PERIOD_MS
+from .tactical_profiles import CORNER_TAKERS, TARGET_MEN, other, player_for, tendencies
+
+TACTICAL_SALT = 0x7AC71C
 
 FIXTURE_PATH = Path(__file__).resolve().parent.parent / "server_data" / "fixtures" / "tp_demo_01.json"
 
@@ -20,7 +27,7 @@ def fixture_match(seed: int = 24017) -> Match:
         "vale": ["Tomas Hale", "Oren Clay", "Luca Briar", "Niko Ash", "Finn Alder", "Emil Stone", "Sami North", "Ivo Brook", "Jasper Dale", "Ruben Hart", "Felix Cove"],
     }
     return Match.model_validate({
-        "match_id": "tp_demo_01", "seed": seed, "fixture_version": "synthetic_v2",
+        "match_id": "tp_demo_01", "seed": seed, "fixture_version": "synthetic_v3",
         "home": {"team_id": "harbor", "display_name": "Harbor Athletic", "short_name": "HBR", "color": "#38BDF8"},
         "away": {"team_id": "vale", "display_name": "Vale United", "short_name": "VAL", "color": "#FBBF24"},
         "roster": [{"player_id": f"{team}_{i:02d}", "team_id": team, "display_name": name,
@@ -42,6 +49,11 @@ class Generator:
         self.ball: dict | None = None
         self.holder: str | None = None
         self.last_stoppage: str | None = None
+        # Tactical decisions use their own stream; ``plans`` stays server-side.
+        self.tactics = random.Random(seed ^ TACTICAL_SALT)
+        self.plans: dict[str, dict] = {}
+        self.corner_flag: dict | None = None
+        self.corner_count = {"harbor": 0, "vale": 0}
 
     def point(self, x: float, y: float = 50) -> dict:
         return {"x": round(x, 2), "y": round(y, 2)}
@@ -54,10 +66,11 @@ class Generator:
             eligible = [f"{team}_{i:02d}" for i in [2, 3, 4, 5] if f"{team}_{i:02d}" != exclude]
         return self.rng.choice(eligible)
 
-    def destination(self, low_x: float, high_x: float, low_y: float = 20, high_y: float = 80) -> dict:
-        return self.point(self.rng.uniform(low_x, high_x), self.rng.uniform(low_y, high_y))
+    def destination(self, low_x: float, high_x: float, low_y: float = 20, high_y: float = 80, rng: random.Random | None = None) -> dict:
+        rng = rng or self.rng
+        return self.point(rng.uniform(low_x, high_x), rng.uniform(low_y, high_y))
 
-    def emit(self, time_ms: int, kind: str, team: str | None = None, detail: dict | None = None, actor: str | None = None):
+    def emit(self, time_ms: int, kind: str, team: str | None = None, detail: dict | None = None, actor: str | None = None) -> str:
         self.seq += 1
         marker = kind in ("PERIOD_START", "PERIOD_END", "STOPPAGE")
         self.events.append(EventEnvelope.model_validate({
@@ -66,20 +79,100 @@ class Generator:
             "period": self.period, "kind": kind, "team_id": team, "player_id": None if marker else actor or self.actor(team),
             "possession_id": None if marker else f"pos_{self.possession:05d}", "detail": detail or {}},
         }))
+        return f"evt_{self.seq:05d}"
 
-    def possess(self, t: int, team: str):
+    def possess(self, t: int, team: str, holder: str | None = None) -> str:
         if self.live and self.ball:
             # Invert both axes when possession changes: the physical ball stays
             # at the same location despite the team's attacking coordinate frame.
             start = self.ball if team == self.owner else self.point(100 - self.ball["x"], 100 - self.ball["y"])
+        elif self.last_stoppage == "corner" and self.corner_flag:
+            start = self.corner_flag
         elif self.last_stoppage == "ball_out":
             start = self.destination(6, 14, 38, 62)  # recorded goal-kick restart
         else:
             start = self.point(50, 50)  # period start or restart after a goal
         self.possession += 1
         self.owner, self.live = team, True
-        self.ball, self.holder, self.last_stoppage = start, self.actor(team, start), None
-        self.emit(t, "POSSESSION", team, {"start": start}, self.holder)
+        restart = self.last_stoppage
+        self.ball, self.holder, self.last_stoppage = start, holder or self.actor(team, start), None
+        event_id = self.emit(t, "POSSESSION", team, {"start": start}, self.holder)
+        self.plan_press(event_id, team, start, restart)
+        return event_id
+
+    def plan_press(self, event_id: str, team: str, start: dict, restart: str | None):
+        """Decide (server-only) whether the opponent presses a possession won or
+        restarted in the team's own half. Centre kick-offs and corners are excluded."""
+        if start["x"] >= 55 or restart in ("goal", "interval", "corner") or (start["x"] == 50 and start["y"] == 50):
+            return
+        press = tendencies(other(team))["press"]
+        chance = press["base"] + (press["target_bonus"] if self.holder == press["target"] else 0)
+        self.plans[event_id] = {"type": "possession", "pressed": self.tactics.random() < chance}
+
+    def pass_to(self, t: int, recipient: str, end: dict, completed: bool = True) -> str:
+        """A scripted pass with an explicit recipient, outside the open-play stream."""
+        assert self.live and self.owner and self.ball and self.holder
+        event_id = self.emit(t, "PASS", self.owner, {"recipient_id": recipient, "completed": completed,
+                             "start": self.ball, "end": end}, self.holder)
+        self.ball = end
+        self.holder = recipient if completed else None
+        return event_id
+
+    def recycle_to_keeper(self, t: int) -> int:
+        """A pressed team plays back to its goalkeeper; returns the keeper's receive time."""
+        team = self.owner
+        keeper = player_for(team, "GK")
+        if self.holder == keeper:
+            return t
+        rng = self.tactics
+        if self.ball["x"] > 30 or self.holder.endswith(("_06", "_07", "_08", "_09", "_10", "_11")):
+            defender = rng.choice([p for p in (player_for(team, "RCB"), player_for(team, "LCB")) if p != self.holder])
+            self.pass_to(t + 1_800, defender, self.destination(17, 25, 30, 70, rng))
+            t += 1_800
+        self.pass_to(t + 1_700, keeper, self.destination(4, 8, 40, 60, rng))
+        return t + 1_700
+
+    def short_build_up(self, t: int):
+        """Goalkeeper plays short to a centre-back split wide in the box."""
+        team = self.owner
+        rng = self.tactics
+        side = rng.choice(("RCB", "LCB"))
+        y = rng.uniform(64, 80) if side == "RCB" else rng.uniform(20, 36)
+        self.pass_to(t, player_for(team, side), self.point(rng.uniform(15, 22), y))
+
+    def pressed_and_forced_back(self, possession_event: str) -> bool:
+        plan = self.plans.get(possession_event)
+        return bool(plan and plan["pressed"] and self.tactics.random() < tendencies(other(self.owner))["press"]["force_back"])
+
+    def corner(self, t: int, team: str) -> bool:
+        """A corner: stoppage, the taker's restart and the delivery. Returns whether
+        the attacking team won first contact."""
+        rng = self.tactics
+        self.stop(t, "corner")
+        side = "left" if self.corner_count[team] % 2 == 0 else "right"
+        self.corner_count[team] += 1
+        self.corner_flag = self.point(99.5, 0.5 if side == "left" else 99.5)
+        taker = CORNER_TAKERS[team][side]
+        self.possess(t + 3_000, team, holder=taker)
+        profile = tendencies(team)["corner"]
+        target = rng.choice(TARGET_MEN[team])
+        near = 42 if side == "left" else 58
+        zone, centre = rng.choice([("near_post", (95.0, near)), ("penalty_spot", (89.5, 50.0)), ("far_post", (94.5, 100 - near))])
+        sd = profile["accuracy"][taker]
+        landing = self.point(min(99.0, max(83.0, centre[0] + rng.gauss(0, sd))), min(80.0, max(20.0, centre[1] + rng.gauss(0, sd * 1.4))))
+        miss = ((landing["x"] - centre[0]) ** 2 + ((landing["y"] - centre[1]) * .68 / 1.05) ** 2) ** .5
+        won = rng.random() < (.6 if miss < 2.5 else .3)
+        delivery = self.pass_to(t + 5_000, target, landing, completed=won)
+        self.plans[delivery] = {"type": "corner", "side": side, "target_id": target, "zone": zone}
+        return won
+
+    def clear_corner(self, t: int, defending: str, attacking: str | None):
+        """The defending team clears a lost delivery; optionally the attackers recover the second ball."""
+        rng = self.tactics
+        self.possess(t, defending, holder=player_for(defending, rng.choice(("RCB", "LCB"))))
+        self.pass_to(t + 800, player_for(defending, rng.choice(("ST", "RW", "LW"))), self.destination(28, 42, 20, 80, rng), completed=attacking is None)
+        if attacking:
+            self.possess(t + 2_200, attacking, holder=player_for(attacking, rng.choice(("RCM", "DM", "LCM"))))
 
     def pass_ball(self, t: int, end: dict, completed: bool = True):
         assert self.live and self.owner and self.ball and self.holder
@@ -97,17 +190,18 @@ class Generator:
         self.emit(t, "CARRY", self.owner, {"start": self.ball, "end": end}, self.holder)
         self.ball = end
 
-    def shoot(self, t: int, outcome: str):
+    def shoot(self, t: int, outcome: str, rng: random.Random | None = None):
         assert self.live and self.owner and self.ball and self.holder
+        rng = rng or self.rng
         if outcome == "goal":
-            target = self.destination(100, 100, 46, 54)
+            target = self.destination(100, 100, 46, 54, rng)
         elif outcome == "saved":
-            target = self.destination(97, 99, 45, 55)
+            target = self.destination(97, 99, 45, 55, rng)
         elif outcome == "blocked":
-            target = self.point(min(95, self.ball["x"] + self.rng.uniform(3, 8)),
-                                min(85, max(15, self.ball["y"] + self.rng.uniform(-6, 6))))
+            target = self.point(min(95, self.ball["x"] + rng.uniform(3, 8)),
+                                min(85, max(15, self.ball["y"] + rng.uniform(-6, 6))))
         else:
-            target = self.destination(100, 100, 22, 39) if self.rng.random() < .5 else self.destination(100, 100, 61, 78)
+            target = self.destination(100, 100, 22, 39, rng) if rng.random() < .5 else self.destination(100, 100, 61, 78, rng)
         self.emit(t, "SHOT", self.owner, {"position": self.ball, "target": target, "outcome": outcome}, self.holder)
         self.ball = target
 
@@ -126,7 +220,12 @@ class Generator:
                 # now starts where the preceding back-pass actually finished.
                 self.pass_ball(t + 6_000, self.destination(56, 64, 25, 75))
                 self.carry(t + 12_000, self.destination(84, 91, 24, 76))
-                self.shoot(t + 14_000, self.rng.choice(["saved", "blocked"]))
+                outcome = self.rng.choice(["saved", "blocked"])
+                self.shoot(t + 14_000, outcome)
+                # A parried shot goes behind for a corner; a lost delivery is cleared
+                # and the pressing side recovers the second ball.
+                if outcome == "saved" and not self.corner(t + 15_000, dominant):
+                    self.clear_corner(t + 21_000, opponent, dominant)
                 self.pass_ball(t + 24_000, self.destination(72, 81, 15, 85))
                 self.possess(t + 30_000, opponent)
                 self.pass_ball(t + 35_000, self.destination(43, 55, 22, 78))
@@ -149,13 +248,34 @@ class Generator:
                 self.shoot(t + 32_000, self.rng.choice(["saved", "blocked"]))
         else:
             for t in range(start, start + length, 60_000):
-                self.possess(t, dominant)
+                goal_kick = self.last_stoppage == "ball_out"
+                possession = self.possess(t, dominant)
+                if goal_kick and self.tactics.random() < tendencies(dominant)["short_build_up"]:
+                    self.short_build_up(t + 3_000)
+                elif self.pressed_and_forced_back(possession):
+                    self.recycle_to_keeper(t)
+                    self.short_build_up(t + 5_200)
                 self.pass_ball(t + 7_000, self.destination(43, 57, 14, 86))
                 self.pass_ball(t + 18_000, self.destination(54, 65, 20, 80), completed=self.rng.random() > .12)
-                self.possess(t + 30_000, opponent)
+                possession = self.possess(t + 30_000, opponent)
+                if self.pressed_and_forced_back(possession):
+                    self.recycle_to_keeper(t + 30_000)
                 self.pass_ball(t + 37_000, self.destination(44, 61, 14, 86))
                 # A sparse shot is insufficient to create an end-to-end episode.
-                if (t // 60_000) % 5 == 0:
+                if (t // 60_000) % 10 == 5:
+                    # A parried effort becomes a corner. The discarded draw keeps the
+                    # seeded open-play stream aligned with an off-target shot.
+                    self.carry(t + 43_000, self.destination(80, 89, 30, 70))
+                    self.rng.random()
+                    self.shoot(t + 48_000, "saved")
+                    if self.corner(t + 49_000, opponent):
+                        outcome = self.tactics.choice(["saved", "blocked", "off_target"])
+                        self.shoot(t + 55_200, outcome, self.tactics)
+                        if outcome == "off_target":
+                            self.stop(t + 56_000, "ball_out")
+                    else:
+                        self.clear_corner(t + 55_000, dominant, None)
+                elif (t // 60_000) % 5 == 0:
                     self.carry(t + 43_000, self.destination(80, 89, 30, 70))
                     self.shoot(t + 48_000, "off_target")
                     self.stop(t + 49_000, "ball_out")
@@ -193,6 +313,13 @@ class Generator:
             self.live, self.owner = False, None
             self.ball, self.holder, self.last_stoppage = None, None, None
         return self.events
+
+
+def generate_plans(seed: int = 24017) -> dict[str, dict]:
+    """Server-only tactical plans keyed by event id, for the synthetic tracking layer."""
+    generator = Generator(seed)
+    generator.generate()
+    return generator.plans
 
 
 def generate_fixture(seed: int = 24017, correction: bool = False) -> tuple[Match, list[EventEnvelope]]:

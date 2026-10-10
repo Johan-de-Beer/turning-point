@@ -2,12 +2,12 @@
 import json
 from pathlib import Path
 
-from .models import EvidenceResponse, MatchMetadata, OverlayResponse, RecapResponse, SessionState
+from .models import EvidenceResponse, MatchMetadata, OverlayResponse, RecapResponse, SessionState, TacticalReport
 
 
 def export():
     path = Path(__file__).resolve().parent.parent / "docs" / "schema-v1.json"
-    schemas = {model.__name__: model.model_json_schema() for model in (MatchMetadata, SessionState, EvidenceResponse, OverlayResponse, RecapResponse)}
+    schemas = {model.__name__: model.model_json_schema() for model in (MatchMetadata, SessionState, EvidenceResponse, OverlayResponse, RecapResponse, TacticalReport)}
     path.write_text(json.dumps(schemas, indent=2), encoding="utf-8")
     print(f"Exported {path}")
 

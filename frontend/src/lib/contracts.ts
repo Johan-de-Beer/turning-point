@@ -28,7 +28,7 @@ export const eventSchema = z.discriminatedUnion('kind', [
   z.strictObject({ ...eventBase, kind: z.literal('CARRY'), detail: z.strictObject({ start: point, end: point }) }),
   z.strictObject({ ...eventBase, kind: z.literal('SHOT'), detail: z.strictObject({ position: point, target: point.nullable().optional(), outcome: z.enum(['goal', 'saved', 'blocked', 'off_target']) }) }),
   z.strictObject({ ...eventBase, kind: z.literal('TACKLE'), detail: z.strictObject({ position: point, successful: z.boolean() }) }),
-  z.strictObject({ ...eventBase, kind: z.literal('STOPPAGE'), detail: z.strictObject({ reason: z.enum(['ball_out', 'foul', 'goal', 'interval']) }) }),
+  z.strictObject({ ...eventBase, kind: z.literal('STOPPAGE'), detail: z.strictObject({ reason: z.enum(['ball_out', 'corner', 'foul', 'goal', 'interval']) }) }),
 ]).superRefine((event, ctx) => {
   const start = (event.period - 1) * 2700000;
   if (event.event_time_ms < start || event.event_time_ms > start + 2700000) ctx.addIssue({ code: 'custom', message: 'Event lies outside its period' });
