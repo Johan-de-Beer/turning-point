@@ -8,6 +8,10 @@ The default provider is a deterministic mock. It needs no account and makes no m
 
 The interface is styled like a broadcast analysis desk: a TV-style score bug and 90-minute match timeline, the current explanation as the lead story above the pitch, and a live-blog rail of insights and events. Headlines and figures use self-hosted Barlow Condensed (OFL). The event view opens on a flat 2D top-down pitch; a 2D / 3D toggle switches to the stadium. See [design](docs/design.md) for tokens and responsive layouts. The original Blender stadium has a seating bowl, canopies, crowds, floodlights and LED boards. A single football follows each delivered synthetic pass, carry and shot between the supplied endpoints. The active actor and completed-pass recipient appear at the event's recorded positions, with player names, action, outcome and event time. Both teams switch physical ends at half-time. Movement between endpoints and its animation timing are illustrative; there is no real continuous ball tracking or off-ball player movement. Historic evidence highlights its exact event revision without replacing the live observation set. Drag the view, switch to Top view, reset the camera or expand it to fullscreen. Motion can be disabled, and reduced-motion preferences are respected. The editable Blender source and regeneration script are included.
 
+## Tactical analysis
+
+A Tactics panel under the pitch reads a synthetic 5 Hz tracking layer and reports, for each team: offside-trap shape and step-up speed with late-stepping defenders, defensive shape shifts and man-oriented or zonal marking weaknesses, who triggers the press, whom they target and how often it forces the ball back to the keeper, runs in behind and whether defenders drop with them, attack initiators with pass angle and speed, build-up through the lines from the keeper, and corner delivery, foot and swing, and target-man timing. Findings are tendencies or opportunities an opponent could test, each with its sample and a key-moment diagram. Tracking, players and tendencies are fictional; see [tactical engine](docs/tactical-engine.md) for the method, thresholds and limitations.
+
 ## Run on Windows
 
 Requires Python 3.12+, Node.js 22.12+ (tested development versions: Python 3.12.3, Node 24.13.0, npm 11.6.2), and PowerShell. From the repository root:
@@ -88,6 +92,7 @@ Automatic deployment retains the named replay volume, takes a consistent private
 
 - [Product and interaction design](docs/design.md)
 - [Architecture](docs/architecture.md) and [API contract](docs/api-contract.md)
+- [Tactical engine method and limitations](docs/tactical-engine.md)
 - [Blender stadium source and animation behavior](docs/stadium-assets.md)
 - [Technical decisions and verified primary sources](docs/technical-decisions.md)
 - [Public hosting and release procedure](docs/deployment.md) and [public backend bounds](docs/public-demo-backend.md)

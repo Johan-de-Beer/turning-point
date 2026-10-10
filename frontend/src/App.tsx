@@ -14,6 +14,7 @@ import { PlayerFocus } from './features/match/PlayerFocus';
 import { PreferencesFields } from './features/preferences/PreferencesFields';
 import { RecapView } from './features/recap/RecapView';
 import { StartScreen } from './features/start/StartScreen';
+import { TacticsPanel } from './features/tactics/TacticsPanel';
 import { eligibleOverlay, type Envelope, type Evidence, type Preferences } from './lib/contracts';
 import { downloadJson, matchClock, windowLabel } from './lib/format';
 import { projectPitchState } from './lib/pitchProjection';
@@ -116,7 +117,8 @@ export default function App() {
           <MetricsPanel state={state} match={match} />
           <PlayerFocus state={state} match={match} busy={busy} onChange={(id) => void controller.updatePreferences({ ...preferences, favorite_player_id: id })} onEvidence={(id) => void openEvidence(id)} />
         </div>
-        <footer className="match-footer"><span>Synthetic fixture with fictional clubs and players. The event view draws only the active players from recorded endpoints, not tracking data. Observed through {matchClock(state.observed_high_water_ms)}.</span><button className="text-button" onClick={() => setSurface('diagnostics')}>Provider & pipeline diagnostics</button></footer>
+        <TacticsPanel state={state} match={match} getTactics={controller.getTactics} />
+        <footer className="match-footer"><span>Synthetic fixture with fictional clubs and players. The event view draws only the active players from recorded endpoints. Tactical analysis uses separate synthetic tracking, generated around recorded events. Observed through {matchClock(state.observed_high_water_ms)}.</span><button className="text-button" onClick={() => setSurface('diagnostics')}>Provider & pipeline diagnostics</button></footer>
       </main>
     </div>}
     {surface === 'preferences' && match && <Dialog title="Make the match yours." eyebrow="Your preferences" onClose={() => setSurface(null)}><PreferencesFields match={match} value={draft} onChange={setDraft} /><div className="dialog-actions"><button className="button button-ghost" onClick={() => setSurface(null)}>Cancel</button><button className="button button-primary" disabled={busy} onClick={async () => { await controller.updatePreferences(draft); setSurface(null); }}>Save preferences <Check size={16} /></button></div></Dialog>}
@@ -133,6 +135,7 @@ export default function App() {
       <div className="provider-banner"><ShieldCheck size={24} /><div><strong>Entirely fictional. Clearly labeled.</strong><p>Clubs, adult players and match events are original synthetic demonstration data.</p></div></div>
       <p>The server releases only the events observed by your replay clock. Football statistics come from deterministic calculations, and every insight links back to the event revisions that support it.</p>
       <p>The stadium is an original Blender asset. A single ball replays delivered synthetic passes, carries and shots using their recorded endpoints. Only the active actor and completed-pass recipient are positioned. Animation timing and intermediate motion illustrate discrete events; they do not represent real continuous ball tracking or off-ball player movement.</p>
+      <p>The tactical analysis reads a separate synthetic tracking layer: positions of all 22 fictional players and the ball every 200 ms, generated around recorded attacks, possessions and corners. It agrees with recorded events at their endpoints and is illustrative in between. Offside traps, marking, pressing, runs, build-up and corner deliveries are measured from those positions, released only as the replay reaches them.</p>
       <p>The local default runs two specialized mock agent roles: Football Analyst and Evidence Editor. Their outputs are labeled. There is no real match feed, broadcast integration, prediction or claim of causality.</p>
       <p className="language-note">No league, club or Microsoft endorsement is implied.</p>
     </div></Dialog>}

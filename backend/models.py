@@ -109,7 +109,7 @@ class TackleDetail(StrictModel):
 
 
 class StoppageDetail(StrictModel):
-    reason: Literal["ball_out", "foul", "goal", "interval"]
+    reason: Literal["ball_out", "corner", "foul", "goal", "interval"]
 
 
 class EventBase(StrictModel):
@@ -521,3 +521,244 @@ class RecapResponse(StrictModel):
     playhead_ms: int
     next_cursor: str
     recap: Recap
+
+
+# ---------------------------------------------------------------- tactics_v1
+TACTICS_VERSION = "tactics_v1"
+
+
+class TacticalEvidence(StrictModel):
+    episode_ids: list[str]
+    event_refs: list[str]
+
+
+class DefenderStep(StrictModel):
+    player_id: str
+    traps: int
+    steps: int
+    late_steps: int
+    mean_lag_ms: float | None
+    mean_depth_at_pass_m: float | None
+    runners_played_onside: int
+
+
+class OffsideTrap(StrictModel):
+    attacks_faced: int
+    traps: int
+    caught_offside: int
+    broken: int
+    mean_step_speed_mps: float | None
+    mean_line_height_m: float | None
+    mean_line_spread_m: float | None
+    defenders: list[DefenderStep]
+
+
+class ShiftLag(StrictModel):
+    player_id: str
+    shifts: int
+    mean_lag_ms: float
+
+
+class MarkingRecord(StrictModel):
+    player_id: str
+    assignments: int
+    early_releases: int
+    runs_faced: int
+    tracked: int
+    late_reactions: int
+    mean_reaction_ms: float | None
+
+
+class ShapeShift(StrictModel):
+    attacks_faced: int
+    mean_width_before_m: float | None
+    mean_width_at_pass_m: float | None
+    mean_length_before_m: float | None
+    mean_length_at_pass_m: float | None
+    mean_shift_to_ball_m: float | None
+    shift_lags: list[ShiftLag]
+    marking_system: Literal["man_oriented", "zonal", "mixed", "insufficient_evidence"]
+    follow_rate: float | None
+    marking: list[MarkingRecord]
+
+
+class PressTrigger(StrictModel):
+    player_id: str
+    presses: int
+    mean_time_to_pressure_ms: float | None
+    mean_closing_speed_mps: float | None
+
+
+class PressTarget(StrictModel):
+    player_id: str
+    possessions: int
+    presses: int
+    press_rate: float
+
+
+class PressOutcomes(StrictModel):
+    possessions: int
+    regained: int
+    forced_to_keeper: int
+    played_through: int
+    stoppage: int
+    retained: int
+    mean_time_to_keeper_ms: float | None
+    mean_time_to_regain_ms: float | None
+
+
+class Press(StrictModel):
+    opportunities: int
+    presses: int
+    triggers: list[PressTrigger]
+    targets: list[PressTarget]
+    when_pressing: PressOutcomes
+    when_not_pressing: PressOutcomes
+    mean_time_to_pressure_ms: float | None
+    mean_closing_speed_mps: float | None
+
+
+class Runner(StrictModel):
+    player_id: str
+    runs: int
+    in_behind: int
+    targeted: int
+    offside: int
+    drew_defender: int
+    drag_rate: float | None
+
+
+class Creator(StrictModel):
+    player_id: str
+    attacks_started: int
+    chances: int
+    mean_time_to_chance_ms: float | None
+
+
+class DecisivePass(StrictModel):
+    event_ref: str
+    time_ms: int
+    passer_id: str
+    recipient_id: str
+    completed: bool
+    length_m: float
+    angle_deg: float
+    speed_mps: float | None
+    through_ball: bool | None
+    recipient_ran: bool | None
+    led_to_chance: bool
+
+
+class BuildUp(StrictModel):
+    sequences: int
+    short_starts: int
+    long_starts: int
+    reached_middle_third: int
+    reached_final_third: int
+    mean_time_to_middle_ms: float | None
+    mean_time_to_final_ms: float | None
+    passes_attempted: int
+    passes_completed: int
+    pass_accuracy: float | None
+    lines_broken: int
+    mean_lines_broken: float | None
+    lost_in_own_half: int
+
+
+class CornerDelivery(StrictModel):
+    event_ref: str
+    time_ms: int
+    taker_id: str
+    foot: Literal["left", "right"]
+    side: Literal["left", "right"]
+    swing: Literal["inswinger", "outswinger"]
+    expected_swing: Literal["inswinger", "outswinger"]
+    curve_m: float
+    flight_ms: int
+    speed_mps: float
+    zone: Literal["near_post", "far_post", "penalty_spot", "six_yard", "other"]
+    target_id: str
+    accuracy_m: float
+    time_to_spot_ms: int | None
+    arrival_vs_ball_ms: int | None
+    first_contact: Literal["attack", "defence"]
+    attackers_in_box: int
+
+
+class TargetMan(StrictModel):
+    player_id: str
+    deliveries: int
+    reached_spot: int
+    mean_time_to_spot_ms: float | None
+    mean_arrival_vs_ball_ms: float | None
+    first_contacts: int
+
+
+class Corners(StrictModel):
+    corners: int
+    deliveries: list[CornerDelivery]
+    target_men: list[TargetMan]
+
+
+class TeamTactics(StrictModel):
+    team_id: str
+    offside_trap: OffsideTrap
+    shape: ShapeShift
+    press: Press
+    runs: list[Runner]
+    creators: list[Creator]
+    decisive_passes: list[DecisivePass]
+    build_up: BuildUp
+    corners: Corners
+
+
+class TacticalObservation(StrictModel):
+    observation_id: str
+    category: Literal["offside_trap", "shape", "marking", "press", "runs", "chance_creation", "build_up", "corners"]
+    kind: Literal["tendency", "opportunity"]
+    subject_team_id: str
+    for_team_id: str
+    headline: str = Field(max_length=140)
+    detail: str = Field(max_length=600)
+    player_ids: list[str]
+    sample_size: int
+    evidence: TacticalEvidence
+    moment_id: str | None = None
+
+
+class MomentPlayer(StrictModel):
+    player_id: str
+    team_id: str
+    x: float
+    y: float
+
+
+class KeyMoment(StrictModel):
+    moment_id: str
+    category: str
+    time_ms: int
+    period: Literal[1, 2]
+    team_id: str
+    title: str = Field(max_length=140)
+    ball: Point
+    players: list[MomentPlayer]
+    offside_line_x: float | None
+    highlight_ids: list[str]
+    path: list[Point]
+    event_ref: str
+
+
+class TacticalReport(StrictModel):
+    session_id: str
+    generation: int
+    data_epoch: int
+    playhead_ms: int
+    next_cursor: str
+    engine_version: Literal["tactics_v1"] = TACTICS_VERSION
+    provenance: Literal["synthetic_tracking"] = "synthetic_tracking"
+    episodes_observed: int
+    teams: dict[str, TeamTactics]
+    observations: list[TacticalObservation]
+    key_moments: list[KeyMoment]
+    definitions: dict[str, str]
+    limitations: list[str]

@@ -1986,6 +1986,7 @@
           "reason": {
             "enum": [
               "ball_out",
+              "corner",
               "foul",
               "goal",
               "interval"
@@ -3614,6 +3615,7 @@
           "reason": {
             "enum": [
               "ball_out",
+              "corner",
               "foul",
               "goal",
               "interval"
@@ -4366,6 +4368,1425 @@
       "recap"
     ],
     "title": "RecapResponse",
+    "type": "object"
+  },
+  "TacticalReport": {
+    "$defs": {
+      "BuildUp": {
+        "additionalProperties": false,
+        "properties": {
+          "sequences": {
+            "title": "Sequences",
+            "type": "integer"
+          },
+          "short_starts": {
+            "title": "Short Starts",
+            "type": "integer"
+          },
+          "long_starts": {
+            "title": "Long Starts",
+            "type": "integer"
+          },
+          "reached_middle_third": {
+            "title": "Reached Middle Third",
+            "type": "integer"
+          },
+          "reached_final_third": {
+            "title": "Reached Final Third",
+            "type": "integer"
+          },
+          "mean_time_to_middle_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Middle Ms"
+          },
+          "mean_time_to_final_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Final Ms"
+          },
+          "passes_attempted": {
+            "title": "Passes Attempted",
+            "type": "integer"
+          },
+          "passes_completed": {
+            "title": "Passes Completed",
+            "type": "integer"
+          },
+          "pass_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Accuracy"
+          },
+          "lines_broken": {
+            "title": "Lines Broken",
+            "type": "integer"
+          },
+          "mean_lines_broken": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Lines Broken"
+          },
+          "lost_in_own_half": {
+            "title": "Lost In Own Half",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sequences",
+          "short_starts",
+          "long_starts",
+          "reached_middle_third",
+          "reached_final_third",
+          "mean_time_to_middle_ms",
+          "mean_time_to_final_ms",
+          "passes_attempted",
+          "passes_completed",
+          "pass_accuracy",
+          "lines_broken",
+          "mean_lines_broken",
+          "lost_in_own_half"
+        ],
+        "title": "BuildUp",
+        "type": "object"
+      },
+      "CornerDelivery": {
+        "additionalProperties": false,
+        "properties": {
+          "event_ref": {
+            "title": "Event Ref",
+            "type": "string"
+          },
+          "time_ms": {
+            "title": "Time Ms",
+            "type": "integer"
+          },
+          "taker_id": {
+            "title": "Taker Id",
+            "type": "string"
+          },
+          "foot": {
+            "enum": [
+              "left",
+              "right"
+            ],
+            "title": "Foot",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "left",
+              "right"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "swing": {
+            "enum": [
+              "inswinger",
+              "outswinger"
+            ],
+            "title": "Swing",
+            "type": "string"
+          },
+          "expected_swing": {
+            "enum": [
+              "inswinger",
+              "outswinger"
+            ],
+            "title": "Expected Swing",
+            "type": "string"
+          },
+          "curve_m": {
+            "title": "Curve M",
+            "type": "number"
+          },
+          "flight_ms": {
+            "title": "Flight Ms",
+            "type": "integer"
+          },
+          "speed_mps": {
+            "title": "Speed Mps",
+            "type": "number"
+          },
+          "zone": {
+            "enum": [
+              "near_post",
+              "far_post",
+              "penalty_spot",
+              "six_yard",
+              "other"
+            ],
+            "title": "Zone",
+            "type": "string"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "string"
+          },
+          "accuracy_m": {
+            "title": "Accuracy M",
+            "type": "number"
+          },
+          "time_to_spot_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time To Spot Ms"
+          },
+          "arrival_vs_ball_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrival Vs Ball Ms"
+          },
+          "first_contact": {
+            "enum": [
+              "attack",
+              "defence"
+            ],
+            "title": "First Contact",
+            "type": "string"
+          },
+          "attackers_in_box": {
+            "title": "Attackers In Box",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_ref",
+          "time_ms",
+          "taker_id",
+          "foot",
+          "side",
+          "swing",
+          "expected_swing",
+          "curve_m",
+          "flight_ms",
+          "speed_mps",
+          "zone",
+          "target_id",
+          "accuracy_m",
+          "time_to_spot_ms",
+          "arrival_vs_ball_ms",
+          "first_contact",
+          "attackers_in_box"
+        ],
+        "title": "CornerDelivery",
+        "type": "object"
+      },
+      "Corners": {
+        "additionalProperties": false,
+        "properties": {
+          "corners": {
+            "title": "Corners",
+            "type": "integer"
+          },
+          "deliveries": {
+            "items": {
+              "$ref": "#/$defs/CornerDelivery"
+            },
+            "title": "Deliveries",
+            "type": "array"
+          },
+          "target_men": {
+            "items": {
+              "$ref": "#/$defs/TargetMan"
+            },
+            "title": "Target Men",
+            "type": "array"
+          }
+        },
+        "required": [
+          "corners",
+          "deliveries",
+          "target_men"
+        ],
+        "title": "Corners",
+        "type": "object"
+      },
+      "Creator": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "attacks_started": {
+            "title": "Attacks Started",
+            "type": "integer"
+          },
+          "chances": {
+            "title": "Chances",
+            "type": "integer"
+          },
+          "mean_time_to_chance_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Chance Ms"
+          }
+        },
+        "required": [
+          "player_id",
+          "attacks_started",
+          "chances",
+          "mean_time_to_chance_ms"
+        ],
+        "title": "Creator",
+        "type": "object"
+      },
+      "DecisivePass": {
+        "additionalProperties": false,
+        "properties": {
+          "event_ref": {
+            "title": "Event Ref",
+            "type": "string"
+          },
+          "time_ms": {
+            "title": "Time Ms",
+            "type": "integer"
+          },
+          "passer_id": {
+            "title": "Passer Id",
+            "type": "string"
+          },
+          "recipient_id": {
+            "title": "Recipient Id",
+            "type": "string"
+          },
+          "completed": {
+            "title": "Completed",
+            "type": "boolean"
+          },
+          "length_m": {
+            "title": "Length M",
+            "type": "number"
+          },
+          "angle_deg": {
+            "title": "Angle Deg",
+            "type": "number"
+          },
+          "speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speed Mps"
+          },
+          "through_ball": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Through Ball"
+          },
+          "recipient_ran": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipient Ran"
+          },
+          "led_to_chance": {
+            "title": "Led To Chance",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "event_ref",
+          "time_ms",
+          "passer_id",
+          "recipient_id",
+          "completed",
+          "length_m",
+          "angle_deg",
+          "speed_mps",
+          "through_ball",
+          "recipient_ran",
+          "led_to_chance"
+        ],
+        "title": "DecisivePass",
+        "type": "object"
+      },
+      "DefenderStep": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "traps": {
+            "title": "Traps",
+            "type": "integer"
+          },
+          "steps": {
+            "title": "Steps",
+            "type": "integer"
+          },
+          "late_steps": {
+            "title": "Late Steps",
+            "type": "integer"
+          },
+          "mean_lag_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Lag Ms"
+          },
+          "mean_depth_at_pass_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Depth At Pass M"
+          },
+          "runners_played_onside": {
+            "title": "Runners Played Onside",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "player_id",
+          "traps",
+          "steps",
+          "late_steps",
+          "mean_lag_ms",
+          "mean_depth_at_pass_m",
+          "runners_played_onside"
+        ],
+        "title": "DefenderStep",
+        "type": "object"
+      },
+      "KeyMoment": {
+        "additionalProperties": false,
+        "properties": {
+          "moment_id": {
+            "title": "Moment Id",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "time_ms": {
+            "title": "Time Ms",
+            "type": "integer"
+          },
+          "period": {
+            "enum": [
+              1,
+              2
+            ],
+            "title": "Period",
+            "type": "integer"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 140,
+            "title": "Title",
+            "type": "string"
+          },
+          "ball": {
+            "$ref": "#/$defs/Point"
+          },
+          "players": {
+            "items": {
+              "$ref": "#/$defs/MomentPlayer"
+            },
+            "title": "Players",
+            "type": "array"
+          },
+          "offside_line_x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offside Line X"
+          },
+          "highlight_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Highlight Ids",
+            "type": "array"
+          },
+          "path": {
+            "items": {
+              "$ref": "#/$defs/Point"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "event_ref": {
+            "title": "Event Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "moment_id",
+          "category",
+          "time_ms",
+          "period",
+          "team_id",
+          "title",
+          "ball",
+          "players",
+          "offside_line_x",
+          "highlight_ids",
+          "path",
+          "event_ref"
+        ],
+        "title": "KeyMoment",
+        "type": "object"
+      },
+      "MarkingRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "assignments": {
+            "title": "Assignments",
+            "type": "integer"
+          },
+          "early_releases": {
+            "title": "Early Releases",
+            "type": "integer"
+          },
+          "runs_faced": {
+            "title": "Runs Faced",
+            "type": "integer"
+          },
+          "tracked": {
+            "title": "Tracked",
+            "type": "integer"
+          },
+          "late_reactions": {
+            "title": "Late Reactions",
+            "type": "integer"
+          },
+          "mean_reaction_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Reaction Ms"
+          }
+        },
+        "required": [
+          "player_id",
+          "assignments",
+          "early_releases",
+          "runs_faced",
+          "tracked",
+          "late_reactions",
+          "mean_reaction_ms"
+        ],
+        "title": "MarkingRecord",
+        "type": "object"
+      },
+      "MomentPlayer": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "x",
+          "y"
+        ],
+        "title": "MomentPlayer",
+        "type": "object"
+      },
+      "OffsideTrap": {
+        "additionalProperties": false,
+        "properties": {
+          "attacks_faced": {
+            "title": "Attacks Faced",
+            "type": "integer"
+          },
+          "traps": {
+            "title": "Traps",
+            "type": "integer"
+          },
+          "caught_offside": {
+            "title": "Caught Offside",
+            "type": "integer"
+          },
+          "broken": {
+            "title": "Broken",
+            "type": "integer"
+          },
+          "mean_step_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Step Speed Mps"
+          },
+          "mean_line_height_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Line Height M"
+          },
+          "mean_line_spread_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Line Spread M"
+          },
+          "defenders": {
+            "items": {
+              "$ref": "#/$defs/DefenderStep"
+            },
+            "title": "Defenders",
+            "type": "array"
+          }
+        },
+        "required": [
+          "attacks_faced",
+          "traps",
+          "caught_offside",
+          "broken",
+          "mean_step_speed_mps",
+          "mean_line_height_m",
+          "mean_line_spread_m",
+          "defenders"
+        ],
+        "title": "OffsideTrap",
+        "type": "object"
+      },
+      "Point": {
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "maximum": 100,
+            "minimum": 0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 100,
+            "minimum": 0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "title": "Point",
+        "type": "object"
+      },
+      "Press": {
+        "additionalProperties": false,
+        "properties": {
+          "opportunities": {
+            "title": "Opportunities",
+            "type": "integer"
+          },
+          "presses": {
+            "title": "Presses",
+            "type": "integer"
+          },
+          "triggers": {
+            "items": {
+              "$ref": "#/$defs/PressTrigger"
+            },
+            "title": "Triggers",
+            "type": "array"
+          },
+          "targets": {
+            "items": {
+              "$ref": "#/$defs/PressTarget"
+            },
+            "title": "Targets",
+            "type": "array"
+          },
+          "when_pressing": {
+            "$ref": "#/$defs/PressOutcomes"
+          },
+          "when_not_pressing": {
+            "$ref": "#/$defs/PressOutcomes"
+          },
+          "mean_time_to_pressure_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Pressure Ms"
+          },
+          "mean_closing_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Closing Speed Mps"
+          }
+        },
+        "required": [
+          "opportunities",
+          "presses",
+          "triggers",
+          "targets",
+          "when_pressing",
+          "when_not_pressing",
+          "mean_time_to_pressure_ms",
+          "mean_closing_speed_mps"
+        ],
+        "title": "Press",
+        "type": "object"
+      },
+      "PressOutcomes": {
+        "additionalProperties": false,
+        "properties": {
+          "possessions": {
+            "title": "Possessions",
+            "type": "integer"
+          },
+          "regained": {
+            "title": "Regained",
+            "type": "integer"
+          },
+          "forced_to_keeper": {
+            "title": "Forced To Keeper",
+            "type": "integer"
+          },
+          "played_through": {
+            "title": "Played Through",
+            "type": "integer"
+          },
+          "stoppage": {
+            "title": "Stoppage",
+            "type": "integer"
+          },
+          "retained": {
+            "title": "Retained",
+            "type": "integer"
+          },
+          "mean_time_to_keeper_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Keeper Ms"
+          },
+          "mean_time_to_regain_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Regain Ms"
+          }
+        },
+        "required": [
+          "possessions",
+          "regained",
+          "forced_to_keeper",
+          "played_through",
+          "stoppage",
+          "retained",
+          "mean_time_to_keeper_ms",
+          "mean_time_to_regain_ms"
+        ],
+        "title": "PressOutcomes",
+        "type": "object"
+      },
+      "PressTarget": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "possessions": {
+            "title": "Possessions",
+            "type": "integer"
+          },
+          "presses": {
+            "title": "Presses",
+            "type": "integer"
+          },
+          "press_rate": {
+            "title": "Press Rate",
+            "type": "number"
+          }
+        },
+        "required": [
+          "player_id",
+          "possessions",
+          "presses",
+          "press_rate"
+        ],
+        "title": "PressTarget",
+        "type": "object"
+      },
+      "PressTrigger": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "presses": {
+            "title": "Presses",
+            "type": "integer"
+          },
+          "mean_time_to_pressure_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Pressure Ms"
+          },
+          "mean_closing_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Closing Speed Mps"
+          }
+        },
+        "required": [
+          "player_id",
+          "presses",
+          "mean_time_to_pressure_ms",
+          "mean_closing_speed_mps"
+        ],
+        "title": "PressTrigger",
+        "type": "object"
+      },
+      "Runner": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "runs": {
+            "title": "Runs",
+            "type": "integer"
+          },
+          "in_behind": {
+            "title": "In Behind",
+            "type": "integer"
+          },
+          "targeted": {
+            "title": "Targeted",
+            "type": "integer"
+          },
+          "offside": {
+            "title": "Offside",
+            "type": "integer"
+          },
+          "drew_defender": {
+            "title": "Drew Defender",
+            "type": "integer"
+          },
+          "drag_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drag Rate"
+          }
+        },
+        "required": [
+          "player_id",
+          "runs",
+          "in_behind",
+          "targeted",
+          "offside",
+          "drew_defender",
+          "drag_rate"
+        ],
+        "title": "Runner",
+        "type": "object"
+      },
+      "ShapeShift": {
+        "additionalProperties": false,
+        "properties": {
+          "attacks_faced": {
+            "title": "Attacks Faced",
+            "type": "integer"
+          },
+          "mean_width_before_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Width Before M"
+          },
+          "mean_width_at_pass_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Width At Pass M"
+          },
+          "mean_length_before_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Length Before M"
+          },
+          "mean_length_at_pass_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Length At Pass M"
+          },
+          "mean_shift_to_ball_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Shift To Ball M"
+          },
+          "shift_lags": {
+            "items": {
+              "$ref": "#/$defs/ShiftLag"
+            },
+            "title": "Shift Lags",
+            "type": "array"
+          },
+          "marking_system": {
+            "enum": [
+              "man_oriented",
+              "zonal",
+              "mixed",
+              "insufficient_evidence"
+            ],
+            "title": "Marking System",
+            "type": "string"
+          },
+          "follow_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Follow Rate"
+          },
+          "marking": {
+            "items": {
+              "$ref": "#/$defs/MarkingRecord"
+            },
+            "title": "Marking",
+            "type": "array"
+          }
+        },
+        "required": [
+          "attacks_faced",
+          "mean_width_before_m",
+          "mean_width_at_pass_m",
+          "mean_length_before_m",
+          "mean_length_at_pass_m",
+          "mean_shift_to_ball_m",
+          "shift_lags",
+          "marking_system",
+          "follow_rate",
+          "marking"
+        ],
+        "title": "ShapeShift",
+        "type": "object"
+      },
+      "ShiftLag": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "shifts": {
+            "title": "Shifts",
+            "type": "integer"
+          },
+          "mean_lag_ms": {
+            "title": "Mean Lag Ms",
+            "type": "number"
+          }
+        },
+        "required": [
+          "player_id",
+          "shifts",
+          "mean_lag_ms"
+        ],
+        "title": "ShiftLag",
+        "type": "object"
+      },
+      "TacticalEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "episode_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Episode Ids",
+            "type": "array"
+          },
+          "event_refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Event Refs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "episode_ids",
+          "event_refs"
+        ],
+        "title": "TacticalEvidence",
+        "type": "object"
+      },
+      "TacticalObservation": {
+        "additionalProperties": false,
+        "properties": {
+          "observation_id": {
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "offside_trap",
+              "shape",
+              "marking",
+              "press",
+              "runs",
+              "chance_creation",
+              "build_up",
+              "corners"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "tendency",
+              "opportunity"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "subject_team_id": {
+            "title": "Subject Team Id",
+            "type": "string"
+          },
+          "for_team_id": {
+            "title": "For Team Id",
+            "type": "string"
+          },
+          "headline": {
+            "maxLength": 140,
+            "title": "Headline",
+            "type": "string"
+          },
+          "detail": {
+            "maxLength": 600,
+            "title": "Detail",
+            "type": "string"
+          },
+          "player_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Player Ids",
+            "type": "array"
+          },
+          "sample_size": {
+            "title": "Sample Size",
+            "type": "integer"
+          },
+          "evidence": {
+            "$ref": "#/$defs/TacticalEvidence"
+          },
+          "moment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Moment Id"
+          }
+        },
+        "required": [
+          "observation_id",
+          "category",
+          "kind",
+          "subject_team_id",
+          "for_team_id",
+          "headline",
+          "detail",
+          "player_ids",
+          "sample_size",
+          "evidence"
+        ],
+        "title": "TacticalObservation",
+        "type": "object"
+      },
+      "TargetMan": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "deliveries": {
+            "title": "Deliveries",
+            "type": "integer"
+          },
+          "reached_spot": {
+            "title": "Reached Spot",
+            "type": "integer"
+          },
+          "mean_time_to_spot_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Spot Ms"
+          },
+          "mean_arrival_vs_ball_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Arrival Vs Ball Ms"
+          },
+          "first_contacts": {
+            "title": "First Contacts",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "player_id",
+          "deliveries",
+          "reached_spot",
+          "mean_time_to_spot_ms",
+          "mean_arrival_vs_ball_ms",
+          "first_contacts"
+        ],
+        "title": "TargetMan",
+        "type": "object"
+      },
+      "TeamTactics": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "offside_trap": {
+            "$ref": "#/$defs/OffsideTrap"
+          },
+          "shape": {
+            "$ref": "#/$defs/ShapeShift"
+          },
+          "press": {
+            "$ref": "#/$defs/Press"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/$defs/Runner"
+            },
+            "title": "Runs",
+            "type": "array"
+          },
+          "creators": {
+            "items": {
+              "$ref": "#/$defs/Creator"
+            },
+            "title": "Creators",
+            "type": "array"
+          },
+          "decisive_passes": {
+            "items": {
+              "$ref": "#/$defs/DecisivePass"
+            },
+            "title": "Decisive Passes",
+            "type": "array"
+          },
+          "build_up": {
+            "$ref": "#/$defs/BuildUp"
+          },
+          "corners": {
+            "$ref": "#/$defs/Corners"
+          }
+        },
+        "required": [
+          "team_id",
+          "offside_trap",
+          "shape",
+          "press",
+          "runs",
+          "creators",
+          "decisive_passes",
+          "build_up",
+          "corners"
+        ],
+        "title": "TeamTactics",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "session_id": {
+        "title": "Session Id",
+        "type": "string"
+      },
+      "generation": {
+        "title": "Generation",
+        "type": "integer"
+      },
+      "data_epoch": {
+        "title": "Data Epoch",
+        "type": "integer"
+      },
+      "playhead_ms": {
+        "title": "Playhead Ms",
+        "type": "integer"
+      },
+      "next_cursor": {
+        "title": "Next Cursor",
+        "type": "string"
+      },
+      "engine_version": {
+        "const": "tactics_v1",
+        "default": "tactics_v1",
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "provenance": {
+        "const": "synthetic_tracking",
+        "default": "synthetic_tracking",
+        "title": "Provenance",
+        "type": "string"
+      },
+      "episodes_observed": {
+        "title": "Episodes Observed",
+        "type": "integer"
+      },
+      "teams": {
+        "additionalProperties": {
+          "$ref": "#/$defs/TeamTactics"
+        },
+        "title": "Teams",
+        "type": "object"
+      },
+      "observations": {
+        "items": {
+          "$ref": "#/$defs/TacticalObservation"
+        },
+        "title": "Observations",
+        "type": "array"
+      },
+      "key_moments": {
+        "items": {
+          "$ref": "#/$defs/KeyMoment"
+        },
+        "title": "Key Moments",
+        "type": "array"
+      },
+      "definitions": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Definitions",
+        "type": "object"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Limitations",
+        "type": "array"
+      }
+    },
+    "required": [
+      "session_id",
+      "generation",
+      "data_epoch",
+      "playhead_ms",
+      "next_cursor",
+      "episodes_observed",
+      "teams",
+      "observations",
+      "key_moments",
+      "definitions",
+      "limitations"
+    ],
+    "title": "TacticalReport",
     "type": "object"
   }
 }

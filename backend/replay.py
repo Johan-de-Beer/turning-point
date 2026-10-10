@@ -16,10 +16,11 @@ from .agents import EditorResult, EvidenceBundle, MockProvider, bundle_for, fing
 from .ingest import IngestionError, Ingestor, canonical_order
 from .limits import ReplayLimits
 from .metrics import DEFINITIONS, facts_for_snapshot, player_statistics, score, snapshot
-from .models import AgentRun, Diagnostics, EventEnvelope, Insight, MetricSnapshot, Overlay, OverlayDisplay, PERIOD_MS, Preferences, Recap, RULES_VERSION, SessionState
+from .models import AgentRun, Diagnostics, EventEnvelope, Insight, MetricSnapshot, Overlay, OverlayDisplay, PERIOD_MS, Preferences, Recap, RULES_VERSION, SessionState, TacticalReport
 from .patterns import Candidate, PatternEngine, conditions_for
 from .recaps import build_recap, locked_recap
 from .storage import Storage
+from .tactics import TacticalEngine
 
 
 class ServiceError(Exception):
@@ -116,6 +117,8 @@ class ReplayService:
         self.tasks: dict[str, asyncio.Task] = {}
         self.semaphore = asyncio.Semaphore(2)
         self.last_persisted: dict[str, float] = {}
+        # Synthetic tracking is built lazily (or warmed at startup) and released by playhead.
+        self.tactics = TacticalEngine(match, fixture)
         self.restore()
 
     def restore(self):
@@ -680,6 +683,12 @@ class ReplayService:
             "playhead_ms": session.playhead_ms, "next_cursor": self.cursor(session), "insight": insight,
             "snapshot": MetricSnapshot.model_validate(raw), "facts": insight.facts, "conditions": insight.conditions,
             "events": sorted(events, key=lambda e: (e.payload.event_time_ms if e.payload else 0, e.delivery_seq)), "metric_definitions": DEFINITIONS}
+
+    def tactics_report(self, session: Session) -> TacticalReport:
+        self.reconcile(session)
+        report = self.tactics.report(session.ingestor.records, session.playhead_ms)
+        return TacticalReport(session_id=session.session_id, generation=session.generation, data_epoch=session.data_epoch,
+            playhead_ms=session.playhead_ms, next_cursor=self.cursor(session), **report)
 
     async def drain(self):
         if self.tasks:

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { request, ApiError } from './api';
 import { canAcceptState, defaultPreferences, evidenceSchema, matchesSchema, mergeObservedEvents, preferencesSchema, sessionSchema, validateSessionReferences, type Evidence, type Match, type Preferences, type Session } from './contracts';
 import { createCapability } from './format';
+import { tacticsSchema, type Tactics } from './tactics';
 
 const preferencesKey = 'turning-point:preferences:v1';
 const sessionKey = 'turning-point:session:v1';
@@ -179,6 +180,16 @@ export function useMatch() {
     return evidence;
   }
 
+  async function getTactics(signal?: AbortSignal): Promise<Tactics> {
+    const current = stateRef.current;
+    const sessionAuth = authRef.current;
+    if (!current || !sessionAuth) throw new ApiError('Start the replay to see the tactical analysis.', 'no_session', false);
+    const report = await request(`/sessions/${current.session_id}/tactics`, tacticsSchema, { capability: sessionAuth.capability, signal });
+    const latest = stateRef.current;
+    if (!latest || report.session_id !== latest.session_id || report.generation !== latest.generation) throw new ApiError('The replay restarted. Refreshing the analysis…', 'stale_tactics', true);
+    return report;
+  }
+
   async function retry() {
     retryRef.current = 0;
     setConnection('reconnecting');
@@ -189,5 +200,5 @@ export function useMatch() {
     catch (reason) { fail(reason, true); }
   }
 
-  return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, retry };
+  return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, getTactics, retry };
 }

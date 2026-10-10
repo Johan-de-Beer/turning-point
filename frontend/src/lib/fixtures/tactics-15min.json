@@ -1,0 +1,1967 @@
+{
+ "session_id": "sample",
+ "generation": 1,
+ "data_epoch": 1,
+ "playhead_ms": 900000,
+ "next_cursor": "c",
+ "engine_version": "tactics_v1",
+ "provenance": "synthetic_tracking",
+ "episodes_observed": 49,
+ "teams": {
+  "harbor": {
+   "team_id": "harbor",
+   "offside_trap": {
+    "attacks_faced": 2,
+    "traps": 1,
+    "caught_offside": 1,
+    "broken": 0,
+    "mean_step_speed_mps": 4.1,
+    "mean_line_height_m": 36.7,
+    "mean_line_spread_m": 1.5,
+    "defenders": [
+     {
+      "player_id": "harbor_02",
+      "traps": 1,
+      "steps": 1,
+      "late_steps": 0,
+      "mean_lag_ms": 100.0,
+      "mean_depth_at_pass_m": 0.3,
+      "runners_played_onside": 0
+     },
+     {
+      "player_id": "harbor_04",
+      "traps": 1,
+      "steps": 1,
+      "late_steps": 0,
+      "mean_lag_ms": 100.0,
+      "mean_depth_at_pass_m": 0.0,
+      "runners_played_onside": 0
+     },
+     {
+      "player_id": "harbor_05",
+      "traps": 1,
+      "steps": 1,
+      "late_steps": 0,
+      "mean_lag_ms": -100.0,
+      "mean_depth_at_pass_m": 0.0,
+      "runners_played_onside": 0
+     },
+     {
+      "player_id": "harbor_03",
+      "traps": 1,
+      "steps": 1,
+      "late_steps": 0,
+      "mean_lag_ms": -100.0,
+      "mean_depth_at_pass_m": 0.0,
+      "runners_played_onside": 0
+     }
+    ]
+   },
+   "shape": {
+    "attacks_faced": 2,
+    "mean_width_before_m": 35.4,
+    "mean_width_at_pass_m": 31.6,
+    "mean_length_before_m": 34.4,
+    "mean_length_at_pass_m": 33.0,
+    "mean_shift_to_ball_m": 3.4,
+    "shift_lags": [
+     {
+      "player_id": "harbor_07",
+      "shifts": 2,
+      "mean_lag_ms": 200.0
+     },
+     {
+      "player_id": "harbor_02",
+      "shifts": 2,
+      "mean_lag_ms": -200.0
+     },
+     {
+      "player_id": "harbor_04",
+      "shifts": 2,
+      "mean_lag_ms": -200.0
+     },
+     {
+      "player_id": "harbor_06",
+      "shifts": 2,
+      "mean_lag_ms": -200.0
+     }
+    ],
+    "marking_system": "insufficient_evidence",
+    "follow_rate": 50.0,
+    "marking": [
+     {
+      "player_id": "harbor_02",
+      "assignments": 2,
+      "early_releases": 0,
+      "runs_faced": 1,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_03",
+      "assignments": 2,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_04",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 1,
+      "tracked": 1,
+      "late_reactions": 0,
+      "mean_reaction_ms": 200.0
+     },
+     {
+      "player_id": "harbor_05",
+      "assignments": 1,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_06",
+      "assignments": 2,
+      "early_releases": 1,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_07",
+      "assignments": 1,
+      "early_releases": 1,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_08",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_09",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_10",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "harbor_11",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     }
+    ]
+   },
+   "press": {
+    "opportunities": 18,
+    "presses": 7,
+    "triggers": [
+     {
+      "player_id": "harbor_10",
+      "presses": 3,
+      "mean_time_to_pressure_ms": 1533.3,
+      "mean_closing_speed_mps": 7.4
+     },
+     {
+      "player_id": "harbor_09",
+      "presses": 3,
+      "mean_time_to_pressure_ms": 1733.3,
+      "mean_closing_speed_mps": 7.4
+     },
+     {
+      "player_id": "harbor_11",
+      "presses": 1,
+      "mean_time_to_pressure_ms": 1200.0,
+      "mean_closing_speed_mps": 7.2
+     }
+    ],
+    "targets": [
+     {
+      "player_id": "vale_07",
+      "possessions": 3,
+      "presses": 2,
+      "press_rate": 66.7
+     },
+     {
+      "player_id": "vale_06",
+      "possessions": 4,
+      "presses": 2,
+      "press_rate": 50.0
+     },
+     {
+      "player_id": "vale_05",
+      "possessions": 1,
+      "presses": 1,
+      "press_rate": 100.0
+     },
+     {
+      "player_id": "vale_04",
+      "possessions": 3,
+      "presses": 1,
+      "press_rate": 33.3
+     },
+     {
+      "player_id": "vale_02",
+      "possessions": 3,
+      "presses": 1,
+      "press_rate": 33.3
+     },
+     {
+      "player_id": "vale_03",
+      "possessions": 1,
+      "presses": 0,
+      "press_rate": 0.0
+     },
+     {
+      "player_id": "vale_08",
+      "possessions": 3,
+      "presses": 0,
+      "press_rate": 0.0
+     }
+    ],
+    "when_pressing": {
+     "possessions": 7,
+     "regained": 3,
+     "forced_to_keeper": 0,
+     "played_through": 2,
+     "stoppage": 0,
+     "retained": 2,
+     "mean_time_to_keeper_ms": null,
+     "mean_time_to_regain_ms": 7400.0
+    },
+    "when_not_pressing": {
+     "possessions": 11,
+     "regained": 5,
+     "forced_to_keeper": 0,
+     "played_through": 4,
+     "stoppage": 0,
+     "retained": 2,
+     "mean_time_to_keeper_ms": null,
+     "mean_time_to_regain_ms": 8440.0
+    },
+    "mean_time_to_pressure_ms": 1571.4,
+    "mean_closing_speed_mps": 7.4
+   },
+   "runs": [
+    {
+     "player_id": "harbor_10",
+     "runs": 9,
+     "in_behind": 8,
+     "targeted": 2,
+     "offside": 1,
+     "drew_defender": 1,
+     "drag_rate": 50.0
+    },
+    {
+     "player_id": "harbor_09",
+     "runs": 6,
+     "in_behind": 6,
+     "targeted": 1,
+     "offside": 0,
+     "drew_defender": 2,
+     "drag_rate": 100.0
+    },
+    {
+     "player_id": "harbor_11",
+     "runs": 1,
+     "in_behind": 0,
+     "targeted": 0,
+     "offside": 1,
+     "drew_defender": 0,
+     "drag_rate": null
+    }
+   ],
+   "creators": [
+    {
+     "player_id": "harbor_08",
+     "attacks_started": 4,
+     "chances": 3,
+     "mean_time_to_chance_ms": 12000.0
+    },
+    {
+     "player_id": "harbor_07",
+     "attacks_started": 4,
+     "chances": 3,
+     "mean_time_to_chance_ms": 12000.0
+    },
+    {
+     "player_id": "harbor_06",
+     "attacks_started": 1,
+     "chances": 1,
+     "mean_time_to_chance_ms": 8000.0
+    }
+   ],
+   "decisive_passes": [
+    {
+     "event_ref": "evt_00025@1",
+     "time_ms": 186000,
+     "passer_id": "harbor_11",
+     "recipient_id": "harbor_06",
+     "completed": true,
+     "length_m": 17.9,
+     "angle_deg": -175.2,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    },
+    {
+     "event_ref": "evt_00034@1",
+     "time_ms": 204000,
+     "passer_id": "harbor_08",
+     "recipient_id": "harbor_09",
+     "completed": true,
+     "length_m": 21.6,
+     "angle_deg": -9.4,
+     "speed_mps": 21.6,
+     "through_ball": true,
+     "recipient_ran": false,
+     "led_to_chance": false
+    },
+    {
+     "event_ref": "evt_00038@1",
+     "time_ms": 224000,
+     "passer_id": "harbor_08",
+     "recipient_id": "harbor_10",
+     "completed": true,
+     "length_m": 20.8,
+     "angle_deg": 34.7,
+     "speed_mps": 14.8,
+     "through_ball": true,
+     "recipient_ran": true,
+     "led_to_chance": false
+    },
+    {
+     "event_ref": "evt_00039@1",
+     "time_ms": 226000,
+     "passer_id": "harbor_10",
+     "recipient_id": "harbor_07",
+     "completed": true,
+     "length_m": 14.0,
+     "angle_deg": 167.7,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    },
+    {
+     "event_ref": "evt_00047@1",
+     "time_ms": 266000,
+     "passer_id": "harbor_10",
+     "recipient_id": "harbor_07",
+     "completed": true,
+     "length_m": 30.8,
+     "angle_deg": 119.7,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    },
+    {
+     "event_ref": "evt_00061@1",
+     "time_ms": 306000,
+     "passer_id": "harbor_09",
+     "recipient_id": "harbor_07",
+     "completed": true,
+     "length_m": 16.4,
+     "angle_deg": 155.3,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    },
+    {
+     "event_ref": "evt_00069@1",
+     "time_ms": 346000,
+     "passer_id": "harbor_09",
+     "recipient_id": "harbor_06",
+     "completed": true,
+     "length_m": 20.6,
+     "angle_deg": -151.4,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    },
+    {
+     "event_ref": "evt_00077@1",
+     "time_ms": 386000,
+     "passer_id": "harbor_11",
+     "recipient_id": "harbor_08",
+     "completed": true,
+     "length_m": 12.9,
+     "angle_deg": 172.2,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    },
+    {
+     "event_ref": "evt_00105@1",
+     "time_ms": 608000,
+     "passer_id": "harbor_06",
+     "recipient_id": "harbor_10",
+     "completed": true,
+     "length_m": 53.0,
+     "angle_deg": 13.3,
+     "speed_mps": 22.0,
+     "through_ball": true,
+     "recipient_ran": true,
+     "led_to_chance": true
+    }
+   ],
+   "build_up": {
+    "sequences": 1,
+    "short_starts": 1,
+    "long_starts": 0,
+    "reached_middle_third": 1,
+    "reached_final_third": 0,
+    "mean_time_to_middle_ms": 7000.0,
+    "mean_time_to_final_ms": null,
+    "passes_attempted": 3,
+    "passes_completed": 2,
+    "pass_accuracy": 66.7,
+    "lines_broken": 1,
+    "mean_lines_broken": 1.0,
+    "lost_in_own_half": 0
+   },
+   "corners": {
+    "corners": 3,
+    "deliveries": [
+     {
+      "event_ref": "evt_00030@1",
+      "time_ms": 200000,
+      "taker_id": "harbor_07",
+      "foot": "right",
+      "side": "left",
+      "swing": "inswinger",
+      "expected_swing": "inswinger",
+      "curve_m": 3.1,
+      "flight_ms": 1600,
+      "speed_mps": 22.5,
+      "zone": "penalty_spot",
+      "target_id": "harbor_05",
+      "accuracy_m": 0.1,
+      "time_to_spot_ms": 1200,
+      "arrival_vs_ball_ms": -400,
+      "first_contact": "defence",
+      "attackers_in_box": 4
+     },
+     {
+      "event_ref": "evt_00052@1",
+      "time_ms": 280000,
+      "taker_id": "harbor_11",
+      "foot": "left",
+      "side": "right",
+      "swing": "inswinger",
+      "expected_swing": "inswinger",
+      "curve_m": 3.5,
+      "flight_ms": 1600,
+      "speed_mps": 20.6,
+      "zone": "penalty_spot",
+      "target_id": "harbor_05",
+      "accuracy_m": 0.4,
+      "time_to_spot_ms": 1400,
+      "arrival_vs_ball_ms": -200,
+      "first_contact": "defence",
+      "attackers_in_box": 4
+     },
+     {
+      "event_ref": "evt_00082@1",
+      "time_ms": 400000,
+      "taker_id": "harbor_07",
+      "foot": "right",
+      "side": "left",
+      "swing": "inswinger",
+      "expected_swing": "inswinger",
+      "curve_m": 3.4,
+      "flight_ms": 1600,
+      "speed_mps": 23.9,
+      "zone": "far_post",
+      "target_id": "harbor_04",
+      "accuracy_m": 2.1,
+      "time_to_spot_ms": 1800,
+      "arrival_vs_ball_ms": 200,
+      "first_contact": "attack",
+      "attackers_in_box": 4
+     }
+    ],
+    "target_men": [
+     {
+      "player_id": "harbor_05",
+      "deliveries": 2,
+      "reached_spot": 2,
+      "mean_time_to_spot_ms": 1300.0,
+      "mean_arrival_vs_ball_ms": -300.0,
+      "first_contacts": 0
+     },
+     {
+      "player_id": "harbor_04",
+      "deliveries": 1,
+      "reached_spot": 1,
+      "mean_time_to_spot_ms": 1800.0,
+      "mean_arrival_vs_ball_ms": 200.0,
+      "first_contacts": 1
+     }
+    ]
+   }
+  },
+  "vale": {
+   "team_id": "vale",
+   "offside_trap": {
+    "attacks_faced": 10,
+    "traps": 8,
+    "caught_offside": 2,
+    "broken": 2,
+    "mean_step_speed_mps": 4.2,
+    "mean_line_height_m": 24.9,
+    "mean_line_spread_m": 1.3,
+    "defenders": [
+     {
+      "player_id": "vale_02",
+      "traps": 8,
+      "steps": 8,
+      "late_steps": 0,
+      "mean_lag_ms": -25.0,
+      "mean_depth_at_pass_m": -0.0,
+      "runners_played_onside": 0
+     },
+     {
+      "player_id": "vale_04",
+      "traps": 8,
+      "steps": 8,
+      "late_steps": 0,
+      "mean_lag_ms": -50.0,
+      "mean_depth_at_pass_m": -0.0,
+      "runners_played_onside": 0
+     },
+     {
+      "player_id": "vale_05",
+      "traps": 8,
+      "steps": 8,
+      "late_steps": 0,
+      "mean_lag_ms": -25.0,
+      "mean_depth_at_pass_m": 0.0,
+      "runners_played_onside": 0
+     },
+     {
+      "player_id": "vale_03",
+      "traps": 8,
+      "steps": 8,
+      "late_steps": 8,
+      "mean_lag_ms": 425.0,
+      "mean_depth_at_pass_m": 1.4,
+      "runners_played_onside": 2
+     }
+    ]
+   },
+   "shape": {
+    "attacks_faced": 10,
+    "mean_width_before_m": 35.4,
+    "mean_width_at_pass_m": 31.1,
+    "mean_length_before_m": 36.4,
+    "mean_length_at_pass_m": 32.8,
+    "mean_shift_to_ball_m": 3.3,
+    "shift_lags": [
+     {
+      "player_id": "vale_06",
+      "shifts": 6,
+      "mean_lag_ms": 0.0
+     },
+     {
+      "player_id": "vale_07",
+      "shifts": 5,
+      "mean_lag_ms": 0.0
+     },
+     {
+      "player_id": "vale_08",
+      "shifts": 6,
+      "mean_lag_ms": 0.0
+     },
+     {
+      "player_id": "vale_09",
+      "shifts": 6,
+      "mean_lag_ms": 0.0
+     },
+     {
+      "player_id": "vale_10",
+      "shifts": 6,
+      "mean_lag_ms": 0.0
+     },
+     {
+      "player_id": "vale_11",
+      "shifts": 6,
+      "mean_lag_ms": 0.0
+     }
+    ],
+    "marking_system": "insufficient_evidence",
+    "follow_rate": 75.0,
+    "marking": [
+     {
+      "player_id": "vale_02",
+      "assignments": 8,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_03",
+      "assignments": 5,
+      "early_releases": 0,
+      "runs_faced": 2,
+      "tracked": 1,
+      "late_reactions": 0,
+      "mean_reaction_ms": 0.0
+     },
+     {
+      "player_id": "vale_04",
+      "assignments": 4,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_05",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 2,
+      "tracked": 2,
+      "late_reactions": 0,
+      "mean_reaction_ms": 200.0
+     },
+     {
+      "player_id": "vale_06",
+      "assignments": 7,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_07",
+      "assignments": 6,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_08",
+      "assignments": 7,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_09",
+      "assignments": 0,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_10",
+      "assignments": 1,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     },
+     {
+      "player_id": "vale_11",
+      "assignments": 1,
+      "early_releases": 0,
+      "runs_faced": 0,
+      "tracked": 0,
+      "late_reactions": 0,
+      "mean_reaction_ms": null
+     }
+    ]
+   },
+   "press": {
+    "opportunities": 16,
+    "presses": 3,
+    "triggers": [
+     {
+      "player_id": "vale_10",
+      "presses": 3,
+      "mean_time_to_pressure_ms": 2933.3,
+      "mean_closing_speed_mps": 6.0
+     }
+    ],
+    "targets": [
+     {
+      "player_id": "harbor_06",
+      "possessions": 3,
+      "presses": 1,
+      "press_rate": 33.3
+     },
+     {
+      "player_id": "harbor_08",
+      "possessions": 4,
+      "presses": 1,
+      "press_rate": 25.0
+     },
+     {
+      "player_id": "harbor_07",
+      "possessions": 7,
+      "presses": 1,
+      "press_rate": 14.3
+     },
+     {
+      "player_id": "harbor_01",
+      "possessions": 1,
+      "presses": 0,
+      "press_rate": 0.0
+     },
+     {
+      "player_id": "harbor_05",
+      "possessions": 1,
+      "presses": 0,
+      "press_rate": 0.0
+     }
+    ],
+    "when_pressing": {
+     "possessions": 3,
+     "regained": 0,
+     "forced_to_keeper": 0,
+     "played_through": 3,
+     "stoppage": 0,
+     "retained": 0,
+     "mean_time_to_keeper_ms": null,
+     "mean_time_to_regain_ms": null
+    },
+    "when_not_pressing": {
+     "possessions": 13,
+     "regained": 0,
+     "forced_to_keeper": 0,
+     "played_through": 9,
+     "stoppage": 0,
+     "retained": 4,
+     "mean_time_to_keeper_ms": null,
+     "mean_time_to_regain_ms": null
+    },
+    "mean_time_to_pressure_ms": 2933.3,
+    "mean_closing_speed_mps": 6.0
+   },
+   "runs": [
+    {
+     "player_id": "vale_09",
+     "runs": 2,
+     "in_behind": 1,
+     "targeted": 0,
+     "offside": 1,
+     "drew_defender": 1,
+     "drag_rate": 100.0
+    },
+    {
+     "player_id": "vale_11",
+     "runs": 1,
+     "in_behind": 1,
+     "targeted": 0,
+     "offside": 0,
+     "drew_defender": 0,
+     "drag_rate": 0.0
+    }
+   ],
+   "creators": [
+    {
+     "player_id": "vale_07",
+     "attacks_started": 1,
+     "chances": 1,
+     "mean_time_to_chance_ms": 18000.0
+    }
+   ],
+   "decisive_passes": [
+    {
+     "event_ref": "evt_00006@1",
+     "time_ms": 37000,
+     "passer_id": "vale_07",
+     "recipient_id": "vale_06",
+     "completed": true,
+     "length_m": 36.9,
+     "angle_deg": -59.5,
+     "speed_mps": null,
+     "through_ball": null,
+     "recipient_ran": null,
+     "led_to_chance": true
+    }
+   ],
+   "build_up": {
+    "sequences": 0,
+    "short_starts": 0,
+    "long_starts": 0,
+    "reached_middle_third": 0,
+    "reached_final_third": 0,
+    "mean_time_to_middle_ms": null,
+    "mean_time_to_final_ms": null,
+    "passes_attempted": 0,
+    "passes_completed": 0,
+    "pass_accuracy": null,
+    "lines_broken": 0,
+    "mean_lines_broken": null,
+    "lost_in_own_half": 0
+   },
+   "corners": {
+    "corners": 0,
+    "deliveries": [],
+    "target_men": []
+   }
+  }
+ },
+ "observations": [
+  {
+   "observation_id": "obs_offside_trap_vale_9",
+   "category": "offside_trap",
+   "kind": "opportunity",
+   "subject_team_id": "vale",
+   "for_team_id": "harbor",
+   "headline": "Vale United's line steps up late on its left",
+   "detail": "Luca Briar (left-back) started the step a mean 425 ms after the rest of the line in 8 of 8 traps and was 1.4 m deeper than the line at the pass. Those late steps kept 2 runners onside. Dario Finch (right winger) made 7 runs in that channel during those traps.",
+   "player_ids": [
+    "vale_03",
+    "harbor_10"
+   ],
+   "sample_size": 8,
+   "evidence": {
+    "episode_ids": [
+     "ep_attack_evt_00034",
+     "ep_attack_evt_00038",
+     "ep_attack_evt_00046",
+     "ep_attack_evt_00056",
+     "ep_attack_evt_00068",
+     "ep_attack_evt_00076",
+     "ep_attack_evt_00105",
+     "ep_attack_evt_00118"
+    ],
+    "event_refs": [
+     "evt_00034@1",
+     "evt_00038@1",
+     "evt_00046@1",
+     "evt_00056@1",
+     "evt_00068@1",
+     "evt_00076@1",
+     "evt_00105@1",
+     "evt_00118@1"
+    ]
+   },
+   "moment_id": "moment_offside_trap_evt_00105"
+  },
+  {
+   "observation_id": "obs_offside_trap_vale_8",
+   "category": "offside_trap",
+   "kind": "tendency",
+   "subject_team_id": "vale",
+   "for_team_id": "harbor",
+   "headline": "Vale United stepped up as a line in 8 of 10 attacks",
+   "detail": "Mean step speed 4.2 m/s; the line sat a mean 24.9 m from goal. 2 traps left a runner in an offside position; 2 traps were broken by a late step.",
+   "player_ids": [],
+   "sample_size": 10,
+   "evidence": {
+    "episode_ids": [
+     "ep_attack_evt_00034",
+     "ep_attack_evt_00038",
+     "ep_attack_evt_00046",
+     "ep_attack_evt_00056",
+     "ep_attack_evt_00068",
+     "ep_attack_evt_00076",
+     "ep_attack_evt_00105",
+     "ep_attack_evt_00118"
+    ],
+    "event_refs": []
+   },
+   "moment_id": null
+  },
+  {
+   "observation_id": "obs_shape_vale_10",
+   "category": "shape",
+   "kind": "tendency",
+   "subject_team_id": "vale",
+   "for_team_id": "harbor",
+   "headline": "Vale United shift 3.3 m toward the ball as attacks build",
+   "detail": "Outfield width goes from 35.4 m to 31.1 m and the block's length from 36.4 m to 32.8 m by the pass. Marking reads as not yet clear: the nearest defender dropped with 75.0% of runs outside traps.",
+   "player_ids": [],
+   "sample_size": 10,
+   "evidence": {
+    "episode_ids": [
+     "ep_attack_evt_00024",
+     "ep_attack_evt_00034",
+     "ep_attack_evt_00038",
+     "ep_attack_evt_00046",
+     "ep_attack_evt_00056",
+     "ep_attack_evt_00060",
+     "ep_attack_evt_00068",
+     "ep_attack_evt_00076",
+     "ep_attack_evt_00105",
+     "ep_attack_evt_00118"
+    ],
+    "event_refs": []
+   },
+   "moment_id": null
+  },
+  {
+   "observation_id": "obs_runs_harbor_3",
+   "category": "runs",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "harbor",
+   "headline": "Dario Finch makes the most runs in behind",
+   "detail": "Dario Finch (right winger) made 9 runs: 8 got in behind onside, 2 found by the pass and 7 not. Outside offside traps a defender dropped with 1 of them.",
+   "player_ids": [
+    "harbor_10"
+   ],
+   "sample_size": 9,
+   "evidence": {
+    "episode_ids": [
+     "ep_attack_evt_00024",
+     "ep_attack_evt_00034",
+     "ep_attack_evt_00038",
+     "ep_attack_evt_00056",
+     "ep_attack_evt_00060",
+     "ep_attack_evt_00068",
+     "ep_attack_evt_00076",
+     "ep_attack_evt_00105",
+     "ep_attack_evt_00118"
+    ],
+    "event_refs": []
+   },
+   "moment_id": "moment_runs_evt_00060"
+  },
+  {
+   "observation_id": "obs_press_harbor_1",
+   "category": "press",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "vale",
+   "headline": "Dario Finch triggers 43% of Harbor Athletic's presses",
+   "detail": "Dario Finch (right winger) started 3 of 7 presses, closing to within 2.5 m in a mean 1.5 s at 7.4 m/s.",
+   "player_ids": [
+    "harbor_10"
+   ],
+   "sample_size": 7,
+   "evidence": {
+    "episode_ids": [
+     "ep_possession_evt_00005",
+     "ep_possession_evt_00084",
+     "ep_possession_evt_00095"
+    ],
+    "event_refs": []
+   },
+   "moment_id": "moment_press_evt_00095"
+  },
+  {
+   "observation_id": "obs_press_harbor_2",
+   "category": "press",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "vale",
+   "headline": "Pressed, Vale United went back to the keeper 0% of the time",
+   "detail": "0 of 7 pressed possessions were recycled to the goalkeeper, against 0% when not pressed. Regained: 3. Played past halfway: 2.",
+   "player_ids": [],
+   "sample_size": 7,
+   "evidence": {
+    "episode_ids": [
+     "ep_possession_evt_00005",
+     "ep_possession_evt_00020",
+     "ep_possession_evt_00043",
+     "ep_possession_evt_00053",
+     "ep_possession_evt_00084",
+     "ep_possession_evt_00095",
+     "ep_possession_evt_00113"
+    ],
+    "event_refs": []
+   },
+   "moment_id": null
+  },
+  {
+   "observation_id": "obs_chance_creation_harbor_4",
+   "category": "chance_creation",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "harbor",
+   "headline": "Rafi Moss starts the most Harbor Athletic attacks",
+   "detail": "Rafi Moss (left central midfielder) made the first progressive action in 4 attacks; 3 reached a shot or box entry, a mean 12.0 s after the possession began.",
+   "player_ids": [
+    "harbor_08"
+   ],
+   "sample_size": 4,
+   "evidence": {
+    "episode_ids": [],
+    "event_refs": []
+   },
+   "moment_id": null
+  },
+  {
+   "observation_id": "obs_chance_creation_harbor_5",
+   "category": "chance_creation",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "harbor",
+   "headline": "Harbor Athletic's decisive passes travel at 19.5 m/s",
+   "detail": "Across 3 through balls and final passes, the mean angle was 19\u00b0 off straight and 3 went beyond the defensive line. Quickest: Leon Reed to Dario Finch at 22.0 m/s.",
+   "player_ids": [
+    "harbor_06",
+    "harbor_10"
+   ],
+   "sample_size": 3,
+   "evidence": {
+    "episode_ids": [],
+    "event_refs": [
+     "evt_00034@1",
+     "evt_00038@1",
+     "evt_00105@1"
+    ]
+   },
+   "moment_id": null
+  },
+  {
+   "observation_id": "obs_corners_harbor_6",
+   "category": "corners",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "vale",
+   "headline": "Harbor Athletic corners: 1.6 s deliveries at 22.3 m/s",
+   "detail": "Asher Pike (right-footed) from the left: 2 inswingers; Kai Lorne (left-footed) from the right: 1 inswinger. 3 of 3 curved the way the kicking foot predicts. Deliveries arrived a mean 0.9 m from the nearest attacker and 1 won first contact.",
+   "player_ids": [
+    "harbor_07",
+    "harbor_11"
+   ],
+   "sample_size": 3,
+   "evidence": {
+    "episode_ids": [
+     "ep_corner_evt_00030",
+     "ep_corner_evt_00052",
+     "ep_corner_evt_00082"
+    ],
+    "event_refs": [
+     "evt_00030@1",
+     "evt_00052@1",
+     "evt_00082@1"
+    ]
+   },
+   "moment_id": "moment_corners_evt_00082"
+  },
+  {
+   "observation_id": "obs_press_vale_11",
+   "category": "press",
+   "kind": "tendency",
+   "subject_team_id": "vale",
+   "for_team_id": "harbor",
+   "headline": "Ruben Hart triggers 100% of Vale United's presses",
+   "detail": "Ruben Hart (right winger) started 3 of 3 presses, closing to within 2.5 m in a mean 2.9 s at 6.0 m/s.",
+   "player_ids": [
+    "vale_10"
+   ],
+   "sample_size": 3,
+   "evidence": {
+    "episode_ids": [
+     "ep_possession_evt_00067",
+     "ep_possession_evt_00104",
+     "ep_possession_evt_00116"
+    ],
+    "event_refs": []
+   },
+   "moment_id": "moment_press_evt_00116"
+  },
+  {
+   "observation_id": "obs_corners_harbor_7",
+   "category": "corners",
+   "kind": "tendency",
+   "subject_team_id": "harbor",
+   "for_team_id": "vale",
+   "headline": "Theo Vale attacks the corner spot first",
+   "detail": "Theo Vale (left centre-back) reached the landing spot a mean 1.30 s after the strike, 300 ms before the ball.",
+   "player_ids": [
+    "harbor_05"
+   ],
+   "sample_size": 2,
+   "evidence": {
+    "episode_ids": [
+     "ep_corner_evt_00030",
+     "ep_corner_evt_00052",
+     "ep_corner_evt_00082"
+    ],
+    "event_refs": []
+   },
+   "moment_id": null
+  }
+ ],
+ "key_moments": [
+  {
+   "moment_id": "moment_press_evt_00095",
+   "category": "press",
+   "time_ms": 510200,
+   "period": 1,
+   "team_id": "vale",
+   "title": "Dario Finch triggers the press",
+   "ball": {
+    "x": 43.23,
+    "y": 30.43
+   },
+   "players": [
+    {
+     "player_id": "vale_01",
+     "team_id": "vale",
+     "x": 5.0,
+     "y": 50.0
+    },
+    {
+     "player_id": "vale_02",
+     "team_id": "vale",
+     "x": 28.7,
+     "y": 72.09
+    },
+    {
+     "player_id": "vale_03",
+     "team_id": "vale",
+     "x": 28.7,
+     "y": 20.09
+    },
+    {
+     "player_id": "vale_04",
+     "team_id": "vale",
+     "x": 28.7,
+     "y": 56.09
+    },
+    {
+     "player_id": "vale_05",
+     "team_id": "vale",
+     "x": 28.7,
+     "y": 36.09
+    },
+    {
+     "player_id": "vale_06",
+     "team_id": "vale",
+     "x": 48.11,
+     "y": 45.11
+    },
+    {
+     "player_id": "vale_07",
+     "team_id": "vale",
+     "x": 43.23,
+     "y": 30.43
+    },
+    {
+     "player_id": "vale_08",
+     "team_id": "vale",
+     "x": 48.11,
+     "y": 29.11
+    },
+    {
+     "player_id": "vale_09",
+     "team_id": "vale",
+     "x": 66.29,
+     "y": 50.0
+    },
+    {
+     "player_id": "vale_10",
+     "team_id": "vale",
+     "x": 66.29,
+     "y": 78.8
+    },
+    {
+     "player_id": "vale_11",
+     "team_id": "vale",
+     "x": 66.29,
+     "y": 21.2
+    },
+    {
+     "player_id": "harbor_01",
+     "team_id": "harbor",
+     "x": 97.0,
+     "y": 48.04
+    },
+    {
+     "player_id": "harbor_02",
+     "team_id": "harbor",
+     "x": 66.13,
+     "y": 19.11
+    },
+    {
+     "player_id": "harbor_03",
+     "team_id": "harbor",
+     "x": 66.13,
+     "y": 71.11
+    },
+    {
+     "player_id": "harbor_04",
+     "team_id": "harbor",
+     "x": 66.13,
+     "y": 35.11
+    },
+    {
+     "player_id": "harbor_05",
+     "team_id": "harbor",
+     "x": 66.13,
+     "y": 55.11
+    },
+    {
+     "player_id": "harbor_06",
+     "team_id": "harbor",
+     "x": 49.29,
+     "y": 44.13
+    },
+    {
+     "player_id": "harbor_07",
+     "team_id": "harbor",
+     "x": 49.29,
+     "y": 29.73
+    },
+    {
+     "player_id": "harbor_08",
+     "team_id": "harbor",
+     "x": 49.29,
+     "y": 58.53
+    },
+    {
+     "player_id": "harbor_09",
+     "team_id": "harbor",
+     "x": 52.23,
+     "y": 44.13
+    },
+    {
+     "player_id": "harbor_10",
+     "team_id": "harbor",
+     "x": 52.23,
+     "y": 31.33
+    },
+    {
+     "player_id": "harbor_11",
+     "team_id": "harbor",
+     "x": 52.23,
+     "y": 56.93
+    }
+   ],
+   "offside_line_x": null,
+   "highlight_ids": [
+    "harbor_10",
+    "vale_07"
+   ],
+   "path": [],
+   "event_ref": "evt_00095@1"
+  },
+  {
+   "moment_id": "moment_runs_evt_00060",
+   "category": "runs",
+   "time_ms": 304000,
+   "period": 1,
+   "team_id": "harbor",
+   "title": "Dario Finch's run pulls Luca Briar back",
+   "ball": {
+    "x": 45.84,
+    "y": 32.23
+   },
+   "players": [
+    {
+     "player_id": "vale_02",
+     "team_id": "vale",
+     "x": 66.79,
+     "y": 21.43
+    },
+    {
+     "player_id": "vale_04",
+     "team_id": "vale",
+     "x": 66.79,
+     "y": 35.51
+    },
+    {
+     "player_id": "vale_05",
+     "team_id": "vale",
+     "x": 68.34,
+     "y": 53.11
+    },
+    {
+     "player_id": "vale_03",
+     "team_id": "vale",
+     "x": 67.91,
+     "y": 67.19
+    },
+    {
+     "player_id": "vale_01",
+     "team_id": "vale",
+     "x": 97.5,
+     "y": 47.33
+    },
+    {
+     "player_id": "vale_07",
+     "team_id": "vale",
+     "x": 53.79,
+     "y": 29.91
+    },
+    {
+     "player_id": "vale_06",
+     "team_id": "vale",
+     "x": 53.79,
+     "y": 44.31
+    },
+    {
+     "player_id": "vale_08",
+     "team_id": "vale",
+     "x": 53.79,
+     "y": 58.71
+    },
+    {
+     "player_id": "vale_10",
+     "team_id": "vale",
+     "x": 36.79,
+     "y": 26.71
+    },
+    {
+     "player_id": "vale_09",
+     "team_id": "vale",
+     "x": 36.79,
+     "y": 44.31
+    },
+    {
+     "player_id": "vale_11",
+     "team_id": "vale",
+     "x": 36.79,
+     "y": 61.91
+    },
+    {
+     "player_id": "harbor_01",
+     "team_id": "harbor",
+     "x": 6.0,
+     "y": 50.0
+    },
+    {
+     "player_id": "harbor_02",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 72.26
+    },
+    {
+     "player_id": "harbor_04",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 57.86
+    },
+    {
+     "player_id": "harbor_05",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 39.86
+    },
+    {
+     "player_id": "harbor_03",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 25.46
+    },
+    {
+     "player_id": "harbor_07",
+     "team_id": "harbor",
+     "x": 45.04,
+     "y": 32.23
+    },
+    {
+     "player_id": "harbor_06",
+     "team_id": "harbor",
+     "x": 47.84,
+     "y": 45.56
+    },
+    {
+     "player_id": "harbor_08",
+     "team_id": "harbor",
+     "x": 47.84,
+     "y": 29.56
+    },
+    {
+     "player_id": "harbor_10",
+     "team_id": "harbor",
+     "x": 66.87,
+     "y": 75.84
+    },
+    {
+     "player_id": "harbor_09",
+     "team_id": "harbor",
+     "x": 68.04,
+     "y": 52.35
+    },
+    {
+     "player_id": "harbor_11",
+     "team_id": "harbor",
+     "x": 66.55,
+     "y": 19.49
+    }
+   ],
+   "offside_line_x": 68.34,
+   "highlight_ids": [
+    "harbor_10",
+    "vale_03"
+   ],
+   "path": [],
+   "event_ref": "evt_00060@1"
+  },
+  {
+   "moment_id": "moment_corners_evt_00082",
+   "category": "corners",
+   "time_ms": 401600,
+   "period": 1,
+   "team_id": "harbor",
+   "title": "Asher Pike's inswinger meets Eli Rowan",
+   "ball": {
+    "x": 94.84,
+    "y": 55.22
+   },
+   "players": [
+    {
+     "player_id": "harbor_07",
+     "team_id": "harbor",
+     "x": 99.5,
+     "y": 0.5
+    },
+    {
+     "player_id": "harbor_04",
+     "team_id": "harbor",
+     "x": 93.36,
+     "y": 53.18
+    },
+    {
+     "player_id": "harbor_09",
+     "team_id": "harbor",
+     "x": 91.52,
+     "y": 44.65
+    },
+    {
+     "player_id": "harbor_05",
+     "team_id": "harbor",
+     "x": 89.5,
+     "y": 50.0
+    },
+    {
+     "player_id": "harbor_02",
+     "team_id": "harbor",
+     "x": 78.0,
+     "y": 34.0
+    },
+    {
+     "player_id": "harbor_03",
+     "team_id": "harbor",
+     "x": 78.0,
+     "y": 66.0
+    },
+    {
+     "player_id": "harbor_06",
+     "team_id": "harbor",
+     "x": 88.0,
+     "y": 30.0
+    },
+    {
+     "player_id": "harbor_08",
+     "team_id": "harbor",
+     "x": 62.0,
+     "y": 50.0
+    },
+    {
+     "player_id": "harbor_10",
+     "team_id": "harbor",
+     "x": 55.0,
+     "y": 30.0
+    },
+    {
+     "player_id": "harbor_11",
+     "team_id": "harbor",
+     "x": 55.0,
+     "y": 70.0
+    },
+    {
+     "player_id": "harbor_01",
+     "team_id": "harbor",
+     "x": 30.0,
+     "y": 50.0
+    },
+    {
+     "player_id": "vale_01",
+     "team_id": "vale",
+     "x": 98.5,
+     "y": 51.04
+    },
+    {
+     "player_id": "vale_04",
+     "team_id": "vale",
+     "x": 91.33,
+     "y": 48.85
+    },
+    {
+     "player_id": "vale_05",
+     "team_id": "vale",
+     "x": 91.54,
+     "y": 45.55
+    },
+    {
+     "player_id": "vale_06",
+     "team_id": "vale",
+     "x": 90.7,
+     "y": 50.0
+    },
+    {
+     "player_id": "vale_02",
+     "team_id": "vale",
+     "x": 95.0,
+     "y": 40.0
+    },
+    {
+     "player_id": "vale_03",
+     "team_id": "vale",
+     "x": 95.0,
+     "y": 47.0
+    },
+    {
+     "player_id": "vale_07",
+     "team_id": "vale",
+     "x": 95.0,
+     "y": 53.0
+    },
+    {
+     "player_id": "vale_08",
+     "team_id": "vale",
+     "x": 95.0,
+     "y": 60.0
+    },
+    {
+     "player_id": "vale_09",
+     "team_id": "vale",
+     "x": 91.0,
+     "y": 44.0
+    },
+    {
+     "player_id": "vale_10",
+     "team_id": "vale",
+     "x": 91.0,
+     "y": 56.0
+    },
+    {
+     "player_id": "vale_11",
+     "team_id": "vale",
+     "x": 88.0,
+     "y": 50.0
+    }
+   ],
+   "offside_line_x": null,
+   "highlight_ids": [
+    "harbor_07",
+    "harbor_04"
+   ],
+   "path": [
+    {
+     "x": 99.5,
+     "y": 0.5
+    },
+    {
+     "x": 99.8,
+     "y": 7.46
+    },
+    {
+     "x": 99.8,
+     "y": 14.43
+    },
+    {
+     "x": 99.8,
+     "y": 21.39
+    },
+    {
+     "x": 99.8,
+     "y": 28.35
+    },
+    {
+     "x": 99.8,
+     "y": 35.32
+    },
+    {
+     "x": 98.71,
+     "y": 42.28
+    },
+    {
+     "x": 96.84,
+     "y": 49.25
+    },
+    {
+     "x": 94.84,
+     "y": 55.22
+    }
+   ],
+   "event_ref": "evt_00082@1"
+  },
+  {
+   "moment_id": "moment_offside_trap_evt_00105",
+   "category": "offside_trap",
+   "time_ms": 608000,
+   "period": 1,
+   "team_id": "harbor",
+   "title": "Luca Briar steps late; Dario Finch stays onside",
+   "ball": {
+    "x": 40.26,
+    "y": 34.02
+   },
+   "players": [
+    {
+     "player_id": "vale_02",
+     "team_id": "vale",
+     "x": 82.73,
+     "y": 22.01
+    },
+    {
+     "player_id": "vale_04",
+     "team_id": "vale",
+     "x": 82.73,
+     "y": 36.09
+    },
+    {
+     "player_id": "vale_05",
+     "team_id": "vale",
+     "x": 82.73,
+     "y": 53.69
+    },
+    {
+     "player_id": "vale_03",
+     "team_id": "vale",
+     "x": 84.06,
+     "y": 67.77
+    },
+    {
+     "player_id": "vale_01",
+     "team_id": "vale",
+     "x": 97.5,
+     "y": 47.6
+    },
+    {
+     "player_id": "vale_07",
+     "team_id": "vale",
+     "x": 69.73,
+     "y": 30.49
+    },
+    {
+     "player_id": "vale_06",
+     "team_id": "vale",
+     "x": 69.73,
+     "y": 44.89
+    },
+    {
+     "player_id": "vale_08",
+     "team_id": "vale",
+     "x": 69.73,
+     "y": 59.29
+    },
+    {
+     "player_id": "vale_10",
+     "team_id": "vale",
+     "x": 52.73,
+     "y": 27.29
+    },
+    {
+     "player_id": "vale_09",
+     "team_id": "vale",
+     "x": 52.73,
+     "y": 44.89
+    },
+    {
+     "player_id": "vale_11",
+     "team_id": "vale",
+     "x": 52.73,
+     "y": 62.49
+    },
+    {
+     "player_id": "harbor_01",
+     "team_id": "harbor",
+     "x": 6.0,
+     "y": 50.0
+    },
+    {
+     "player_id": "harbor_02",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 72.38
+    },
+    {
+     "player_id": "harbor_04",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 57.98
+    },
+    {
+     "player_id": "harbor_05",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 39.98
+    },
+    {
+     "player_id": "harbor_03",
+     "team_id": "harbor",
+     "x": 20.0,
+     "y": 25.58
+    },
+    {
+     "player_id": "harbor_07",
+     "team_id": "harbor",
+     "x": 42.26,
+     "y": 62.01
+    },
+    {
+     "player_id": "harbor_06",
+     "team_id": "harbor",
+     "x": 39.46,
+     "y": 34.02
+    },
+    {
+     "player_id": "harbor_08",
+     "team_id": "harbor",
+     "x": 42.26,
+     "y": 30.01
+    },
+    {
+     "player_id": "harbor_10",
+     "team_id": "harbor",
+     "x": 83.76,
+     "y": 69.67
+    },
+    {
+     "player_id": "harbor_09",
+     "team_id": "harbor",
+     "x": 81.67,
+     "y": 48.52
+    },
+    {
+     "player_id": "harbor_11",
+     "team_id": "harbor",
+     "x": 81.74,
+     "y": 19.67
+    }
+   ],
+   "offside_line_x": 84.06,
+   "highlight_ids": [
+    "vale_03",
+    "harbor_10"
+   ],
+   "path": [],
+   "event_ref": "evt_00105@1"
+  },
+  {
+   "moment_id": "moment_press_evt_00116",
+   "category": "press",
+   "time_ms": 720600,
+   "period": 1,
+   "team_id": "harbor",
+   "title": "Ruben Hart triggers the press",
+   "ball": {
+    "x": 44.91,
+    "y": 78.16
+   },
+   "players": [
+    {
+     "player_id": "harbor_01",
+     "team_id": "harbor",
+     "x": 5.0,
+     "y": 50.0
+    },
+    {
+     "player_id": "harbor_02",
+     "team_id": "harbor",
+     "x": 29.46,
+     "y": 81.63
+    },
+    {
+     "player_id": "harbor_03",
+     "team_id": "harbor",
+     "x": 29.46,
+     "y": 29.63
+    },
+    {
+     "player_id": "harbor_04",
+     "team_id": "harbor",
+     "x": 29.46,
+     "y": 65.63
+    },
+    {
+     "player_id": "harbor_05",
+     "team_id": "harbor",
+     "x": 29.46,
+     "y": 45.63
+    },
+    {
+     "player_id": "harbor_06",
+     "team_id": "harbor",
+     "x": 48.95,
+     "y": 57.04
+    },
+    {
+     "player_id": "harbor_07",
+     "team_id": "harbor",
+     "x": 44.91,
+     "y": 78.16
+    },
+    {
+     "player_id": "harbor_08",
+     "team_id": "harbor",
+     "x": 48.95,
+     "y": 41.04
+    },
+    {
+     "player_id": "harbor_09",
+     "team_id": "harbor",
+     "x": 66.96,
+     "y": 50.0
+    },
+    {
+     "player_id": "harbor_10",
+     "team_id": "harbor",
+     "x": 66.96,
+     "y": 78.8
+    },
+    {
+     "player_id": "harbor_11",
+     "team_id": "harbor",
+     "x": 66.96,
+     "y": 21.2
+    },
+    {
+     "player_id": "vale_01",
+     "team_id": "vale",
+     "x": 97.0,
+     "y": 52.82
+    },
+    {
+     "player_id": "vale_02",
+     "team_id": "vale",
+     "x": 66.72,
+     "y": 31.04
+    },
+    {
+     "player_id": "vale_03",
+     "team_id": "vale",
+     "x": 66.72,
+     "y": 83.04
+    },
+    {
+     "player_id": "vale_04",
+     "team_id": "vale",
+     "x": 66.72,
+     "y": 47.04
+    },
+    {
+     "player_id": "vale_05",
+     "team_id": "vale",
+     "x": 66.72,
+     "y": 67.04
+    },
+    {
+     "player_id": "vale_06",
+     "team_id": "vale",
+     "x": 49.96,
+     "y": 58.45
+    },
+    {
+     "player_id": "vale_07",
+     "team_id": "vale",
+     "x": 49.96,
+     "y": 44.05
+    },
+    {
+     "player_id": "vale_08",
+     "team_id": "vale",
+     "x": 49.96,
+     "y": 72.85
+    },
+    {
+     "player_id": "vale_09",
+     "team_id": "vale",
+     "x": 53.91,
+     "y": 58.45
+    },
+    {
+     "player_id": "vale_10",
+     "team_id": "vale",
+     "x": 53.91,
+     "y": 45.65
+    },
+    {
+     "player_id": "vale_11",
+     "team_id": "vale",
+     "x": 53.91,
+     "y": 71.25
+    }
+   ],
+   "offside_line_x": null,
+   "highlight_ids": [
+    "vale_10",
+    "harbor_07"
+   ],
+   "path": [],
+   "event_ref": "evt_00116@1"
+  }
+ ],
+ "definitions": {
+  "offside_trap": "Three or more of the back four step toward halfway at \u22652 m/s within 1.8 s before a pass into the attacking 40%. Onset is the first of two consecutive frames above that speed.",
+  "late_step": "A back-four defender whose step onset is \u2265250 ms after the line's median onset, or who does not step while the rest do.",
+  "offside_position": "At the pass frame the runner is beyond both the ball and the second-last defender (goalkeeper included) in the opponent half. Body parts and the referee's judgement are not modelled.",
+  "trap_broken": "A runner was onside only because a late-stepping defender was deeper than the rest of the line.",
+  "line_height": "Distance from the defending team's goal line to the back four's median position at the pass, in metres.",
+  "line_spread": "Front-to-back spread of the back four at the pass, in metres; lower is flatter.",
+  "shift_to_ball": "Lateral movement of the ten outfield players' centre toward the ball's side between 3 s before the pass and the pass.",
+  "shift_lag": "Time a player takes to finish 90% of their lateral shift, relative to the unit's median.",
+  "early_release": "The nearest defender at the start of the move is engaging the ball carrier (\u22645 m) at the pass while that attacker is free (no defender within 5 m).",
+  "late_reaction": "A defender starts dropping with a run \u2265450 ms after the run begins.",
+  "marking_system": "Man-oriented when the nearest defender drops with at least 60% of runs, zonal at 35% or less, otherwise mixed.",
+  "run": "An attacker moving toward goal at \u22655.5 m/s for three consecutive frames, starting within 12 units of the defensive line.",
+  "drew_defender": "A back-four defender in the runner's channel retreats at \u22652 m/s, starting before the pass, within 1.2 s of the run.",
+  "press": "An opponent outfield player within 25 m of the ball runs toward it at \u22654.5 m/s for two consecutive frames within 3 s of a possession starting in the team's own half.",
+  "press_trigger": "The first player to make that pressing run. The target is the player in possession at that moment.",
+  "time_to_pressure": "From the trigger's onset until they are within 2.5 m of the ball.",
+  "press_outcome": "The first of: a pass to the goalkeeper (forced to keeper), an opponent possession (regained), a completed pass or carry past halfway (played through), a stoppage, within 12 s.",
+  "build_up": "A sequence from the goalkeeper's possession or receipt until the possession ends or 20 s. Lines broken counts opponent lines (forwards, midfield, back four mean x) a completed pass crosses.",
+  "attack_initiator": "In a possession that reaches the final third or a chance, the first player to complete a pass or carry gaining \u226512 units or entering the final third.",
+  "chance": "A shot or a completed entry into the box. Time to chance is measured from the start of the possession.",
+  "pass_angle": "Direction of a pass relative to straight at goal: 0\u00b0 is straight forward, positive toward the passer's right.",
+  "pass_speed": "Mean ball speed between leaving the passer and arriving, from 5 Hz synthetic ball positions.",
+  "corner_swing": "Measured from the ball's curve: bending toward the goal line is an inswinger. Expected swing follows the kicking foot and corner side.",
+  "corner_accuracy": "Distance from where the delivery arrives to the nearest attacker at that moment.",
+  "time_to_spot": "Time from the delivery being struck until the nearest attacker at arrival is within 1.5 m of where it lands."
+ },
+ "limitations": [
+  "Synthetic tracking: positions are generated from fictional tendencies at 5 Hz. They are not measured players.",
+  "Positions agree with recorded events where events exist. Between them, motion is illustrative.",
+  "Offside uses one point per player and ignores body parts, deliberate play and refereeing judgement.",
+  "Tendencies describe what happened in the released sample. They are not predictions, and small samples are labelled.",
+  "Opportunities point to repeated patterns an opponent could test. They do not claim that a goal or chance would follow."
+ ]
+}
