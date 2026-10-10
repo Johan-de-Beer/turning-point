@@ -57,7 +57,7 @@ A run is an attacker moving toward goal at 5.5 m/s or faster (19.8 km/h, the usu
 
 The initiator is the first outfield player in a possession that reaches the final third or a chance to complete a pass or carry gaining at least 12 units or entering the final third. Goalkeepers are excluded. Time to chance runs from the start of the possession to the shot or box entry.
 
-Decisive passes are completed forward passes into the attacking 40%. Each has its length, angle and speed. The angle is measured from straight at goal, positive to the passer's right. Speed is the mean ball speed over the tracked flight. A through ball is a pass from the attacking half to a runner already in stride.
+Decisive passes are completed forward passes into the attacking 40%. Each has its length and speed (the mean ball speed over the tracked flight). A through ball is a pass from the attacking half to a runner already in stride. The Chance column says whether a Major or Minor chance followed, with the xG of the first shot later in that possession beneath it (see [match analytics](match-analytics.md)); the pass angle is no longer reported.
 
 ### Build-up from the goalkeeper
 

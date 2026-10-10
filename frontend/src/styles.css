@@ -579,6 +579,14 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tactics-definitions { display: grid; gap: var(--space-2); margin-top: var(--space-3); font-size: 13px; }
 .tactics-definitions dt { color: var(--text); font-weight: 600; text-transform: capitalize; }
 .tactics-definitions dd { margin: 0; color: var(--text-2); line-height: 1.5; }
+.chance-cell { display: inline-grid; gap: 1px; line-height: 1.2; }
+.chance-cell small { color: var(--text-3); font-size: 12px; }
+.chance-major strong { color: var(--teal); }
+.analytics-views { flex-wrap: wrap; }
+.analytics-panel .metric-legend { margin-top: var(--space-1); }
+.workload-alert { display: flex; align-items: center; gap: 8px; color: var(--warning); font-size: 14px; }
+.trend-drop { color: var(--warning); font-weight: 600; }
+.tactics-table small { color: var(--text-3); }
 @media (max-width: 960px) {
   .tactics-lead { grid-template-columns: 1fr; }
   .tactics-moment { position: static; order: -1; }

@@ -18,7 +18,7 @@ const pressOutcomes = z.strictObject({ possessions: count, regained: count, forc
 const press = z.strictObject({ opportunities: count, presses: count, triggers: z.array(pressTrigger), targets: z.array(pressTarget), when_pressing: pressOutcomes, when_not_pressing: pressOutcomes, mean_time_to_pressure_ms: maybe, mean_closing_speed_mps: maybe });
 const runner = z.strictObject({ player_id: id, runs: count, in_behind: count, targeted: count, offside: count, drew_defender: count, drag_rate: maybe });
 const creator = z.strictObject({ player_id: id, attacks_started: count, chances: count, mean_time_to_chance_ms: maybe });
-const decisivePass = z.strictObject({ event_ref: id, time_ms: count, passer_id: id, recipient_id: id, completed: z.boolean(), length_m: num, angle_deg: num, speed_mps: maybe, through_ball: z.boolean().nullable(), recipient_ran: z.boolean().nullable(), led_to_chance: z.boolean() });
+const decisivePass = z.strictObject({ event_ref: id, time_ms: count, passer_id: id, recipient_id: id, completed: z.boolean(), length_m: num, speed_mps: maybe, through_ball: z.boolean().nullable(), recipient_ran: z.boolean().nullable(), led_to_chance: z.boolean(), chance: z.enum(['major', 'minor']).nullable(), xg: num.min(0).max(1).nullable(), shot_ref: id.nullable() });
 const buildUp = z.strictObject({ sequences: count, short_starts: count, long_starts: count, reached_middle_third: count, reached_final_third: count, mean_time_to_middle_ms: maybe, mean_time_to_final_ms: maybe, passes_attempted: count, passes_completed: count, pass_accuracy: maybe, lines_broken: count, mean_lines_broken: maybe, lost_in_own_half: count });
 const side = z.enum(['left', 'right']);
 const swing = z.enum(['inswinger', 'outswinger']);
@@ -71,10 +71,10 @@ export const metres = (value: number | null | undefined) => value == null ? '—
 export const speed = (value: number | null | undefined) => value == null ? '—' : `${value.toFixed(1)} m/s`;
 export const share = (part: number, whole: number) => whole ? `${Math.round(part / whole * 100)}%` : '—';
 
-export function angleLabel(degrees: number): string {
-  const magnitude = Math.round(Math.abs(degrees));
-  if (magnitude <= 5) return 'straight';
-  return `${magnitude}° ${degrees > 0 ? 'right' : 'left'}`;
+/** Chance type for a decisive pass, with the xG of the shot that followed beneath it. */
+export function chanceLabel(pass: Pick<TeamTactics['decisive_passes'][number], 'chance' | 'xg'>): { type: string; xg: string } {
+  if (!pass.chance) return { type: 'None', xg: '' };
+  return { type: pass.chance === 'major' ? 'Major' : 'Minor', xg: pass.xg == null ? 'no shot' : `xG ${pass.xg.toFixed(2)}` };
 }
 
 export const zoneLabel: Record<z.infer<typeof delivery>['zone'], string> = {

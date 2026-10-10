@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { envelopeSchema, insightSchema, matchSchema, type Envelope, type Session } from './contracts';
-import { casualFactCues, feedItems, involvesPlayer, percentOfMatch, timelineMarkers } from './events';
+import { casualFactCues, feedItems, involvesPlayer, percentOfMatch, playerLabel, timelineMarkers } from './events';
 
-const match = matchSchema.parse({ match_id: 'test_match', schema_version: '1.0', provenance: 'synthetic', home: { team_id: 'harbor', display_name: 'Harbor Athletic', short_name: 'HBR', color: '#38bdf8' }, away: { team_id: 'vale', display_name: 'Vale United', short_name: 'VAL', color: '#fbbf24' }, roster: [{ player_id: 'harbor_08', team_id: 'harbor', display_name: 'Test Harbor Eight', shirt_number: 8, position: 'MID' }, { player_id: 'harbor_09', team_id: 'harbor', display_name: 'Test Harbor Nine', shirt_number: 9, position: 'FWD' }, { player_id: 'vale_04', team_id: 'vale', display_name: 'Test Vale Four', shirt_number: 4, position: 'DEF' }], period_lengths_ms: [2700000, 2700000] });
+const match = matchSchema.parse({ match_id: 'test_match', schema_version: '1.0', provenance: 'synthetic', home: { team_id: 'harbor', display_name: 'Harbor Athletic', short_name: 'HBR', color: '#38bdf8' }, away: { team_id: 'vale', display_name: 'Vale United', short_name: 'VAL', color: '#fbbf24' }, roster: [{ player_id: 'harbor_08', team_id: 'harbor', display_name: 'Test Harbor Eight', shirt_number: 8, position: 'MID' }, { player_id: 'harbor_09', team_id: 'harbor', display_name: 'Test Harbor Nine', shirt_number: 9, position: 'FWD', role: 'ST' }, { player_id: 'vale_04', team_id: 'vale', display_name: 'Test Vale Four', shirt_number: 4, position: 'DEF' }], period_lengths_ms: [2700000, 2700000] });
 
 let seq = 0;
 function envelope(kind: string, time: number, extra: Record<string, unknown> = {}): Envelope {
@@ -62,5 +62,13 @@ describe('match timeline markers', () => {
     expect(markers.goals).toEqual([{ kind: 'goal', id: valeGoal.event_id, at: 5000, teamId: 'vale', playerId: 'vale_04' }]);
     expect(percentOfMatch(2700000)).toBe(50);
     expect(percentOfMatch(9e9)).toBe(100);
+  });
+});
+
+describe('player positions', () => {
+  it('labels players with their specific position, falling back to the broad group', () => {
+    expect(playerLabel(match, 'harbor_09')).toBe('Test Harbor Nine (ST)');
+    expect(playerLabel(match, 'harbor_08')).toBe('Test Harbor Eight (MID)');
+    expect(playerLabel(match, 'nobody')).toBeNull();
   });
 });
