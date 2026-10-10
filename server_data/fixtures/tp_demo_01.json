@@ -420,7 +420,8 @@
             "x": 100.0,
             "y": 36.81
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -983,7 +984,12 @@
             "x": 97.31,
             "y": 54.8
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 3.26,
+            "z_m": 0.51,
+            "speed_mps": 15.8
+          }
         }
       }
     },
@@ -1406,7 +1412,8 @@
             "x": 95.0,
             "y": 42.69
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -1664,7 +1671,12 @@
             "x": 98.99,
             "y": 50.44
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 3.33,
+            "z_m": 1.79,
+            "speed_mps": 25.7
+          }
         }
       }
     },
@@ -2087,7 +2099,8 @@
             "x": 94.32,
             "y": 69.58
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -2345,7 +2358,8 @@
             "x": 91.37,
             "y": 38.39
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -2627,7 +2641,12 @@
             "x": 98.21,
             "y": 49.54
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": {
+            "y_m": -0.31,
+            "z_m": 0.6,
+            "speed_mps": 15.6
+          }
         }
       }
     },
@@ -3536,7 +3555,12 @@
             "x": 100.0,
             "y": 48.46
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -1.05,
+            "z_m": 0.92,
+            "speed_mps": 19.1
+          }
         }
       }
     },
@@ -7095,7 +7119,8 @@
             "x": 100.0,
             "y": 30.06
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -7242,7 +7267,12 @@
             "x": 97.53,
             "y": 52.88
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 1.96,
+            "z_m": 1.25,
+            "speed_mps": 18.9
+          }
         }
       }
     },
@@ -7394,7 +7424,8 @@
             "x": 95.0,
             "y": 39.97
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": null
         }
       }
     },
@@ -7546,7 +7577,12 @@
             "x": 98.37,
             "y": 48.86
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -0.78,
+            "z_m": 1.07,
+            "speed_mps": 14.4
+          }
         }
       }
     },
@@ -7674,7 +7710,12 @@
             "x": 98.94,
             "y": 48.68
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -2.63,
+            "z_m": 2.24,
+            "speed_mps": 24.9
+          }
         }
       }
     },
@@ -7802,7 +7843,8 @@
             "x": 93.34,
             "y": 45.1
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": null
         }
       }
     },
@@ -7930,7 +7972,12 @@
             "x": 98.0,
             "y": 48.22
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": {
+            "y_m": -1.21,
+            "z_m": 0.67,
+            "speed_mps": 19.2
+          }
         }
       }
     },
@@ -8082,7 +8129,12 @@
             "x": 97.07,
             "y": 54.12
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": {
+            "y_m": 2.8,
+            "z_m": 1.59,
+            "speed_mps": 17.9
+          }
         }
       }
     },
@@ -8210,7 +8262,12 @@
             "x": 97.37,
             "y": 48.73
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -2.64,
+            "z_m": 2.19,
+            "speed_mps": 30.1
+          }
         }
       }
     },
@@ -8362,7 +8419,12 @@
             "x": 98.39,
             "y": 54.94
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": {
+            "y_m": 3.36,
+            "z_m": 0.56,
+            "speed_mps": 16.7
+          }
         }
       }
     },
@@ -8490,7 +8552,12 @@
             "x": 98.83,
             "y": 54.75
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 3.06,
+            "z_m": 1.91,
+            "speed_mps": 24.8
+          }
         }
       }
     },
@@ -8642,7 +8709,8 @@
             "x": 92.96,
             "y": 31.19
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": null
         }
       }
     },
@@ -8794,7 +8862,8 @@
             "x": 94.58,
             "y": 58.48
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": null
         }
       }
     },
@@ -9104,7 +9173,12 @@
             "x": 98.75,
             "y": 53.76
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 2.67,
+            "z_m": 1.93,
+            "speed_mps": 27.7
+          }
         }
       }
     },
@@ -10357,7 +10431,8 @@
             "x": 100.0,
             "y": 22.06
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -11562,7 +11637,12 @@
             "x": 97.55,
             "y": 49.37
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -2.6,
+            "z_m": 0.06,
+            "speed_mps": 29.3
+          }
         }
       }
     },
@@ -13007,7 +13087,8 @@
             "x": 100.0,
             "y": 70.24
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -13368,7 +13449,12 @@
             "x": 100.0,
             "y": 47.62
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -1.62,
+            "z_m": 0.09,
+            "speed_mps": 29.0
+          }
         }
       }
     },
@@ -14117,7 +14203,12 @@
             "x": 98.37,
             "y": 52.11
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 1.43,
+            "z_m": 0.53,
+            "speed_mps": 20.7
+          }
         }
       }
     },
@@ -15506,7 +15597,8 @@
             "x": 100.0,
             "y": 37.15
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -15865,7 +15957,8 @@
             "x": 95.0,
             "y": 39.45
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -16147,7 +16240,8 @@
             "x": 88.4,
             "y": 55.78
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -16405,7 +16499,12 @@
             "x": 98.37,
             "y": 49.21
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -0.54,
+            "z_m": 0.59,
+            "speed_mps": 15.5
+          }
         }
       }
     },
@@ -16852,7 +16951,8 @@
             "x": 93.89,
             "y": 53.35
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -17134,7 +17234,12 @@
             "x": 97.23,
             "y": 47.35
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -2.4,
+            "z_m": 2.31,
+            "speed_mps": 24.4
+          }
         }
       }
     },
@@ -17557,7 +17662,8 @@
             "x": 94.87,
             "y": 42.48
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -18145,7 +18251,12 @@
             "x": 100.0,
             "y": 48.31
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -1.15,
+            "z_m": 0.52,
+            "speed_mps": 17.0
+          }
         }
       }
     },
@@ -18844,7 +18955,8 @@
             "x": 100.0,
             "y": 74.07
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -22577,7 +22689,8 @@
             "x": 100.0,
             "y": 64.87
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -23476,7 +23589,8 @@
             "x": 95.0,
             "y": 63.8
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -23604,7 +23718,12 @@
             "x": 98.44,
             "y": 52.42
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 1.65,
+            "z_m": 0.61,
+            "speed_mps": 15.2
+          }
         }
       }
     },
@@ -23756,7 +23875,12 @@
             "x": 98.45,
             "y": 51.93
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 1.31,
+            "z_m": 0.95,
+            "speed_mps": 15.7
+          }
         }
       }
     },
@@ -23908,7 +24032,8 @@
             "x": 94.71,
             "y": 34.95
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": null
         }
       }
     },
@@ -24060,7 +24185,8 @@
             "x": 94.26,
             "y": 47.31
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -24188,7 +24314,12 @@
             "x": 97.92,
             "y": 51.55
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 1.05,
+            "z_m": 1.5,
+            "speed_mps": 14.7
+          }
         }
       }
     },
@@ -24316,7 +24447,12 @@
             "x": 98.04,
             "y": 52.34
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": {
+            "y_m": 3.04,
+            "z_m": 0.09,
+            "speed_mps": 28.4
+          }
         }
       }
     },
@@ -24444,7 +24580,12 @@
             "x": 98.68,
             "y": 51.1
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": {
+            "y_m": 0.75,
+            "z_m": 1.39,
+            "speed_mps": 13.7
+          }
         }
       }
     },
@@ -24572,7 +24713,12 @@
             "x": 97.8,
             "y": 50.04
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 0.03,
+            "z_m": 1.08,
+            "speed_mps": 16.9
+          }
         }
       }
     },
@@ -24724,7 +24870,8 @@
             "x": 95.0,
             "y": 46.89
           },
-          "body_part": "left_foot"
+          "body_part": "left_foot",
+          "placement": null
         }
       }
     },
@@ -24876,7 +25023,12 @@
             "x": 97.69,
             "y": 51.53
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 3.29,
+            "z_m": 0.21,
+            "speed_mps": 28.3
+          }
         }
       }
     },
@@ -25004,7 +25156,12 @@
             "x": 98.35,
             "y": 53.61
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": 2.45,
+            "z_m": 0.7,
+            "speed_mps": 15.3
+          }
         }
       }
     },
@@ -25778,7 +25935,8 @@
             "x": 100.0,
             "y": 26.76
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": null
         }
       }
     },
@@ -26847,7 +27005,12 @@
             "x": 98.97,
             "y": 48.86
           },
-          "body_part": "right_foot"
+          "body_part": "right_foot",
+          "placement": {
+            "y_m": -0.78,
+            "z_m": 1.19,
+            "speed_mps": 20.1
+          }
         }
       }
     },

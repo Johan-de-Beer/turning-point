@@ -97,6 +97,13 @@ class CarryDetail(StrictModel):
     end: Point
 
 
+class ShotPlacement(StrictModel):
+    """Where an on-target shot crossed the goal line, from the shooter's view, and how hard it was hit."""
+    y_m: float = Field(ge=-3.66, le=3.66, strict=True)   # metres from the goal centre, positive to the shooter's right (y = 100)
+    z_m: float = Field(ge=0, le=2.44, strict=True)       # height above the ground
+    speed_mps: float = Field(ge=0, le=45, strict=True)
+
+
 class ShotDetail(StrictModel):
     position: Point
     outcome: Literal["goal", "saved", "blocked", "off_target"]
@@ -105,6 +112,8 @@ class ShotDetail(StrictModel):
     target: Point | None = None
     # Synthetic recorded body part; absent on legacy shots and then treated as a foot.
     body_part: Literal["right_foot", "left_foot", "head"] | None = None
+    # Synthetic recorded placement in the goal mouth, on goals and saved shots only.
+    placement: ShotPlacement | None = None
 
 
 class TackleDetail(StrictModel):
@@ -781,8 +790,9 @@ class TacticalReport(StrictModel):
     limitations: list[str]
 
 
-# -------------------------------------------------------------- analytics_v1
-ANALYTICS_VERSION = "analytics_v1"
+# -------------------------------------------------------------- analytics_v2
+ANALYTICS_VERSION = "analytics_v2"
+GameStateName = Literal["winning", "drawing", "losing"]
 
 
 class TerritoryWindow(StrictModel):
@@ -811,6 +821,10 @@ class ShotValue(StrictModel):
     assist: Literal["through_ball", "cutback", "pass", "individual", "cross", "set_piece"]
     body_part: Literal["right_foot", "left_foot", "head"]
     chance: Literal["major", "minor"]
+    xgot: float | None
+    placement: ShotPlacement | None
+    key_passer_id: str | None
+    game_state: GameStateName
 
 
 class TeamChances(StrictModel):
@@ -822,6 +836,9 @@ class TeamChances(StrictModel):
     xg_against: float
     major_chances: int
     xg_per_shot: float | None
+    goals_against: int
+    # Goals conceded minus xG conceded: negative means fewer goals let in than the chances allowed.
+    goals_minus_xg_against: float
 
 
 class LineFigures(StrictModel):
@@ -876,12 +893,16 @@ class ValuedAction(StrictModel):
     time_ms: int
     team_id: str
     player_id: str
-    action: Literal["pass", "carry", "shot", "lost_pass", "dispossessed"]
+    action: Literal["pass", "carry", "shot", "lost_pass", "dispossessed", "tackle_won", "interception"]
     start: Point
     end: Point | None
     value_before: float
     value_after: float
     pv: float
+    # VAEP-style: change in the scoring chance minus change in the conceding chance.
+    scoring_delta: float
+    conceding_delta: float
+    vaep: float
 
 
 class PlayerValue(StrictModel):
@@ -891,6 +912,8 @@ class PlayerValue(StrictModel):
     pv: float
     positive_actions: int
     best_ref: str | None
+    vaep: float
+    defensive_vaep: float
 
 
 class TeamValue(StrictModel):
@@ -900,6 +923,240 @@ class TeamValue(StrictModel):
     pv: float
     pv_per_action: float | None
     by_action: dict[str, float]
+    vaep: float
+    vaep_by_action: dict[str, float]
+
+
+class ScoreSegment(StrictModel):
+    start_ms: int
+    end_ms: int
+    score: dict[str, int]
+
+
+class GameStateRow(StrictModel):
+    state: GameStateName
+    minutes: float
+    possession_share: float | None
+    field_tilt: float | None
+    passes: int
+    shots: int
+    xg: float
+    xg_per_shot: float | None
+    goals: int
+    box_touches: int
+    xova: float
+    vaep: float
+    vaep_per_action: float | None
+    ppda: float | None
+    vertical_mps: float | None
+    directness: float | None
+    back_four_m: float | None
+
+
+class TeamGameState(StrictModel):
+    team_id: str
+    current: GameStateName
+    rows: list[GameStateRow]
+
+
+class GameState(StrictModel):
+    score: dict[str, int]
+    segments: list[ScoreSegment]
+    teams: dict[str, TeamGameState]
+
+
+class Heatmap(StrictModel):
+    subject_id: str          # a team id or a player id
+    team_id: str
+    kind: Literal["touches", "tracking", "received", "defensive"]
+    total: int               # events, or seconds for tracking
+    cells: list[int]         # GRID_X x GRID_Y, x-major, in the team's attacking frame
+
+
+class Heatmaps(StrictModel):
+    grid_x: int
+    grid_y: int
+    maps: list[Heatmap]
+
+
+class KeeperRow(StrictModel):
+    player_id: str
+    team_id: str
+    shots_on_target: int
+    saves: int
+    goals_conceded: int
+    xg_faced: float
+    xgot_faced: float
+    xg_prevented: float
+    save_pct: float | None
+
+
+class TeamShooting(StrictModel):
+    team_id: str
+    shots_on_target: int
+    xg_on_target: float
+    xgot: float
+    placement_added: float
+
+
+class Goalkeeping(StrictModel):
+    keepers: list[KeeperRow]
+    shooting: dict[str, TeamShooting]
+
+
+class TempoFigures(StrictModel):
+    possessions: int
+    vertical_mps: float | None
+    final_third_entries: int
+    passes_per_entry: float | None
+    forward_passes: int
+    lateral_passes: int
+    backward_passes: int
+    directness: float | None
+    possession_s: dict[str, float | None]
+    progressive_passes: int
+    regain_to_progressive_s: float | None
+
+
+class TempoInterval(StrictModel):
+    start_ms: int
+    end_ms: int
+    vertical_mps: float | None
+    directness: float | None
+    passes_per_entry: float | None
+
+
+class TeamTempo(StrictModel):
+    team_id: str
+    match: TempoFigures
+    intervals: list[TempoInterval]
+
+
+class Pressing(StrictModel):
+    team_id: str
+    ppda: float | None
+    opponent_passes: int
+    defensive_actions: int
+
+
+class PlayerCreation(StrictModel):
+    player_id: str
+    team_id: str
+    box_touches: int
+    zone14_touches: int
+    key_passes: int
+    assists: int
+    xa: float
+    shots: int
+    xg: float
+    progressive_passes: int
+    sca: int
+    gca: int
+
+
+class TeamCreation(StrictModel):
+    team_id: str
+    box_touches: int
+    box_entries: int
+    zone14_touches: int
+    zone14_entries: int
+    key_passes: int
+    first_time_key_passes: int
+    assists: int
+    xa: float
+    key_pass_types: dict[str, int]
+    key_pass_origins: dict[str, int]
+    xg_per_box_touch: float | None
+    progressive_passes: int
+    sca: int
+    gca: int
+    sca_types: dict[str, int]
+    gca_types: dict[str, int]
+
+
+class CreatingAction(StrictModel):
+    """One of the (up to) two offensive actions directly before a shot: a shot- or goal-creating action."""
+    shot_ref: str
+    time_ms: int
+    team_id: str
+    player_id: str
+    kind: Literal["pass_live", "pass_dead", "take_on", "shot", "defensive"]
+    goal: bool
+
+
+class NetworkNode(StrictModel):
+    player_id: str
+    x: float
+    y: float
+    touches: int
+    passes: int
+    received: int
+
+
+class NetworkEdge(StrictModel):
+    a: str
+    b: str
+    passes: int     # completed passes between the two, both directions
+    a_to_b: int
+
+
+class PassNetwork(StrictModel):
+    team_id: str
+    completed_passes: int
+    nodes: list[NetworkNode]
+    edges: list[NetworkEdge]
+    width_m: float | None   # spread of the average positions across the pitch
+    depth_m: float | None   # and along it
+
+
+class DefensiveRow(StrictModel):
+    player_id: str
+    team_id: str
+    minutes: float
+    tackles_won: int
+    tackles_lost: int
+    aerials_won: int
+    interceptions: int
+    recoveries: int
+    total: int
+    per90: float | None
+    by_third: dict[str, int]
+
+
+class PackingAction(StrictModel):
+    event_ref: str
+    time_ms: int
+    team_id: str
+    player_id: str
+    action: Literal["pass", "carry"]
+    packed: int
+    defenders_packed: int
+    start: Point
+    end: Point
+
+
+class PlayerPacking(StrictModel):
+    player_id: str
+    team_id: str
+    passes: int
+    packed_by_passes: int
+    carries: int
+    packed_by_carries: int
+    passing_rate: float | None
+    dribbling_rate: float | None
+    defenders_packed: int
+
+
+class TeamPacking(StrictModel):
+    team_id: str
+    passes: int
+    packed_by_passes: int
+    carries: int
+    packed_by_carries: int
+    passing_rate: float | None
+    dribbling_rate: float | None
+    defenders_packed: int
+    line_breaking: int
 
 
 class MatchAnalytics(StrictModel):
@@ -908,7 +1165,7 @@ class MatchAnalytics(StrictModel):
     data_epoch: int
     playhead_ms: int
     next_cursor: str
-    engine_version: Literal["analytics_v1"] = ANALYTICS_VERSION
+    engine_version: Literal["analytics_v2"] = ANALYTICS_VERSION
     provenance: Literal["synthetic_events_and_tracking"] = "synthetic_events_and_tracking"
     territory: Territory
     chances: dict[str, TeamChances]
@@ -918,5 +1175,19 @@ class MatchAnalytics(StrictModel):
     team_value: dict[str, TeamValue]
     player_value: list[PlayerValue]
     top_actions: list[ValuedAction]
+    top_vaep: list[ValuedAction]
+    game_state: GameState
+    heatmaps: Heatmaps
+    goalkeeping: Goalkeeping
+    tempo: dict[str, TeamTempo]
+    pressing: dict[str, Pressing]
+    creation: dict[str, TeamCreation]
+    player_creation: list[PlayerCreation]
+    packing: dict[str, TeamPacking]
+    player_packing: list[PlayerPacking]
+    top_packing: list[PackingAction]
+    creating_actions: list[CreatingAction]
+    pass_networks: dict[str, PassNetwork]
+    defensive_actions: list[DefensiveRow]
     definitions: dict[str, str]
     limitations: list[str]

@@ -702,3 +702,9 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 @media (forced-colors: active) {
   .team-mark, .bug-team, .bug-score, .fixture-side, .fixture-v, .timeline-insight button, .timeline-goal button, .comparison-bar span, .event-glyph { forced-color-adjust: none; }
 }
+.heatmap-select { display: flex; align-items: center; gap: var(--space-2); color: var(--text-2); }
+.heatmap-select select { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-input); border-radius: var(--radius); padding: var(--space-1) var(--space-2); font: inherit; max-width: 100%; }
+.heatmap-pitch { display: block; width: 100%; max-width: 640px; margin: var(--space-3) 0; }
+.heatmap-surface { fill: var(--surface-2); }
+.heatmap-lines { stroke: var(--text-3); stroke-opacity: .55; stroke-width: .35; }
+.network-label { fill: var(--ink); font: 700 2.4px var(--font); pointer-events: none; }

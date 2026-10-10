@@ -140,13 +140,13 @@ def test_analytics_endpoint_is_capability_scoped_and_advances(client):  # noqa: 
     sid = create(app).json()["session_id"]
     assert app.get(f"/api/sessions/{sid}/analytics", headers=headers("w" * 64)).status_code == 404
     first = app.get(f"/api/sessions/{sid}/analytics", headers=headers()).json()
-    assert first["engine_version"] == "analytics_v1" and first["shots"] == []
+    assert first["engine_version"] == "analytics_v2" and first["shots"] == []
     control(app, sid, "play")
     clock.advance(20)
     later = app.get(f"/api/sessions/{sid}/analytics", headers=headers()).json()
     assert later["playhead_ms"] == 1_200_000 and later["shots"] and later["workload"][0]["distance_m"] > 0
     text = json.dumps(later)
-    for hidden in ("line_base", "transition_mps", "cruise_mps", "fade"):
+    for hidden in ("line_base", "transition_mps", "cruise_mps", "fade", "lead_drop", "hard_save_rate"):
         assert hidden not in text
     assert CAP not in text
 
