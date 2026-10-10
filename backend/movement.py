@@ -37,6 +37,7 @@ ACCEL_MIN_MS = 400
 TRANSITION_MS = 5_000
 SECONDS = 2 * PERIOD_MS // 1000
 
+GRID_X, GRID_Y = 12, 8   # heatmap cells along and across the pitch
 LINE_FIELDS = ("frames", "deepest", "back_four", "centroid", "gap", "width")
 LINE_PHASES = ("all", "after_loss", "settled")
 
@@ -75,6 +76,14 @@ class Movement:
     lines: dict[str, dict[str, dict[str, array]]]
     before_shots: dict[str, list[LineReading]]
     frames: int
+    # Heatmap cell (home frame, x-major: cx * GRID_Y + cy) of each player at every whole second.
+    cells: dict[str, bytearray] = field(default_factory=dict)
+    # Every player's position (home frame) at the frame nearest each pass and carry, by event id.
+    snapshots: dict[str, dict[str, tuple[float, float]]] = field(default_factory=dict)
+
+
+def cell(x: float, y: float) -> int:
+    return min(GRID_X - 1, int(x / 100 * GRID_X)) * GRID_Y + min(GRID_Y - 1, int(y / 100 * GRID_Y))
 
 
 def to_home(team: str, home: str, x: float, y: float) -> tuple[float, float]:
@@ -90,6 +99,12 @@ class MovementBuilder:
         self.episodes = episodes
         self.players = [p.player_id for p in match.roster]
         self.team_of = {p.player_id: p.team_id for p in match.roster}
+        self.goals = [(r.payload.event_time_ms, r.payload.team_id) for r in self.ordered
+                      if r.payload.kind == "SHOT" and r.payload.detail.outcome == "goal"]
+
+    def leading(self, team: str, t: int) -> bool:
+        scored = sum(1 for at, side in self.goals if at < t and side == team)
+        return scored > sum(1 for at, side in self.goals if at < t and side != team)
 
     # ------------------------------------------------------------ timelines
     def timelines(self, period: int):
@@ -154,6 +169,8 @@ class MovementBuilder:
         lines = {team: {phase: {name: array("d", [0.0] * (SECONDS + 1)) for name in LINE_FIELDS} for phase in LINE_PHASES}
                  for team in (self.home, self.away)}
         before: dict[str, list[LineReading]] = {self.home: [], self.away: []}
+        self.cells = {pid: bytearray(SECONDS + 1) for pid in self.players}
+        self.snapshots: dict[str, dict[str, tuple[float, float]]] = {}
         frames = 0
         for period in (1, 2):
             frames += self.run_period(period, totals, lines, before)
@@ -168,7 +185,7 @@ class MovementBuilder:
                 for values in phase.values():
                     for s in range(1, SECONDS + 1):
                         values[s] += values[s - 1]
-        return Movement(totals, lines, before, frames)
+        return Movement(totals, lines, before, frames, self.cells, self.snapshots)
 
     def run_period(self, period: int, totals, lines, before) -> int:
         start, end = (period - 1) * PERIOD_MS, period * PERIOD_MS
@@ -200,6 +217,12 @@ class MovementBuilder:
         lost_at = {self.home: -10**9, self.away: -10**9}
         # The frame one second before each shot (snapped to the frame clock).
         shot_times = {start + (t - 1_000 - start) // FRAME_MS * FRAME_MS: team for t, team in shots}
+        # Frames at which to keep everyone's position: the frame nearest each pass and carry.
+        snap_at: dict[int, list[str]] = {}
+        for r in self.ordered:
+            e = r.payload
+            if e.period == period and e.kind in ("PASS", "CARRY"):
+                snap_at.setdefault(start + round((e.event_time_ms - start) / FRAME_MS) * FRAME_MS, []).append(r.event_id)
         count = 0
         for t in range(start, end + 1, FRAME_MS):
             while bi + 1 < len(ball_keys) and ball_keys[bi + 1][0] <= t:
@@ -228,6 +251,9 @@ class MovementBuilder:
                 previous = ep.frames[max(0, index - 1)]
                 flip = ep.team_id != home
             second = t // 1000 if t % 1000 == 0 else t // 1000 + 1
+            # Game management: a leading side drops its line by its planted amount.
+            drop = {team: profiles[team].get("lead_drop", 0.0) if self.leading(team, t) else 0.0
+                    for team in (self.home, self.away)}
 
             for pid, (team, r, group, ay, base, transition, cruise, fade, period_ms, phase) in setup.items():
                 s = state[pid]
@@ -259,7 +285,7 @@ class MovementBuilder:
                     else:
                         if not live:
                             ox, oy = 50.0, 50.0
-                        back = clamp(base + .45 * (ox - 50), 8, 52)
+                        back = clamp(base - drop[team] + .45 * (ox - 50), 8, 52)
                         if group == "GK":
                             px, py = min(14.0, 3 + .12 * back), 50 + (oy - 50) * .1
                         elif group == "BACK":
@@ -323,6 +349,12 @@ class MovementBuilder:
                     if not p.top_speed or new_speed > p.top_speed[-1][1] + .05:
                         p.top_speed.append((t, round(new_speed, 2)))
                 s[0], s[1], s[2], s[3], s[4] = x, y, vx, vy, new_speed
+
+            if t % 1000 == 0:
+                for pid in self.players:
+                    self.cells[pid][t // 1000] = cell(state[pid][0], state[pid][1])
+            for event_id in snap_at.get(t, ()):
+                self.snapshots[event_id] = {pid: (round(state[pid][0], 2), round(state[pid][1], 2)) for pid in self.players}
 
             # Defensive line of each team out of possession (live play only).
             for team in (self.home, self.away):

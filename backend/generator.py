@@ -18,6 +18,7 @@ from .tactical_profiles import CORNER_TAKERS, TARGET_MEN, foot, other, player_fo
 
 TACTICAL_SALT = 0x7AC71C
 DUEL_SALT = 0xD0E1
+PLACEMENT_SALT = 0x5A7E
 
 FIXTURE_PATH = Path(__file__).resolve().parent.parent / "server_data" / "fixtures" / "tp_demo_01.json"
 
@@ -61,6 +62,8 @@ class Generator:
         self.corner_count = {"harbor": 0, "vale": 0}
         # Duels draw from a third stream so the open-play and tactical streams keep their shape.
         self.duels = random.Random(seed ^ DUEL_SALT)
+        # Shot placement in the goal mouth draws from a fourth stream for the same reason.
+        self.placements = random.Random(seed ^ PLACEMENT_SALT)
         self.header_next = False
 
     def point(self, x: float, y: float = 50) -> dict:
@@ -243,8 +246,32 @@ class Generator:
             target = self.destination(100, 100, 22, 39, rng) if rng.random() < .5 else self.destination(100, 100, 61, 78, rng)
         body = "head" if self.header_next else f"{foot(self.holder)}_foot"
         self.header_next = False
-        self.emit(t, "SHOT", self.owner, {"position": self.ball, "target": target, "outcome": outcome, "body_part": body}, self.holder)
+        detail = {"position": self.ball, "target": target, "outcome": outcome, "body_part": body}
+        if outcome in ("goal", "saved"):
+            detail["placement"] = self.placement(target, outcome, body)
+        self.emit(t, "SHOT", self.owner, detail, self.holder)
         self.ball = target
+
+    def placement(self, target: dict, outcome: str, body: str) -> dict:
+        """Height and pace of an on-target shot; the lateral spot follows the recorded target.
+        Goals mostly find the corners. Saves are hard (corner, hit hard) at the rate the
+        goalkeeper's hidden profile plants, otherwise near the keeper and softer."""
+        rng = self.placements
+        keeper = tendencies(other(self.owner))["goalkeeping"]
+        hard = rng.random() < (.8 if outcome == "goal" else keeper["hard_save_rate"])
+        if hard:
+            z = rng.uniform(1.75, 2.35) if rng.random() < .55 else rng.uniform(.05, .45)
+            speed = rng.uniform(24, 31)
+        else:
+            z = rng.uniform(.5, 1.6)
+            speed = rng.uniform(13, 21)
+        if body == "head":
+            speed *= .6
+        y = (target["y"] - 50) * .68
+        if hard and outcome == "saved":
+            # A hard save is also wide of the keeper.
+            y = (1 if y >= 0 else -1) * rng.uniform(2.2, 3.4)
+        return {"y_m": round(max(-3.6, min(3.6, y)), 2), "z_m": round(z, 2), "speed_mps": round(speed, 1)}
 
     def stop(self, t: int, reason: str):
         self.emit(t, "STOPPAGE", detail={"reason": reason})

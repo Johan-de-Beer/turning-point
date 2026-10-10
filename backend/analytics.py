@@ -1,5 +1,6 @@
 """Live match analytics: field tilt, chance quality, defensive line height, player
-workload and possession value, all for the observed prefix of the match.
+workload and possession value (with a VAEP-style defensive side), plus the advanced
+metrics in ``advanced``, all for the observed prefix of the match.
 
 Field tilt, xG and possession value come from observed events. Line height and
 workload come from the continuous synthetic movement layer (``movement``), released
@@ -11,6 +12,7 @@ from __future__ import annotations
 import threading
 from statistics import median
 
+from .advanced import ADVANCED_DEFINITIONS, ADVANCED_LIMITATIONS, AdvancedMetrics
 from .chances import DEFINITIONS as CHANCE_DEFINITIONS, location_value, shot_quality
 from .ingest import canonical_order
 from .metrics import calculate_window, final_third_pass
@@ -26,11 +28,13 @@ RECENT_WORK_S = 600
 HIGH_LINE_M, LOW_LINE_M = 42.0, 30.0
 MIN_LINE_S = 30
 DROP_POINTS = 10.0
+# Share of a lost possession's threat that comes back as a counter-attack chance (VAEP-style conceding side).
+COUNTER_RISK = .1
 
 DEFINITIONS = {
     "field_tilt": "A team's share of both teams' final-third passes: attempted passes into or within the attacking final third (x ≥ 66.67). It shows where possession happens, not how good it is.",
     "possession_share": "Share of known owned in-play time, as in the match numbers.",
-    **{key: CHANCE_DEFINITIONS[key] for key in ("xg", "xg_against", "chance_type", "assist_type", "possession_value", "location_value")},
+    **{key: CHANCE_DEFINITIONS[key] for key in ("xg", "xgot", "xg_against", "chance_type", "assist_type", "possession_value", "location_value")},
     "line_height": "Out of possession in live play, from the continuous 5 Hz synthetic positions: the deepest outfield player's, the back four's mean and the ten outfield players' centroid distance from the team's own goal line, in metres.",
     "line_gap": "Distance from the back four's mean depth to the midfield three's mean depth: the space between the lines.",
     "line_width": "Distance between the widest two of the back four.",
@@ -42,6 +46,8 @@ DEFINITIONS = {
     "accelerations": "Efforts above 3 m/s² (or below −3 m/s² for decelerations) held for at least 0.4 s.",
     "load": "Composite external load: the sum of velocity changes frame to frame, divided by 10 (arbitrary units).",
     "intensity_trend": f"Metres per minute in the last {RECENT_WORK_S // 60} minutes as a share of the player's match average. Flagged when it is {DROP_POINTS:.0f} or more points below the team's median outfield trend after 30 minutes.",
+    **ADVANCED_DEFINITIONS,
+    "counter_risk": f"In the VAEP-style value a team holding the ball at a spot carries a conceding chance of {COUNTER_RISK:.0%} of the opponent's value at the mirrored spot, the threat of losing it there.",
 }
 
 LIMITATIONS = [
@@ -51,6 +57,7 @@ LIMITATIONS = [
     "Workload is external load only (distance, speed bands, accelerations, a composite). Internal load such as heart rate, perceived exertion (RPE) and the acute:chronic workload ratio need physiological data and multi-week history that a single synthetic match does not have.",
     "Line height and workload come from continuous synthetic positions. Where a tactical tracking episode exists the positions follow it; elsewhere players move to formation spots that slide with the ball.",
     "Field tilt counts final-third passes only. Direct counter-attacks that reach a shot in one or two passes add little to it.",
+    *ADVANCED_LIMITATIONS,
 ]
 
 
@@ -93,12 +100,18 @@ class AnalyticsEngine:
         return result
 
 
-class AnalyticsReport:
+class AnalyticsReport(AdvancedMetrics):
     def __init__(self, match: Match, movement: Movement | None, records: dict[str, EventEnvelope], playhead: int):
         self.match, self.movement, self.records, self.playhead = match, movement, records, playhead
         self.teams = [match.home.team_id, match.away.team_id]
+        self.team_of = {p.player_id: p.team_id for p in match.roster}
         self.ordered = [r for r in canonical_order(records) if r.payload.event_time_ms <= playhead]
         self.second = min(SECONDS, playhead // 1000)
+        self.quality = shot_quality(self.records, self.ordered)
+        self._goals = self.goals()
+        self._touches = self.collect_touches()
+        self._interceptions = self.interceptions()
+        self._possessions = self.possessions()
 
     def other(self, team: str) -> str:
         return self.teams[1] if team == self.teams[0] else self.teams[0]
@@ -133,10 +146,10 @@ class AnalyticsReport:
 
     # -------------------------------------------------------------- chances
     def chances(self) -> tuple[dict[str, TeamChances], list[ShotValue]]:
-        quality = shot_quality(self.records, self.ordered)
         shots = [ShotValue(event_ref=q.ref, time_ms=q.time_ms, team_id=q.team_id, player_id=q.player_id, outcome=q.outcome, xg=q.xg,
-                           distance_m=q.distance_m, angle_deg=q.angle_deg, assist=q.assist, body_part=q.body_part, chance=q.chance)
-                 for q in quality.values()]
+                           distance_m=q.distance_m, angle_deg=q.angle_deg, assist=q.assist, body_part=q.body_part, chance=q.chance,
+                           xgot=q.xgot, placement=q.placement, key_passer_id=q.passer_id, game_state=self.state_at(q.team_id, q.time_ms))
+                 for q in self.quality.values()]
         result = {}
         for team in self.teams:
             own = [s for s in shots if s.team_id == team]
@@ -211,70 +224,103 @@ class AnalyticsReport:
         return rows
 
     # ---------------------------------------------------- possession value
-    def possession_value(self) -> tuple[dict[str, TeamValue], list[PlayerValue], list[ValuedAction]]:
-        quality = shot_quality(self.records, self.ordered)
+    def possession_value(self) -> tuple[dict[str, TeamValue], list[PlayerValue], list[ValuedAction], list[ValuedAction], list[ValuedAction]]:
+        """Possession value (xOVA: the scoring side) and a VAEP-style value (scoring minus conceding) per action.
+
+        A team holding the ball at p has scoring chance V(p) and conceding chance ρ·V(p̄), where p̄ is
+        the mirrored spot (the opponent's view) and ρ the counter-attack risk. A lost ball (a lost
+        pass, or dispossession) is charged the full swing to the opponent holding it; the defender
+        who wins it (an interception or a tackle) is credited with half of that swing.
+        """
+        quality = self.quality
         actions: list[ValuedAction] = []
         holder: dict[str, str | None] = {}
         possessions = {team: 0 for team in self.teams}
+        rho = COUNTER_RISK
+        V = location_value
+        mirror = lambda p: (100 - p[0], 100 - p[1])
 
-        def add(record, action, player, team, start, end, before, after, pv):
+        def add(record, action, player, team, start, end, before, after, pv, scoring, conceding):
             actions.append(ValuedAction(event_ref=record.ref, time_ms=record.payload.event_time_ms, team_id=team, player_id=player,
                 action=action, start={"x": start[0], "y": start[1]}, end=None if end is None else {"x": end[0], "y": end[1]},
-                value_before=round(before, 4), value_after=round(after, 4), pv=round(pv, 4)))
+                value_before=round(before, 4), value_after=round(after, 4), pv=round(pv, 4),
+                scoring_delta=round(scoring, 4), conceding_delta=round(conceding, 4), vaep=round(scoring - conceding, 4)))
 
         for record in self.ordered:
             e = record.payload
             if e.kind == "POSSESSION":
                 possessions[e.team_id] += 1
                 holder[e.possession_id] = e.player_id
+                if record.event_id in self._interceptions:
+                    # Half the swing from the opponent holding the ball here to this side holding it.
+                    q = (e.detail.start.x, e.detail.start.y)
+                    gain = (1 - rho) / 2
+                    add(record, "interception", e.player_id, e.team_id, q, None, 0.0, 0.0, 0.0, gain * V(*q), -gain * V(*mirror(q)))
             elif e.kind in ("PASS", "CARRY"):
                 a, b = (e.detail.start.x, e.detail.start.y), (e.detail.end.x, e.detail.end.y)
-                before = location_value(*a)
+                before = V(*a)
                 if e.kind == "PASS" and not e.detail.completed:
-                    add(record, "lost_pass", e.player_id, e.team_id, a, b, before, 0.0, -before)
+                    # The opponent now holds the ball where the pass ended.
+                    scoring, conceding = rho * V(*b) - before, V(*mirror(b)) - rho * V(*mirror(a))
+                    add(record, "lost_pass", e.player_id, e.team_id, a, b, before, 0.0, -before, scoring, conceding)
                     holder[e.possession_id] = None
                 else:
-                    after = location_value(*b)
-                    add(record, e.kind.lower(), e.player_id, e.team_id, a, b, before, after, after - before)
+                    after = V(*b)
+                    add(record, e.kind.lower(), e.player_id, e.team_id, a, b, before, after, after - before,
+                        after - before, rho * (V(*mirror(b)) - V(*mirror(a))))
                     holder[e.possession_id] = e.detail.recipient_id if e.kind == "PASS" else e.player_id
             elif e.kind == "SHOT" and record.event_id in quality:
                 a = (e.detail.position.x, e.detail.position.y)
-                before, after = location_value(*a), quality[record.event_id].xg
-                add(record, "shot", e.player_id, e.team_id, a, None, before, after, after - before)
+                before, after = V(*a), quality[record.event_id].xg
+                add(record, "shot", e.player_id, e.team_id, a, None, before, after, after - before, after - before, -rho * V(*mirror(a)))
                 holder[e.possession_id] = None
             elif e.kind == "TACKLE" and e.detail.successful:
                 victim = holder.get(e.possession_id)
                 if victim:
                     # The tackle is recorded in the winner's frame; value the ball where the loser had it.
-                    spot = (100 - e.detail.position.x, 100 - e.detail.position.y)
-                    before = location_value(*spot)
-                    add(record, "dispossessed", victim, self.other(e.team_id), spot, None, before, 0.0, -before)
+                    s_ = (e.detail.position.x, e.detail.position.y)
+                    spot = mirror(s_)
+                    before = V(*spot)
+                    half = (1 - rho) / 2
+                    add(record, "dispossessed", victim, self.other(e.team_id), spot, None, before, 0.0, -before,
+                        (rho - 1) * V(*spot), (1 - rho) * V(*s_))
+                    add(record, "tackle_won", e.player_id, e.team_id, s_, None, 0.0, 0.0, 0.0, half * V(*s_), -half * V(*spot))
                 holder[e.possession_id] = None
 
+        defensive = ("tackle_won", "interception")
         teams = {}
         for team in self.teams:
             own = [a for a in actions if a.team_id == team]
             total = sum(a.pv for a in own)
-            by_action = {}
+            by_action, by_vaep = {}, {}
             for a in own:
-                by_action[a.action] = by_action.get(a.action, 0.0) + a.pv
-            teams[team] = TeamValue(team_id=team, actions=len(own), possessions=possessions[team], pv=round(total, 3),
-                pv_per_action=round(total / len(own), 4) if own else None, by_action={k: round(v, 3) for k, v in sorted(by_action.items())})
+                if a.action not in defensive:
+                    by_action[a.action] = by_action.get(a.action, 0.0) + a.pv
+                by_vaep[a.action] = by_vaep.get(a.action, 0.0) + a.vaep
+            on_ball = [a for a in own if a.action not in defensive]
+            teams[team] = TeamValue(team_id=team, actions=len(on_ball), possessions=possessions[team], pv=round(total, 3),
+                pv_per_action=round(total / len(on_ball), 4) if on_ball else None, by_action={k: round(v, 3) for k, v in sorted(by_action.items())},
+                vaep=round(sum(a.vaep for a in own), 3), vaep_by_action={k: round(v, 3) for k, v in sorted(by_vaep.items())})
         players = []
         for player in self.match.roster:
             own = [a for a in actions if a.player_id == player.player_id]
             if not own:
                 continue
-            best = max(own, key=lambda a: a.pv)
-            players.append(PlayerValue(player_id=player.player_id, team_id=player.team_id, actions=len(own), pv=round(sum(a.pv for a in own), 3),
-                positive_actions=sum(a.pv > 0 for a in own), best_ref=best.event_ref if best.pv > 0 else None))
+            on_ball = [a for a in own if a.action not in defensive]
+            best = max(on_ball, key=lambda a: a.pv, default=None)
+            players.append(PlayerValue(player_id=player.player_id, team_id=player.team_id, actions=len(on_ball), pv=round(sum(a.pv for a in own), 3),
+                positive_actions=sum(a.pv > 0 for a in on_ball), best_ref=best.event_ref if best and best.pv > 0 else None,
+                vaep=round(sum(a.vaep for a in own), 3), defensive_vaep=round(sum(a.vaep for a in own if a.action in defensive), 3)))
         players.sort(key=lambda p: -p.pv)
-        top = sorted((a for a in actions if a.action != "shot"), key=lambda a: -a.pv)[:10]
-        return teams, players, top
+        top = sorted((a for a in actions if a.action != "shot" and a.action not in defensive), key=lambda a: -a.pv)[:10]
+        top_vaep = sorted((a for a in actions if a.action != "shot"), key=lambda a: -a.vaep)[:10]
+        return teams, players, top, actions, top_vaep
 
     def build(self) -> dict:
         chances, shots = self.chances()
-        team_value, player_value, top_actions = self.possession_value()
+        team_value, player_value, top_actions, actions, top_vaep = self.possession_value()
+        creation, player_creation = self.creation(shots, self.quality)
+        packing, player_packing, top_packing = self.packing()
         limitations = list(LIMITATIONS)
         if self.movement:
             lines = {team: self.defensive_line(team) for team in self.teams}
@@ -286,5 +332,8 @@ class AnalyticsReport:
             workload = []
             limitations.append("Movement tracking is unavailable because the fixture does not match the tracking source.")
         return {"territory": self.territory(), "chances": chances, "shots": shots, "defensive_line": lines, "workload": workload,
-                "team_value": team_value, "player_value": player_value, "top_actions": top_actions,
+                "team_value": team_value, "player_value": player_value, "top_actions": top_actions, "top_vaep": top_vaep,
+                "game_state": self.game_state(shots, actions), "heatmaps": self.heatmaps(), "goalkeeping": self.goalkeeping(shots),
+                "tempo": self.tempo(), "pressing": self.pressing(), "creation": creation, "player_creation": player_creation,
+                "packing": packing, "player_packing": player_packing, "top_packing": top_packing,
                 "definitions": DEFINITIONS, "limitations": limitations}
