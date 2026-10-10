@@ -1,4 +1,4 @@
-import type { Envelope, Insight, Match, Session, Team } from './contracts';
+import type { Envelope, Insight, Match, Player, Session, Team } from './contracts';
 import { formatPercent } from './format';
 
 export const MATCH_MS = 5_400_000;
@@ -6,6 +6,17 @@ export const HALF_MS = 2_700_000;
 
 export function teamFor(match: Match, teamId: string | null | undefined): Team | undefined {
   return [match.home, match.away].find((team) => team.team_id === teamId);
+}
+
+/** Specific position when the roster has one (ST, CAM, CDM…), else the broad group. */
+export function positionLabel(player: Pick<Player, 'position' | 'role'>): string {
+  return player.role ?? player.position;
+}
+
+/** "Name (ST)": a player's name with their position, for event descriptions. */
+export function playerLabel(match: Match, playerId: string | null | undefined): string | null {
+  const player = match.roster.find((item) => item.player_id === playerId);
+  return player ? `${player.display_name} (${positionLabel(player)})` : null;
 }
 
 /** Goals, period boundaries and withdrawn records stay visible whatever the player focus. */

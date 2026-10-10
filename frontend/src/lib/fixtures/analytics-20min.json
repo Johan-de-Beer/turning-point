@@ -1,0 +1,1084 @@
+{
+ "session_id": "sample",
+ "generation": 1,
+ "data_epoch": 1,
+ "playhead_ms": 1200000,
+ "next_cursor": "c",
+ "engine_version": "analytics_v1",
+ "provenance": "synthetic_events_and_tracking",
+ "territory": {
+  "match": {
+   "start_ms": 0,
+   "end_ms": 1200000,
+   "final_third_passes": {
+    "harbor": 22,
+    "vale": 0
+   },
+   "field_tilt": {
+    "harbor": 100.0,
+    "vale": 0.0
+   },
+   "possession_share": {
+    "harbor": 62.2,
+    "vale": 37.8
+   }
+  },
+  "recent": {
+   "start_ms": 600000,
+   "end_ms": 1200000,
+   "final_third_passes": {
+    "harbor": 1,
+    "vale": 0
+   },
+   "field_tilt": {
+    "harbor": 100.0,
+    "vale": 0.0
+   },
+   "possession_share": {
+    "harbor": 64.7,
+    "vale": 35.3
+   }
+  },
+  "intervals": [
+   {
+    "start_ms": 0,
+    "end_ms": 900000,
+    "final_third_passes": {
+     "harbor": 22,
+     "vale": 0
+    },
+    "field_tilt": {
+     "harbor": 100.0,
+     "vale": 0.0
+    },
+    "possession_share": {
+     "harbor": 61.9,
+     "vale": 38.1
+    }
+   },
+   {
+    "start_ms": 900000,
+    "end_ms": 1200000,
+    "final_third_passes": {
+     "harbor": 0,
+     "vale": 0
+    },
+    "field_tilt": {
+     "harbor": null,
+     "vale": null
+    },
+    "possession_share": {
+     "harbor": 63.3,
+     "vale": 36.7
+    }
+   }
+  ]
+ },
+ "chances": {
+  "harbor": {
+   "team_id": "harbor",
+   "shots": 7,
+   "on_target": 4,
+   "goals": 1,
+   "xg": 1.2,
+   "xg_against": 0.05,
+   "major_chances": 1,
+   "xg_per_shot": 0.171
+  },
+  "vale": {
+   "team_id": "vale",
+   "shots": 1,
+   "on_target": 0,
+   "goals": 0,
+   "xg": 0.05,
+   "xg_against": 1.2,
+   "major_chances": 0,
+   "xg_per_shot": 0.05
+  }
+ },
+ "shots": [
+  {
+   "event_ref": "evt_00008@1",
+   "time_ms": 48000,
+   "team_id": "vale",
+   "player_id": "vale_06",
+   "outcome": "off_target",
+   "xg": 0.054,
+   "distance_m": 21.5,
+   "angle_deg": 17.3,
+   "assist": "individual",
+   "body_part": "right_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00027@1",
+   "time_ms": 194000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "outcome": "saved",
+   "xg": 0.249,
+   "distance_m": 10.8,
+   "angle_deg": 36.7,
+   "assist": "individual",
+   "body_part": "right_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00041@1",
+   "time_ms": 234000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "outcome": "blocked",
+   "xg": 0.212,
+   "distance_m": 11.9,
+   "angle_deg": 33.4,
+   "assist": "individual",
+   "body_part": "right_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00049@1",
+   "time_ms": 274000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "outcome": "saved",
+   "xg": 0.114,
+   "distance_m": 16.4,
+   "angle_deg": 25.2,
+   "assist": "individual",
+   "body_part": "right_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00063@1",
+   "time_ms": 314000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "outcome": "blocked",
+   "xg": 0.069,
+   "distance_m": 18.9,
+   "angle_deg": 15.3,
+   "assist": "individual",
+   "body_part": "right_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00071@1",
+   "time_ms": 354000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "outcome": "blocked",
+   "xg": 0.081,
+   "distance_m": 18.2,
+   "angle_deg": 18.4,
+   "assist": "individual",
+   "body_part": "right_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00079@1",
+   "time_ms": 394000,
+   "team_id": "harbor",
+   "player_id": "harbor_08",
+   "outcome": "saved",
+   "xg": 0.126,
+   "distance_m": 15.6,
+   "angle_deg": 25.9,
+   "assist": "individual",
+   "body_part": "left_foot",
+   "chance": "minor"
+  },
+  {
+   "event_ref": "evt_00106@1",
+   "time_ms": 615000,
+   "team_id": "harbor",
+   "player_id": "harbor_10",
+   "outcome": "goal",
+   "xg": 0.35,
+   "distance_m": 11.2,
+   "angle_deg": 35.9,
+   "assist": "through_ball",
+   "body_part": "right_foot",
+   "chance": "major"
+  }
+ ],
+ "defensive_line": {
+  "harbor": {
+   "team_id": "harbor",
+   "block": "mid",
+   "match": {
+    "seconds": 438.4,
+    "deepest_m": 33.0,
+    "back_four_m": 35.7,
+    "centroid_m": 48.1,
+    "gap_m": 14.7,
+    "width_m": 34.5
+   },
+   "recent": {
+    "seconds": 110.0,
+    "deepest_m": 31.5,
+    "back_four_m": 33.6,
+    "centroid_m": 46.4,
+    "gap_m": 15.3,
+    "width_m": 34.5
+   },
+   "settled": {
+    "seconds": 309.2,
+    "deepest_m": 32.3,
+    "back_four_m": 33.5,
+    "centroid_m": 45.6,
+    "gap_m": 15.0,
+    "width_m": 34.3
+   },
+   "after_loss": {
+    "seconds": 129.2,
+    "deepest_m": 34.8,
+    "back_four_m": 41.0,
+    "centroid_m": 54.0,
+    "gap_m": 14.1,
+    "width_m": 34.9
+   },
+   "before_shots": {
+    "seconds": 0.2,
+    "deepest_m": 28.6,
+    "back_four_m": 29.3,
+    "centroid_m": 38.5,
+    "gap_m": 11.1,
+    "width_m": 33.3
+   },
+   "shots_faced": 1,
+   "intervals": [
+    {
+     "start_ms": 0,
+     "end_ms": 900000,
+     "seconds": 328.4,
+     "back_four_m": 36.4,
+     "deepest_m": 33.5
+    },
+    {
+     "start_ms": 900000,
+     "end_ms": 1200000,
+     "seconds": 110.0,
+     "back_four_m": 33.6,
+     "deepest_m": 31.5
+    }
+   ]
+  },
+  "vale": {
+   "team_id": "vale",
+   "block": "low",
+   "match": {
+    "seconds": 722.8,
+    "deepest_m": 23.3,
+    "back_four_m": 24.9,
+    "centroid_m": 38.0,
+    "gap_m": 15.0,
+    "width_m": 33.7
+   },
+   "recent": {
+    "seconds": 190.0,
+    "deepest_m": 25.7,
+    "back_four_m": 26.7,
+    "centroid_m": 39.8,
+    "gap_m": 15.3,
+    "width_m": 34.2
+   },
+   "settled": {
+    "seconds": 592.6,
+    "deepest_m": 22.3,
+    "back_four_m": 23.4,
+    "centroid_m": 36.2,
+    "gap_m": 14.6,
+    "width_m": 33.6
+   },
+   "after_loss": {
+    "seconds": 130.2,
+    "deepest_m": 28.0,
+    "back_four_m": 31.3,
+    "centroid_m": 46.6,
+    "gap_m": 16.9,
+    "width_m": 34.3
+   },
+   "before_shots": {
+    "seconds": 1.4,
+    "deepest_m": 15.3,
+    "back_four_m": 16.5,
+    "centroid_m": 28.1,
+    "gap_m": 14.5,
+    "width_m": 34.1
+   },
+   "shots_faced": 7,
+   "intervals": [
+    {
+     "start_ms": 0,
+     "end_ms": 900000,
+     "seconds": 532.8,
+     "back_four_m": 24.2,
+     "deepest_m": 22.5
+    },
+    {
+     "start_ms": 900000,
+     "end_ms": 1200000,
+     "seconds": 190.0,
+     "back_four_m": 26.7,
+     "deepest_m": 25.7
+    }
+   ]
+  }
+ },
+ "workload": [
+  {
+   "player_id": "harbor_01",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 421.0,
+   "hsr_m": 0.0,
+   "sprint_m": 0.0,
+   "sprints": 0,
+   "accelerations": 5,
+   "decelerations": 4,
+   "load": 70.9,
+   "top_speed_mps": 4.6,
+   "metres_per_min": 21.1,
+   "recent_metres_per_min": 15.2,
+   "trend_pct": 71.9,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_02",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2379.0,
+   "hsr_m": 94.0,
+   "sprint_m": 33.0,
+   "sprints": 2,
+   "accelerations": 19,
+   "decelerations": 4,
+   "load": 178.6,
+   "top_speed_mps": 7.9,
+   "metres_per_min": 119.0,
+   "recent_metres_per_min": 109.8,
+   "trend_pct": 92.3,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_03",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2197.0,
+   "hsr_m": 51.0,
+   "sprint_m": 12.0,
+   "sprints": 0,
+   "accelerations": 21,
+   "decelerations": 5,
+   "load": 148.5,
+   "top_speed_mps": 8.0,
+   "metres_per_min": 109.8,
+   "recent_metres_per_min": 103.6,
+   "trend_pct": 94.3,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_04",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 1805.0,
+   "hsr_m": 89.0,
+   "sprint_m": 33.0,
+   "sprints": 2,
+   "accelerations": 25,
+   "decelerations": 2,
+   "load": 158.2,
+   "top_speed_mps": 7.9,
+   "metres_per_min": 90.2,
+   "recent_metres_per_min": 80.3,
+   "trend_pct": 89.0,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_05",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 1748.0,
+   "hsr_m": 71.0,
+   "sprint_m": 23.0,
+   "sprints": 2,
+   "accelerations": 25,
+   "decelerations": 2,
+   "load": 159.2,
+   "top_speed_mps": 7.9,
+   "metres_per_min": 87.4,
+   "recent_metres_per_min": 80.4,
+   "trend_pct": 92.0,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_06",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2206.0,
+   "hsr_m": 142.0,
+   "sprint_m": 56.0,
+   "sprints": 3,
+   "accelerations": 29,
+   "decelerations": 4,
+   "load": 163.3,
+   "top_speed_mps": 8.3,
+   "metres_per_min": 110.3,
+   "recent_metres_per_min": 112.6,
+   "trend_pct": 102.1,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_07",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2424.0,
+   "hsr_m": 137.0,
+   "sprint_m": 32.0,
+   "sprints": 1,
+   "accelerations": 25,
+   "decelerations": 7,
+   "load": 161.7,
+   "top_speed_mps": 8.2,
+   "metres_per_min": 121.2,
+   "recent_metres_per_min": 119.9,
+   "trend_pct": 99.0,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_08",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2337.0,
+   "hsr_m": 120.0,
+   "sprint_m": 37.0,
+   "sprints": 2,
+   "accelerations": 28,
+   "decelerations": 4,
+   "load": 163.4,
+   "top_speed_mps": 8.2,
+   "metres_per_min": 116.9,
+   "recent_metres_per_min": 122.5,
+   "trend_pct": 104.8,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_09",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2431.0,
+   "hsr_m": 459.0,
+   "sprint_m": 226.0,
+   "sprints": 15,
+   "accelerations": 38,
+   "decelerations": 10,
+   "load": 151.3,
+   "top_speed_mps": 9.2,
+   "metres_per_min": 121.6,
+   "recent_metres_per_min": 117.3,
+   "trend_pct": 96.5,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_10",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2618.0,
+   "hsr_m": 605.0,
+   "sprint_m": 257.0,
+   "sprints": 14,
+   "accelerations": 43,
+   "decelerations": 19,
+   "load": 152.7,
+   "top_speed_mps": 9.3,
+   "metres_per_min": 130.9,
+   "recent_metres_per_min": 122.0,
+   "trend_pct": 93.2,
+   "flag": null
+  },
+  {
+   "player_id": "harbor_11",
+   "team_id": "harbor",
+   "minutes": 20.0,
+   "distance_m": 2221.0,
+   "hsr_m": 69.0,
+   "sprint_m": 17.0,
+   "sprints": 0,
+   "accelerations": 18,
+   "decelerations": 7,
+   "load": 124.7,
+   "top_speed_mps": 8.1,
+   "metres_per_min": 111.1,
+   "recent_metres_per_min": 104.4,
+   "trend_pct": 94.0,
+   "flag": null
+  },
+  {
+   "player_id": "vale_01",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 492.0,
+   "hsr_m": 0.0,
+   "sprint_m": 0.0,
+   "sprints": 0,
+   "accelerations": 7,
+   "decelerations": 4,
+   "load": 98.1,
+   "top_speed_mps": 4.2,
+   "metres_per_min": 24.6,
+   "recent_metres_per_min": 26.9,
+   "trend_pct": 109.2,
+   "flag": null
+  },
+  {
+   "player_id": "vale_02",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2118.0,
+   "hsr_m": 64.0,
+   "sprint_m": 1.0,
+   "sprints": 0,
+   "accelerations": 15,
+   "decelerations": 5,
+   "load": 158.8,
+   "top_speed_mps": 7.2,
+   "metres_per_min": 105.9,
+   "recent_metres_per_min": 101.3,
+   "trend_pct": 95.7,
+   "flag": null
+  },
+  {
+   "player_id": "vale_03",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2089.0,
+   "hsr_m": 87.0,
+   "sprint_m": 6.0,
+   "sprints": 0,
+   "accelerations": 13,
+   "decelerations": 5,
+   "load": 161.0,
+   "top_speed_mps": 7.3,
+   "metres_per_min": 104.4,
+   "recent_metres_per_min": 99.8,
+   "trend_pct": 95.6,
+   "flag": null
+  },
+  {
+   "player_id": "vale_04",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 1840.0,
+   "hsr_m": 91.0,
+   "sprint_m": 15.0,
+   "sprints": 1,
+   "accelerations": 19,
+   "decelerations": 5,
+   "load": 166.1,
+   "top_speed_mps": 7.4,
+   "metres_per_min": 92.0,
+   "recent_metres_per_min": 87.4,
+   "trend_pct": 95.0,
+   "flag": null
+  },
+  {
+   "player_id": "vale_05",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 1834.0,
+   "hsr_m": 83.0,
+   "sprint_m": 6.0,
+   "sprints": 0,
+   "accelerations": 19,
+   "decelerations": 3,
+   "load": 165.1,
+   "top_speed_mps": 7.3,
+   "metres_per_min": 91.7,
+   "recent_metres_per_min": 86.2,
+   "trend_pct": 94.0,
+   "flag": null
+  },
+  {
+   "player_id": "vale_06",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2321.0,
+   "hsr_m": 224.0,
+   "sprint_m": 91.0,
+   "sprints": 5,
+   "accelerations": 29,
+   "decelerations": 3,
+   "load": 160.5,
+   "top_speed_mps": 8.2,
+   "metres_per_min": 116.0,
+   "recent_metres_per_min": 115.5,
+   "trend_pct": 99.6,
+   "flag": null
+  },
+  {
+   "player_id": "vale_07",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2249.0,
+   "hsr_m": 142.0,
+   "sprint_m": 62.0,
+   "sprints": 4,
+   "accelerations": 21,
+   "decelerations": 8,
+   "load": 152.6,
+   "top_speed_mps": 8.3,
+   "metres_per_min": 112.4,
+   "recent_metres_per_min": 112.1,
+   "trend_pct": 99.7,
+   "flag": null
+  },
+  {
+   "player_id": "vale_08",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2286.0,
+   "hsr_m": 122.0,
+   "sprint_m": 50.0,
+   "sprints": 3,
+   "accelerations": 20,
+   "decelerations": 7,
+   "load": 155.3,
+   "top_speed_mps": 8.1,
+   "metres_per_min": 114.3,
+   "recent_metres_per_min": 115.2,
+   "trend_pct": 100.8,
+   "flag": null
+  },
+  {
+   "player_id": "vale_09",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2443.0,
+   "hsr_m": 136.0,
+   "sprint_m": 17.0,
+   "sprints": 1,
+   "accelerations": 21,
+   "decelerations": 8,
+   "load": 131.7,
+   "top_speed_mps": 8.4,
+   "metres_per_min": 122.2,
+   "recent_metres_per_min": 124.9,
+   "trend_pct": 102.2,
+   "flag": null
+  },
+  {
+   "player_id": "vale_10",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2460.0,
+   "hsr_m": 177.0,
+   "sprint_m": 11.0,
+   "sprints": 1,
+   "accelerations": 17,
+   "decelerations": 7,
+   "load": 130.8,
+   "top_speed_mps": 9.0,
+   "metres_per_min": 123.0,
+   "recent_metres_per_min": 128.7,
+   "trend_pct": 104.6,
+   "flag": null
+  },
+  {
+   "player_id": "vale_11",
+   "team_id": "vale",
+   "minutes": 20.0,
+   "distance_m": 2161.0,
+   "hsr_m": 62.0,
+   "sprint_m": 10.0,
+   "sprints": 1,
+   "accelerations": 10,
+   "decelerations": 2,
+   "load": 104.3,
+   "top_speed_mps": 9.5,
+   "metres_per_min": 108.0,
+   "recent_metres_per_min": 109.1,
+   "trend_pct": 101.0,
+   "flag": null
+  }
+ ],
+ "team_value": {
+  "harbor": {
+   "team_id": "harbor",
+   "actions": 131,
+   "possessions": 31,
+   "pv": 0.46,
+   "pv_per_action": 0.0035,
+   "by_action": {
+    "carry": 0.6,
+    "dispossessed": -0.208,
+    "lost_pass": -0.033,
+    "pass": -0.282,
+    "shot": 0.384
+   }
+  },
+  "vale": {
+   "team_id": "vale",
+   "actions": 63,
+   "possessions": 27,
+   "pv": -0.108,
+   "pv_per_action": -0.0017,
+   "by_action": {
+    "carry": 0.031,
+    "dispossessed": -0.146,
+    "lost_pass": -0.012,
+    "pass": 0.002,
+    "shot": 0.017
+   }
+  }
+ },
+ "player_value": [
+  {
+   "player_id": "harbor_06",
+   "team_id": "harbor",
+   "actions": 32,
+   "pv": 0.319,
+   "positive_actions": 11,
+   "best_ref": "evt_00026@1"
+  },
+  {
+   "player_id": "harbor_07",
+   "team_id": "harbor",
+   "actions": 44,
+   "pv": 0.318,
+   "positive_actions": 18,
+   "best_ref": "evt_00082@1"
+  },
+  {
+   "player_id": "harbor_08",
+   "team_id": "harbor",
+   "actions": 37,
+   "pv": 0.166,
+   "positive_actions": 15,
+   "best_ref": "evt_00078@1"
+  },
+  {
+   "player_id": "harbor_10",
+   "team_id": "harbor",
+   "actions": 6,
+   "pv": 0.124,
+   "positive_actions": 1,
+   "best_ref": "evt_00106@1"
+  },
+  {
+   "player_id": "vale_06",
+   "team_id": "vale",
+   "actions": 19,
+   "pv": 0.012,
+   "positive_actions": 6,
+   "best_ref": "evt_00007@1"
+  },
+  {
+   "player_id": "harbor_01",
+   "team_id": "harbor",
+   "actions": 1,
+   "pv": 0.0,
+   "positive_actions": 0,
+   "best_ref": null
+  },
+  {
+   "player_id": "harbor_05",
+   "team_id": "harbor",
+   "actions": 1,
+   "pv": 0.0,
+   "positive_actions": 0,
+   "best_ref": null
+  },
+  {
+   "player_id": "vale_01",
+   "team_id": "vale",
+   "actions": 1,
+   "pv": 0.0,
+   "positive_actions": 1,
+   "best_ref": "evt_00203@1"
+  },
+  {
+   "player_id": "vale_02",
+   "team_id": "vale",
+   "actions": 3,
+   "pv": 0.0,
+   "positive_actions": 1,
+   "best_ref": "evt_00058@1"
+  },
+  {
+   "player_id": "vale_03",
+   "team_id": "vale",
+   "actions": 1,
+   "pv": 0.0,
+   "positive_actions": 0,
+   "best_ref": null
+  },
+  {
+   "player_id": "vale_05",
+   "team_id": "vale",
+   "actions": 2,
+   "pv": 0.0,
+   "positive_actions": 0,
+   "best_ref": null
+  },
+  {
+   "player_id": "vale_04",
+   "team_id": "vale",
+   "actions": 4,
+   "pv": -0.012,
+   "positive_actions": 1,
+   "best_ref": "evt_00074@1"
+  },
+  {
+   "player_id": "harbor_11",
+   "team_id": "harbor",
+   "actions": 4,
+   "pv": -0.045,
+   "positive_actions": 0,
+   "best_ref": null
+  },
+  {
+   "player_id": "vale_07",
+   "team_id": "vale",
+   "actions": 15,
+   "pv": -0.048,
+   "positive_actions": 4,
+   "best_ref": "evt_00016@1"
+  },
+  {
+   "player_id": "vale_08",
+   "team_id": "vale",
+   "actions": 18,
+   "pv": -0.061,
+   "positive_actions": 3,
+   "best_ref": "evt_00022@1"
+  },
+  {
+   "player_id": "harbor_09",
+   "team_id": "harbor",
+   "actions": 4,
+   "pv": -0.073,
+   "positive_actions": 0,
+   "best_ref": null
+  },
+  {
+   "player_id": "harbor_04",
+   "team_id": "harbor",
+   "actions": 2,
+   "pv": -0.348,
+   "positive_actions": 0,
+   "best_ref": null
+  }
+ ],
+ "top_actions": [
+  {
+   "event_ref": "evt_00082@1",
+   "time_ms": 400000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "pass",
+   "start": {
+    "x": 99.5,
+    "y": 0.5
+   },
+   "end": {
+    "x": 94.84,
+    "y": 55.22
+   },
+   "value_before": 0.0134,
+   "value_after": 0.3591,
+   "pv": 0.3457
+  },
+  {
+   "event_ref": "evt_00026@1",
+   "time_ms": 192000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "action": "carry",
+   "start": {
+    "x": 60.1,
+    "y": 60.98
+   },
+   "end": {
+    "x": 89.89,
+    "y": 53.27
+   },
+   "value_before": 0.0062,
+   "value_after": 0.19,
+   "pv": 0.1838
+  },
+  {
+   "event_ref": "evt_00105@1",
+   "time_ms": 608000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "action": "pass",
+   "start": {
+    "x": 40.26,
+    "y": 34.02
+   },
+   "end": {
+    "x": 89.38,
+    "y": 51.96
+   },
+   "value_before": 0.006,
+   "value_after": 0.1797,
+   "pv": 0.1737
+  },
+  {
+   "event_ref": "evt_00040@1",
+   "time_ms": 232000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "carry",
+   "start": {
+    "x": 59.31,
+    "y": 63.94
+   },
+   "end": {
+    "x": 88.95,
+    "y": 45.94
+   },
+   "value_before": 0.0062,
+   "value_after": 0.1603,
+   "pv": 0.1541
+  },
+  {
+   "event_ref": "evt_00078@1",
+   "time_ms": 392000,
+   "team_id": "harbor",
+   "player_id": "harbor_08",
+   "action": "carry",
+   "start": {
+    "x": 60.82,
+    "y": 28.5
+   },
+   "end": {
+    "x": 85.44,
+    "y": 45.41
+   },
+   "value_before": 0.0062,
+   "value_after": 0.09,
+   "pv": 0.0837
+  },
+  {
+   "event_ref": "evt_00048@1",
+   "time_ms": 272000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "carry",
+   "start": {
+    "x": 63.11,
+    "y": 60.02
+   },
+   "end": {
+    "x": 84.43,
+    "y": 49.36
+   },
+   "value_before": 0.0064,
+   "value_after": 0.0794,
+   "pv": 0.0731
+  },
+  {
+   "event_ref": "evt_00070@1",
+   "time_ms": 352000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "action": "carry",
+   "start": {
+    "x": 59.04,
+    "y": 32.84
+   },
+   "end": {
+    "x": 86.3,
+    "y": 33.64
+   },
+   "value_before": 0.0062,
+   "value_after": 0.0617,
+   "pv": 0.0555
+  },
+  {
+   "event_ref": "evt_00062@1",
+   "time_ms": 312000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "carry",
+   "start": {
+    "x": 62.3,
+    "y": 71.91
+   },
+   "end": {
+    "x": 87.76,
+    "y": 70.44
+   },
+   "value_before": 0.0063,
+   "value_after": 0.0559,
+   "pv": 0.0496
+  },
+  {
+   "event_ref": "evt_00007@1",
+   "time_ms": 43000,
+   "team_id": "vale",
+   "player_id": "vale_06",
+   "action": "carry",
+   "start": {
+    "x": 58.47,
+    "y": 23.3
+   },
+   "end": {
+    "x": 81.91,
+    "y": 35.29
+   },
+   "value_before": 0.0061,
+   "value_after": 0.0368,
+   "pv": 0.0306
+  },
+  {
+   "event_ref": "evt_00034@1",
+   "time_ms": 204000,
+   "team_id": "harbor",
+   "player_id": "harbor_08",
+   "action": "pass",
+   "start": {
+    "x": 60.62,
+    "y": 65.74
+   },
+   "end": {
+    "x": 80.91,
+    "y": 60.53
+   },
+   "value_before": 0.0062,
+   "value_after": 0.0362,
+   "pv": 0.03
+  }
+ ],
+ "definitions": {
+  "field_tilt": "A team's share of both teams' final-third passes: attempted passes into or within the attacking final third (x \u2265 66.67). It shows where possession happens, not how good it is.",
+  "possession_share": "Share of known owned in-play time, as in the match numbers.",
+  "xg": "Expected goals: a heuristic probability (0\u20131) that a shot is scored, from distance to goal, the angle the goal mouth subtends, how the shot was set up and the body part. Coefficients are illustrative, not fitted to data.",
+  "xg_against": "The xG of shots the opponent took.",
+  "chance_type": "Major when the shot's xG is at least 0.30 (a chance a player would usually be expected to score), minor below that or when the box was entered without a shot.",
+  "assist_type": "From the event before the shot in the same possession: corner (set piece), cross (from a wide channel of the final third into the box), cutback (from near the byline back toward goal), through ball (forward pass of at least 12 units ending centrally beyond x = 80), other pass, or individual (carry or no assist).",
+  "possession_value": "Change in the location value surface caused by an action: value after minus value before. A lost ball scores minus the value it had; a shot scores its xG minus the value of where it was taken. Defensive actions are not valued.",
+  "location_value": "Heuristic chance that a possession at this spot ends in a goal: a baseline plus the open-play xG of a shot from there, weighted by how often play near that depth reaches a shot. Analogous to expected threat (xT), not trained.",
+  "line_height": "Out of possession in live play, from the continuous 5 Hz synthetic positions: the deepest outfield player's, the back four's mean and the ten outfield players' centroid distance from the team's own goal line, in metres.",
+  "line_gap": "Distance from the back four's mean depth to the midfield three's mean depth: the space between the lines.",
+  "line_width": "Distance between the widest two of the back four.",
+  "block": "From the back four's mean depth when settled out of possession: high at 42 m or more, low under 30 m, otherwise mid. At least 30 s of settled defending is needed.",
+  "line_phases": "After losing the ball: the first 5 s after the opponent wins possession. Settled: the rest of the time out of possession. Before shots: the frame 1 s before each opponent shot.",
+  "distance": "Distance covered by the synthetic player track, in metres.",
+  "hsr": "High-speed running: distance at 5.5 m/s (19.8 km/h) or faster.",
+  "sprint": "Sprint distance at 7.0 m/s (25.2 km/h) or faster; a sprint effort lasts at least 1 s.",
+  "accelerations": "Efforts above 3 m/s\u00b2 (or below \u22123 m/s\u00b2 for decelerations) held for at least 0.4 s.",
+  "load": "Composite external load: the sum of velocity changes frame to frame, divided by 10 (arbitrary units).",
+  "intensity_trend": "Metres per minute in the last 10 minutes as a share of the player's match average. Flagged when it is 10 or more points below the team's median outfield trend after 30 minutes."
+ },
+ "limitations": [
+  "Synthetic data: the event stream and the 5 Hz player tracks are generated from fictional tendencies. They are not measured players.",
+  "xG and the location value surface are transparent heuristics with illustrative coefficients, not models fitted to shot data, so they rank chances within this sample rather than give calibrated probabilities.",
+  "Possession value values on-ball actions only. Defensive actions, off-ball runs and the opponent's gain from a turnover are not valued.",
+  "Workload is external load only (distance, speed bands, accelerations, a composite). Internal load such as heart rate, perceived exertion (RPE) and the acute:chronic workload ratio need physiological data and multi-week history that a single synthetic match does not have.",
+  "Line height and workload come from continuous synthetic positions. Where a tactical tracking episode exists the positions follow it; elsewhere players move to formation spots that slide with the ball.",
+  "Field tilt counts final-third passes only. Direct counter-attacks that reach a shot in one or two passes add little to it."
+ ]
+}

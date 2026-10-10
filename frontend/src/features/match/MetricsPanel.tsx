@@ -7,9 +7,13 @@ export function MetricsPanel({ state, match }: { state: Session; match: Match })
   const home = metrics[match.home.team_id];
   const away = metrics[match.away.team_id];
   if (!home || !away) return null;
-  const rows = [
+  const rows: { label: string; home: number | null; away: number | null; percentage?: boolean; decimals?: number; definition: string }[] = [
     { label: 'Possession', home: home.possession_share, away: away.possession_share, percentage: true, definition: 'Share of known owned in-play time.' },
+    { label: 'Field tilt', home: home.field_tilt, away: away.field_tilt, percentage: true, definition: 'Share of both teams’ passes into or within the final third. Where the ball is played, not how well.' },
     { label: 'Shots', home: home.shots, away: away.shots, definition: 'Observed shot events; each goal counts once.' },
+    { label: 'Shots on target', home: home.on_target, away: away.on_target, definition: 'Shots that were scored or saved.' },
+    { label: 'xG', home: home.xg, away: away.xg, decimals: 2, definition: 'Summed heuristic chance quality of the shots (distance, angle, set-up, body part).' },
+    { label: 'Duels won', home: home.duels_won, away: away.duels_won, definition: 'Ground and aerial duels won, out of every duel contested.' },
     { label: 'Final-third entries', home: home.final_third_entries, away: away.final_third_entries, definition: 'Completed pass or carry crossing into x ≥ 66.67.' },
     { label: 'Pass accuracy', home: home.pass_accuracy, away: away.pass_accuracy, percentage: true, definition: 'Completed / attempted passes. No attempts is unavailable.' },
   ];
@@ -25,7 +29,7 @@ export function MetricsPanel({ state, match }: { state: Session; match: Match })
       const total = (row.home ?? 0) + (row.away ?? 0);
       const homeShare = total ? (row.home ?? 0) / total * 100 : 0;
       const awayShare = total ? 100 - homeShare : 0;
-      const value = (side: number | null) => row.percentage ? formatPercent(side) : side ?? '—';
+      const value = (side: number | null) => row.percentage ? formatPercent(side) : side == null ? '—' : row.decimals ? side.toFixed(row.decimals) : side;
       return <div className="metric-row" key={row.label}>
         <dt className="metric-label">{row.label}</dt>
         <dd className="metric-values" aria-label={`${match.home.short_name} ${row.home == null ? 'unavailable' : value(row.home)}, ${match.away.short_name} ${row.away == null ? 'unavailable' : value(row.away)}`}>

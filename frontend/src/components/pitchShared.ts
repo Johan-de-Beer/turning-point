@@ -3,7 +3,7 @@ import { isObserved } from './pitchPlayback';
 
 // Shared by the 2D pitch and the WebGL stadium. Keep this module free of three.js
 // so the default flat view never pulls the stadium chunk into the main bundle.
-export type PitchPlayer = { player_id: string; display_name: string; shirt_number: number; team_id: string };
+export type PitchPlayer = { player_id: string; display_name: string; shirt_number: number; team_id: string; role?: string | null; position?: string };
 export interface PitchSceneProps {
   events: readonly PitchEvent[]; homeTeamId: string; awayTeamId: string;
   homeTeamName?: string; awayTeamName?: string; players?: readonly PitchPlayer[];
@@ -21,7 +21,7 @@ export function action(event: PitchEvent): string {
   if (event.kind === 'CARRY') return 'Ball carry';
   if (event.kind === 'SHOT') return event.detail.outcome === 'goal' ? 'Goal' : 'Shot · ' + String(event.detail.outcome).replace('_', ' ');
   if (event.kind === 'POSSESSION') return 'Possession';
-  if (event.kind === 'TACKLE') return event.detail.successful ? 'Successful tackle' : 'Tackle attempt';
+  if (event.kind === 'TACKLE') return event.detail.contest === 'aerial' ? (event.detail.successful ? 'Aerial duel won' : 'Aerial duel lost') : event.detail.successful ? 'Tackle won' : 'Tackle lost';
   if (event.kind === 'STOPPAGE') return 'Play stopped · ' + String(event.detail.reason).replace('_', ' ');
   if (event.kind === 'PERIOD_END') return event.period === 1 ? 'Half-time' : 'Full-time';
   return event.period === 1 ? 'Kick-off' : 'Second-half kick-off';
@@ -29,10 +29,16 @@ export function action(event: PitchEvent): string {
 
 export const player = (id: unknown, props: PitchSceneProps) => props.players?.find(item => item.player_id === id);
 export const playerName = (id: unknown, props: PitchSceneProps) => player(id, props)?.display_name ?? '';
+/** Name with position, e.g. "Callum Wren (ST)", for event titles. */
+export const playerLabel = (id: unknown, props: PitchSceneProps) => {
+  const item = player(id, props);
+  const position = item?.role ?? item?.position;
+  return item ? (position ? `${item.display_name} (${position})` : item.display_name) : '';
+};
 
 export function eventTitle(event: PitchEvent, props: PitchSceneProps): string {
-  const actor = playerName(event.player_id, props) || (event.team_id === props.homeTeamId ? props.homeTeamName : props.awayTeamName) || event.team_id || 'Match';
-  const recipient = playerName(event.detail.recipient_id, props);
+  const actor = playerLabel(event.player_id, props) || (event.team_id === props.homeTeamId ? props.homeTeamName : props.awayTeamName) || event.team_id || 'Match';
+  const recipient = playerLabel(event.detail.recipient_id, props);
   return event.kind === 'PASS' && recipient ? actor + ' → ' + recipient : actor;
 }
 

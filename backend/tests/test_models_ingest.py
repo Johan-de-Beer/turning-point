@@ -166,8 +166,10 @@ def test_state_transition_tombstone_retained_and_metrics_fail_closed(fixture):
     assert ingestion.apply(tombstone) == (True, True)
     metrics = calculate_window(ingestion.records, ["harbor", "vale"], 1, 0, 180_000)
     assert not metrics.coverage.state_valid and not metrics.coverage.eligible
-    # Legal later transitions and actions remain ingestible after the gap.
-    for e in events[4:20]:
+    # Legal later transitions and actions remain ingestible after the gap. A duel inside
+    # the possession whose start was withdrawn has no known owner, so resume at the next one.
+    resume = next(i for i, e in enumerate(events) if i >= 4 and e.payload.kind == "POSSESSION")
+    for e in events[resume:resume + 16]:
         ingestion.apply(e)
     clean = calculate_window(ingestion.records, ["harbor", "vale"], 1, 180_000, 360_000)
     assert clean.coverage.unknown_state_ms == 0 and clean.coverage.state_valid

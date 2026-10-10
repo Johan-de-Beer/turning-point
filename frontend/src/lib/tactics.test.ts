@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import sample from './fixtures/tactics-15min.json';
-import { angleLabel, momentLayout, observationsFor, tacticsSchema } from './tactics';
+import { chanceLabel, momentLayout, observationsFor, tacticsSchema } from './tactics';
 
 // The sample is the backend's own report after 15 observed minutes (kept in sync by a backend test).
 const report = tacticsSchema.parse(sample);
@@ -40,9 +40,12 @@ describe('tactical analysis contract', () => {
     expect(layout.ball.y).toBeCloseTo(moment.ball.y * .68);
   });
 
-  it('describes pass angles relative to straight at goal', () => {
-    expect(angleLabel(3)).toBe('straight');
-    expect(angleLabel(31.6)).toBe('32° right');
-    expect(angleLabel(-18)).toBe('18° left');
+  it('labels decisive-pass chances as major or minor with their xG', () => {
+    expect(chanceLabel({ chance: 'major', xg: .412 })).toEqual({ type: 'Major', xg: 'xG 0.41' });
+    expect(chanceLabel({ chance: 'minor', xg: null })).toEqual({ type: 'Minor', xg: 'no shot' });
+    expect(chanceLabel({ chance: null, xg: null })).toEqual({ type: 'None', xg: '' });
+    const passes = Object.values(report.teams).flatMap((team) => team.decisive_passes);
+    expect(passes.length).toBeGreaterThan(0);
+    expect(passes.every((pass) => !('angle_deg' in pass))).toBe(true);
   });
 });

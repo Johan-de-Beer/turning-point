@@ -4,6 +4,7 @@ import { request, ApiError } from './api';
 import { canAcceptState, defaultPreferences, evidenceSchema, matchesSchema, mergeObservedEvents, preferencesSchema, sessionSchema, validateSessionReferences, type Evidence, type Match, type Preferences, type Session } from './contracts';
 import { createCapability } from './format';
 import { tacticsSchema, type Tactics } from './tactics';
+import { analyticsSchema, type Analytics } from './analytics';
 
 const preferencesKey = 'turning-point:preferences:v1';
 const sessionKey = 'turning-point:session:v1';
@@ -190,6 +191,16 @@ export function useMatch() {
     return report;
   }
 
+  async function getAnalytics(signal?: AbortSignal): Promise<Analytics> {
+    const current = stateRef.current;
+    const sessionAuth = authRef.current;
+    if (!current || !sessionAuth) throw new ApiError('Start the replay to see the live analytics.', 'no_session', false);
+    const report = await request(`/sessions/${current.session_id}/analytics`, analyticsSchema, { capability: sessionAuth.capability, signal });
+    const latest = stateRef.current;
+    if (!latest || report.session_id !== latest.session_id || report.generation !== latest.generation) throw new ApiError('The replay restarted. Refreshing the analytics…', 'stale_analytics', true);
+    return report;
+  }
+
   async function retry() {
     retryRef.current = 0;
     setConnection('reconnecting');
@@ -200,5 +211,5 @@ export function useMatch() {
     catch (reason) { fail(reason, true); }
   }
 
-  return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, getTactics, retry };
+  return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, getTactics, getAnalytics, retry };
 }

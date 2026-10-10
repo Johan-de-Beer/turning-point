@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Crosshair, LoaderCircle } from 'lucide-react';
 import type { Match, Session } from '../../lib/contracts';
 import { matchClock } from '../../lib/format';
+import { useLiveReport } from '../../lib/useLiveReport';
 import {
-  angleLabel, categoryLabel, metres, momentLayout, observationsFor, seconds, share, speed, zoneLabel,
+  categoryLabel, chanceLabel, metres, momentLayout, observationsFor, seconds, share, speed, zoneLabel,
   type KeyMoment, type TacticalObservation, type Tactics, type TacticsView, type TeamTactics,
 } from '../../lib/tactics';
 
-const REFRESH_MS = 5000;
 const views: { id: TacticsView; label: string }[] = [
   { id: 'defending', label: 'Defending' }, { id: 'attacking', label: 'Attacking' }, { id: 'set_pieces', label: 'Set pieces' },
 ];
@@ -15,33 +15,10 @@ const views: { id: TacticsView; label: string }[] = [
 type Props = { state: Session; match: Match; getTactics: (signal?: AbortSignal) => Promise<Tactics> };
 
 export function TacticsPanel({ state, match, getTactics }: Props) {
-  const [report, setReport] = useState<Tactics | null>(null);
-  const [failed, setFailed] = useState(false);
+  const { report, failed } = useLiveReport(state, getTactics);
   const [teamId, setTeamId] = useState(state.preferences.favorite_team_id ?? match.home.team_id);
   const [view, setView] = useState<TacticsView>('defending');
   const [momentId, setMomentId] = useState<string | null>(null);
-  const fetched = useRef({ key: '', at: 0 });
-  const latest = useRef(state); latest.current = state;
-  const load = useRef(getTactics); load.current = getTactics;
-
-  // Refresh on a real-time cadence while the observed match moves on; at once on restart or correction.
-  useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-    const refresh = async (force = false) => {
-      const current = latest.current;
-      const key = `${current.session_id}:${current.generation}:${current.data_epoch}:${Math.floor(current.playhead_ms / 1000)}`;
-      if (!force && (key === fetched.current.key || Date.now() - fetched.current.at < REFRESH_MS)) return;
-      fetched.current = { key, at: Date.now() };
-      try {
-        const next = await load.current(controller.signal);
-        if (!cancelled) { setReport(next); setFailed(false); }
-      } catch { if (!cancelled) setFailed(true); }
-    };
-    void refresh(true);
-    const timer = window.setInterval(() => void refresh(), 1000);
-    return () => { cancelled = true; controller.abort(); window.clearInterval(timer); };
-  }, [state.session_id, state.generation, state.data_epoch, state.status]);
 
   useEffect(() => { if (state.preferences.favorite_team_id) setTeamId(state.preferences.favorite_team_id); }, [state.preferences.favorite_team_id]);
 
@@ -142,11 +119,11 @@ function MomentPitch({ moment, name, shirt, colour, teamName }: { moment: KeyMom
   </figure>;
 }
 
-function Stats({ items }: { items: [string, ReactNode][] }) {
+export function Stats({ items }: { items: [string, ReactNode][] }) {
   return <dl className="tactics-stats">{items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>;
 }
 
-function Table({ caption, head, rows }: { caption: string; head: string[]; rows: ReactNode[][] }) {
+export function Table({ caption, head, rows }: { caption: string; head: string[]; rows: ReactNode[][] }) {
   if (!rows.length) return null;
   return <div className="table-scroll" tabIndex={0} role="region" aria-label={caption}><table className="tactics-table">
     <caption>{caption}</caption>
@@ -182,6 +159,11 @@ function Defending({ team, name }: Section) {
   </div>;
 }
 
+function Chance({ pass }: { pass: TeamTactics['decisive_passes'][number] }) {
+  const label = chanceLabel(pass);
+  return <span className={`chance-cell chance-${pass.chance ?? 'none'}`}><strong>{label.type}</strong>{label.xg && <small>{label.xg}</small>}</span>;
+}
+
 function Attacking({ team, name }: Section) {
   const build = team.build_up;
   return <div className="tactics-sections">
@@ -191,8 +173,8 @@ function Attacking({ team, name }: Section) {
     </section>
     <section><h3>Chance creation</h3>
       <Table caption="Who starts attacks" head={['Player', 'Attacks started', 'Chances', 'Time to chance']} rows={team.creators.map((c) => [name(c.player_id), c.attacks_started, c.chances, seconds(c.mean_time_to_chance_ms)])} />
-      <Table caption="Decisive passes" head={['Time', 'Pass', 'Length', 'Angle', 'Speed', 'Beyond the line', 'Chance']}
-        rows={team.decisive_passes.slice().reverse().map((d) => [matchClock(d.time_ms), `${name(d.passer_id)} → ${name(d.recipient_id)}`, metres(d.length_m), angleLabel(d.angle_deg), speed(d.speed_mps), d.through_ball == null ? '—' : d.through_ball ? 'Yes' : 'No', d.led_to_chance ? 'Yes' : 'No'])} />
+      <Table caption="Decisive passes" head={['Time', 'Pass', 'Length', 'Speed', 'Beyond the line', 'Chance']}
+        rows={team.decisive_passes.slice().reverse().map((d) => [matchClock(d.time_ms), `${name(d.passer_id)} → ${name(d.recipient_id)}`, metres(d.length_m), speed(d.speed_mps), d.through_ball == null ? '—' : d.through_ball ? 'Yes' : 'No', <Chance key="chance" pass={d} />])} />
     </section>
     <section><h3>Build-up from the keeper</h3>
       <Stats items={[['Sequences', build.sequences], ['Short / long start', `${build.short_starts} / ${build.long_starts}`], ['Reached middle third', `${share(build.reached_middle_third, build.sequences)} · ${seconds(build.mean_time_to_middle_ms)}`], ['Reached final third', `${share(build.reached_final_third, build.sequences)} · ${seconds(build.mean_time_to_final_ms)}`], ['Pass accuracy', build.pass_accuracy == null ? '—' : `${build.pass_accuracy}%`], ['Lines broken per sequence', build.mean_lines_broken ?? '—'], ['Lost in own half', build.lost_in_own_half]]} />

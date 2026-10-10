@@ -11,6 +11,7 @@ import threading
 from dataclasses import dataclass, field
 from statistics import mean, median
 
+from .chances import DEFINITIONS as CHANCE_DEFINITIONS, shot_quality
 from .generator import generate_plans
 from .ingest import canonical_order
 from .models import (BuildUp, Corners, CornerDelivery, Creator, DecisivePass, DefenderStep, EventEnvelope, KeyMoment,
@@ -53,7 +54,9 @@ DEFINITIONS = {
     "build_up": "A sequence from the goalkeeper's possession or receipt until the possession ends or 20 s. Lines broken counts opponent lines (forwards, midfield, back four mean x) a completed pass crosses.",
     "attack_initiator": "In a possession that reaches the final third or a chance, the first player to complete a pass or carry gaining ≥12 units or entering the final third.",
     "chance": "A shot or a completed entry into the box. Time to chance is measured from the start of the possession.",
-    "pass_angle": "Direction of a pass relative to straight at goal: 0° is straight forward, positive toward the passer's right.",
+    "decisive_chance": "The chance a decisive pass led to: major or minor by the xG of the first shot later in that possession; a box entry with no shot is minor without xG.",
+    "xg": CHANCE_DEFINITIONS["xg"],
+    "chance_type": CHANCE_DEFINITIONS["chance_type"],
     "pass_speed": "Mean ball speed between leaving the passer and arriving, from 5 Hz synthetic ball positions.",
     "corner_swing": "Measured from the ball's curve: bending toward the goal line is an inswinger. Expected swing follows the kicking foot and corner side.",
     "corner_accuracy": "Distance from where the delivery arrives to the nearest attacker at that moment.",
@@ -439,6 +442,7 @@ class Report:
                 self.released.add(ep.episode_id)
         self.observations: list[TacticalObservation] = []
         self.moments: list[KeyMoment] = []
+        self.quality = shot_quality(records, ordered)
 
     # -------------------------------------------------------------- helpers
     def attacks_against(self, team: str) -> list[AttackMeasure]:
@@ -725,6 +729,7 @@ class Report:
             if start.kind != "POSSESSION":
                 continue
             initiator, chance, last_pass, entered = None, None, None, False
+            shot = next((r for r in rows if r.payload.kind == "SHOT"), None)
             for record in rows:
                 e = record.payload
                 if e.kind == "SHOT":
@@ -756,12 +761,12 @@ class Report:
                 row["chances"] += 1
                 row["times"].append(chance[1] - start.event_time_ms)
                 if last_pass:
-                    decisive.append(self.decisive(last_pass, True))
+                    decisive.append(self.decisive(last_pass, shot))
         for m in self.attacks_by(team):
             record = self.records[m.episode.anchor_event_id]
             if m.through_ball and record.payload.detail.start.x >= 50:
                 if not any(d.event_ref == record.ref for d in decisive):
-                    decisive.append(self.decisive(record, False))
+                    decisive.append(self.decisive(record, None, chance=False))
         rows = sorted((Creator(player_id=p, attacks_started=v["attacks"], chances=v["chances"], mean_time_to_chance_ms=r1(avg(v["times"])))
                        for p, v in creators.items()), key=lambda c: (-c.attacks_started, -c.chances))
         decisive.sort(key=lambda d: d.time_ms)
@@ -774,14 +779,16 @@ class Report:
         fast = [d for d in decisive if d.speed_mps is not None]
         if len(fast) >= 3:
             quick = max(fast, key=lambda d: d.speed_mps)
+            major = sum(1 for d in fast if d.chance == "major")
             self.observe("chance_creation", "tendency", team, team, f"{team_name(self.match, team)}'s decisive passes travel at {mean(d.speed_mps for d in fast):.1f} m/s",
-                f"Across {len(fast)} through balls and final passes, the mean angle was {mean(abs(d.angle_deg) for d in fast):.0f}° off straight and "
-                f"{sum(1 for d in fast if d.through_ball)} went beyond the defensive line. Quickest: {name(self.match, quick.passer_id)} to "
+                f"Across {len(fast)} through balls and final passes, {sum(1 for d in fast if d.through_ball)} went beyond the defensive line and "
+                f"{plural(major, 'major chance')} followed. Quickest: {name(self.match, quick.passer_id)} to "
                 f"{name(self.match, quick.recipient_id)} at {quick.speed_mps} m/s.", [quick.passer_id, quick.recipient_id], len(fast), [], [d.event_ref for d in fast])
         return rows[:8], decisive[-10:]
 
-    def decisive(self, record: EventEnvelope, chance: bool) -> DecisivePass:
+    def decisive(self, record: EventEnvelope, shot: EventEnvelope | None, chance: bool = True) -> DecisivePass:
         e = record.payload
+        quality = self.quality.get(shot.event_id) if shot else None
         dx, dy = (e.detail.end.x - e.detail.start.x) * X_M, (e.detail.end.y - e.detail.start.y) * Y_M
         ep = self.prepared.by_anchor.get(record.event_id)
         measure = self.prepared.attacks.get(ep.episode_id) if ep and ep.episode_id in self.released else None
@@ -789,9 +796,10 @@ class Report:
         if measure:
             ran = any(r.player_id == e.detail.recipient_id for r in measure.runs)
         return DecisivePass(event_ref=record.ref, time_ms=e.event_time_ms, passer_id=e.player_id, recipient_id=e.detail.recipient_id,
-            completed=e.detail.completed, length_m=round(math.hypot(dx, dy), 1), angle_deg=round(math.degrees(math.atan2(dy, dx)), 1),
+            completed=e.detail.completed, length_m=round(math.hypot(dx, dy), 1),
             speed_mps=r1(measure.pass_speed) if measure else None, through_ball=measure.through_ball if measure else None,
-            recipient_ran=ran, led_to_chance=chance)
+            recipient_ran=ran, led_to_chance=chance, chance=(quality.chance if quality else "minor") if chance else None,
+            xg=quality.xg if quality else None, shot_ref=quality.ref if quality else None)
 
     def build_up(self, team: str) -> BuildUp:
         keeper = player_for(team, "GK")

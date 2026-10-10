@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { defaultPreferences, mergeObservedEvents, type Envelope, type Session } from './contracts';
 import { projectPitchState } from './pitchProjection';
 
-const metrics = { shots: 0, on_target: 0, completed_passes: 0, attempted_passes: 0, pass_accuracy: null, final_third_entries: 0, box_entries: 0, possession_share: null, goals: 0 };
+const metrics = { shots: 0, on_target: 0, completed_passes: 0, attempted_passes: 0, pass_accuracy: null, final_third_entries: 0, box_entries: 0, possession_share: null, goals: 0, duels: 0, duels_won: 0, final_third_passes: 0, field_tilt: null, xg: 0 };
 function session(events: Envelope[] = []): Session {
   return {
     schema_version: '1.0', session_id: 'session_a', match_id: 'test_match', generation: 1, data_epoch: 1, preferences_version: 1,

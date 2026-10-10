@@ -14,9 +14,10 @@ import random
 from pathlib import Path
 
 from .models import EventEnvelope, Match, PERIOD_MS
-from .tactical_profiles import CORNER_TAKERS, TARGET_MEN, other, player_for, tendencies
+from .tactical_profiles import CORNER_TAKERS, TARGET_MEN, foot, other, player_for, position, tendencies
 
 TACTICAL_SALT = 0x7AC71C
+DUEL_SALT = 0xD0E1
 
 FIXTURE_PATH = Path(__file__).resolve().parent.parent / "server_data" / "fixtures" / "tp_demo_01.json"
 
@@ -27,11 +28,12 @@ def fixture_match(seed: int = 24017) -> Match:
         "vale": ["Tomas Hale", "Oren Clay", "Luca Briar", "Niko Ash", "Finn Alder", "Emil Stone", "Sami North", "Ivo Brook", "Jasper Dale", "Ruben Hart", "Felix Cove"],
     }
     return Match.model_validate({
-        "match_id": "tp_demo_01", "seed": seed, "fixture_version": "synthetic_v3",
+        "match_id": "tp_demo_01", "seed": seed, "fixture_version": "synthetic_v4",
         "home": {"team_id": "harbor", "display_name": "Harbor Athletic", "short_name": "HBR", "color": "#38BDF8"},
         "away": {"team_id": "vale", "display_name": "Vale United", "short_name": "VAL", "color": "#FBBF24"},
         "roster": [{"player_id": f"{team}_{i:02d}", "team_id": team, "display_name": name,
-                    "shirt_number": i, "position": "GK" if i == 1 else "DEF" if i <= 5 else "MID" if i <= 8 else "FWD"}
+                    "shirt_number": i, "position": "GK" if i == 1 else "DEF" if i <= 5 else "MID" if i <= 8 else "FWD",
+                    "role": position(f"{team}_{i:02d}")}
                    for team, roster in names.items() for i, name in enumerate(roster, 1)],
     })
 
@@ -42,6 +44,9 @@ class Generator:
         self.rng = random.Random(seed)
         self.events: list[EventEnvelope] = []
         self.seq = 0
+        # Duels carry their own id series so adding them never renumbers the other events
+        # (the synthetic tracking is seeded per event id).
+        self.ids = {"evt": 0, "duel": 0}
         self.possession = 0
         self.owner: str | None = None
         self.live = False
@@ -54,6 +59,9 @@ class Generator:
         self.plans: dict[str, dict] = {}
         self.corner_flag: dict | None = None
         self.corner_count = {"harbor": 0, "vale": 0}
+        # Duels draw from a third stream so the open-play and tactical streams keep their shape.
+        self.duels = random.Random(seed ^ DUEL_SALT)
+        self.header_next = False
 
     def point(self, x: float, y: float = 50) -> dict:
         return {"x": round(x, 2), "y": round(y, 2)}
@@ -72,16 +80,37 @@ class Generator:
 
     def emit(self, time_ms: int, kind: str, team: str | None = None, detail: dict | None = None, actor: str | None = None) -> str:
         self.seq += 1
+        series = "duel" if kind == "TACKLE" else "evt"
+        self.ids[series] += 1
+        event_id = f"evt_{self.ids[series]:05d}" if series == "evt" else f"duel_{self.ids[series]:04d}"
         marker = kind in ("PERIOD_START", "PERIOD_END", "STOPPAGE")
         self.events.append(EventEnvelope.model_validate({
-            "delivery_seq": self.seq, "available_at_ms": time_ms, "event_id": f"evt_{self.seq:05d}", "revision": 1,
+            "delivery_seq": self.seq, "available_at_ms": time_ms, "event_id": event_id, "revision": 1,
             "operation": "upsert", "payload": {"match_id": self.match.match_id, "event_time_ms": time_ms,
             "period": self.period, "kind": kind, "team_id": team, "player_id": None if marker else actor or self.actor(team),
             "possession_id": None if marker else f"pos_{self.possession:05d}", "detail": detail or {}},
         }))
-        return f"evt_{self.seq:05d}"
+        return event_id
+
+    def challenger(self, team: str, point: dict) -> str:
+        """The defending player nearest the line of a duel, drawn from the duel stream."""
+        x = point["x"]
+        roles = ("RCB", "LCB", "RB", "LB") if x < 38 else ("DM", "RCM", "LCM") if x < 72 else ("ST", "RW", "LW", "RCM")
+        return player_for(team, self.duels.choice(roles))
+
+    def mirror(self, point: dict) -> dict:
+        return self.point(100 - point["x"], 100 - point["y"])
+
+    def duel(self, t: int, defending: str, where: dict, won: bool, contest: str = "ground", defender: str | None = None):
+        """A contest inside the attacking team's possession; ``where`` is in the attackers' frame."""
+        spot = self.mirror(where)
+        self.emit(t, "TACKLE", defending, {"position": spot, "successful": won, "contest": contest},
+                  defender or self.challenger(defending, spot))
 
     def possess(self, t: int, team: str, holder: str | None = None) -> str:
+        if self.live and self.ball and self.owner and self.owner != team and self.holder:
+            # The new side won the ball off a player in possession: a ground duel.
+            self.duel(t - 400, team, self.ball, True)
         if self.live and self.ball:
             # Invert both axes when possession changes: the physical ball stays
             # at the same location despite the team's attacking coordinate frame.
@@ -93,6 +122,7 @@ class Generator:
         else:
             start = self.point(50, 50)  # period start or restart after a goal
         self.possession += 1
+        self.header_next = False
         self.owner, self.live = team, True
         restart = self.last_stoppage
         self.ball, self.holder, self.last_stoppage = start, holder or self.actor(team, start), None
@@ -112,6 +142,7 @@ class Generator:
     def pass_to(self, t: int, recipient: str, end: dict, completed: bool = True) -> str:
         """A scripted pass with an explicit recipient, outside the open-play stream."""
         assert self.live and self.owner and self.ball and self.holder
+        self.header_next = False
         event_id = self.emit(t, "PASS", self.owner, {"recipient_id": recipient, "completed": completed,
                              "start": self.ball, "end": end}, self.holder)
         self.ball = end
@@ -164,6 +195,9 @@ class Generator:
         won = rng.random() < (.6 if miss < 2.5 else .3)
         delivery = self.pass_to(t + 5_000, target, landing, completed=won)
         self.plans[delivery] = {"type": "corner", "side": side, "target_id": target, "zone": zone}
+        # The aerial contest at the delivery: the first defender to it challenges the target.
+        self.duel(t + 5_700, other(team), landing, not won, "aerial", player_for(other(team), self.duels.choice(("RCB", "LCB"))))
+        self.header_next = won
         return won
 
     def clear_corner(self, t: int, defending: str, attacking: str | None):
@@ -177,6 +211,7 @@ class Generator:
     def pass_ball(self, t: int, end: dict, completed: bool = True):
         assert self.live and self.owner and self.ball and self.holder
         recipient = self.actor(self.owner, end, exclude=self.holder)
+        self.header_next = False
         self.emit(t, "PASS", self.owner, {"recipient_id": recipient, "completed": completed,
                   "start": self.ball, "end": end}, self.holder)
         self.ball = end
@@ -188,6 +223,10 @@ class Generator:
         # passes. Keep the fictional event spacing plausible for a ball holder.
         end = self.point(end["x"], min(self.ball["y"] + 18, max(self.ball["y"] - 18, end["y"])))
         self.emit(t, "CARRY", self.owner, {"start": self.ball, "end": end}, self.holder)
+        if self.duels.random() < .45:
+            # The carrier rides a challenge on the way: a ground duel the defender loses.
+            midway = self.point((self.ball["x"] + end["x"]) / 2, (self.ball["y"] + end["y"]) / 2)
+            self.duel(t + 800, other(self.owner), midway, False)
         self.ball = end
 
     def shoot(self, t: int, outcome: str, rng: random.Random | None = None):
@@ -202,7 +241,9 @@ class Generator:
                                 min(85, max(15, self.ball["y"] + rng.uniform(-6, 6))))
         else:
             target = self.destination(100, 100, 22, 39, rng) if rng.random() < .5 else self.destination(100, 100, 61, 78, rng)
-        self.emit(t, "SHOT", self.owner, {"position": self.ball, "target": target, "outcome": outcome}, self.holder)
+        body = "head" if self.header_next else f"{foot(self.holder)}_foot"
+        self.header_next = False
+        self.emit(t, "SHOT", self.owner, {"position": self.ball, "target": target, "outcome": outcome, "body_part": body}, self.holder)
         self.ball = target
 
     def stop(self, t: int, reason: str):

@@ -10,7 +10,9 @@ The interface is styled like a broadcast analysis desk: a TV-style score bug and
 
 ## Tactical analysis
 
-A Tactics panel under the pitch reads a synthetic 5 Hz tracking layer and reports, for each team: offside-trap shape and step-up speed with late-stepping defenders, defensive shape shifts and man-oriented or zonal marking weaknesses, who triggers the press, whom they target and how often it forces the ball back to the keeper, runs in behind and whether defenders drop with them, attack initiators with pass angle and speed, build-up through the lines from the keeper, and corner delivery, foot and swing, and target-man timing. Findings are tendencies or opportunities an opponent could test, each with its sample and a key-moment diagram. Tracking, players and tendencies are fictional; see [tactical engine](docs/tactical-engine.md) for the method, thresholds and limitations.
+A Tactics panel under the pitch reads a synthetic 5 Hz tracking layer and reports, for each team: offside-trap shape and step-up speed with late-stepping defenders, defensive shape shifts and man-oriented or zonal marking weaknesses, who triggers the press, whom they target and how often it forces the ball back to the keeper, runs in behind and whether defenders drop with them, attack initiators and decisive passes with speed and a Major/Minor chance type with xG, build-up through the lines from the keeper, and corner delivery, foot and swing, and target-man timing. Findings are tendencies or opportunities an opponent could test, each with its sample and a key-moment diagram. Tracking, players and tendencies are fictional; see [tactical engine](docs/tactical-engine.md) for the method, thresholds and limitations.
+
+A Live analytics panel adds field tilt (live and by 15 minutes, against possession), heuristic xG and Major/Minor chances, defensive line height by phase, external player workload and possession value, and the match numbers now include shots on target, duels won, field tilt and xG. Events show each player's position (ST, CAM, CDM…). See [match analytics](docs/match-analytics.md).
 
 ## Run on Windows
 
@@ -93,6 +95,7 @@ Automatic deployment retains the named replay volume, takes a consistent private
 - [Product and interaction design](docs/design.md)
 - [Architecture](docs/architecture.md) and [API contract](docs/api-contract.md)
 - [Tactical engine method and limitations](docs/tactical-engine.md)
+- [Live match analytics method and limitations](docs/match-analytics.md)
 - [Blender stadium source and animation behavior](docs/stadium-assets.md)
 - [Technical decisions and verified primary sources](docs/technical-decisions.md)
 - [Public hosting and release procedure](docs/deployment.md) and [public backend bounds](docs/public-demo-backend.md)

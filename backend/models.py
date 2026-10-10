@@ -27,6 +27,8 @@ class Player(StrictModel):
     display_name: str = Field(min_length=1, max_length=80)
     shirt_number: int = Field(ge=1, le=99, strict=True)
     position: Literal["GK", "DEF", "MID", "FWD"]
+    # Specific playing position (e.g. ST, CAM, CDM). Optional for legacy fixtures.
+    role: Literal["GK", "RB", "CB", "LB", "RWB", "LWB", "CDM", "CM", "CAM", "RM", "LM", "RW", "LW", "CF", "ST"] | None = None
 
 
 class MatchMetadata(StrictModel):
@@ -101,11 +103,16 @@ class ShotDetail(StrictModel):
     # Synthetic recorded endpoint, supplied only once this shot is observed.
     # Legacy stored shots can remain source-only; never infer a missing target.
     target: Point | None = None
+    # Synthetic recorded body part; absent on legacy shots and then treated as a foot.
+    body_part: Literal["right_foot", "left_foot", "head"] | None = None
 
 
 class TackleDetail(StrictModel):
     position: Point
     successful: bool = Field(strict=True)
+    # A ground challenge or an aerial contest. The actor is always the defending player;
+    # ``successful`` means the defender won the duel.
+    contest: Literal["ground", "aerial"] = "ground"
 
 
 class StoppageDetail(StrictModel):
@@ -284,6 +291,11 @@ class TeamMetrics(StrictModel):
     box_entries: int
     possession_share: float | None
     goals: int
+    duels: int = 0
+    duels_won: int = 0
+    final_third_passes: int = 0
+    field_tilt: float | None = None
+    xg: float = 0.0
 
 
 class Baseline(StrictModel):
@@ -428,6 +440,8 @@ class PlayerStats(StrictModel):
     on_target: int
     goals: int
     tackles: int
+    duels: int = 0
+    duels_won: int = 0
     event_refs: list[str]
 
 
@@ -642,11 +656,14 @@ class DecisivePass(StrictModel):
     recipient_id: str
     completed: bool
     length_m: float
-    angle_deg: float
     speed_mps: float | None
     through_ball: bool | None
     recipient_ran: bool | None
     led_to_chance: bool
+    # Major or minor by the xG of the shot that followed; None when no chance followed.
+    chance: Literal["major", "minor"] | None
+    xg: float | None
+    shot_ref: str | None
 
 
 class BuildUp(StrictModel):
@@ -760,5 +777,146 @@ class TacticalReport(StrictModel):
     teams: dict[str, TeamTactics]
     observations: list[TacticalObservation]
     key_moments: list[KeyMoment]
+    definitions: dict[str, str]
+    limitations: list[str]
+
+
+# -------------------------------------------------------------- analytics_v1
+ANALYTICS_VERSION = "analytics_v1"
+
+
+class TerritoryWindow(StrictModel):
+    start_ms: int
+    end_ms: int
+    final_third_passes: dict[str, int]
+    field_tilt: dict[str, float | None]
+    possession_share: dict[str, float | None]
+
+
+class Territory(StrictModel):
+    match: TerritoryWindow
+    recent: TerritoryWindow
+    intervals: list[TerritoryWindow]
+
+
+class ShotValue(StrictModel):
+    event_ref: str
+    time_ms: int
+    team_id: str
+    player_id: str
+    outcome: Literal["goal", "saved", "blocked", "off_target"]
+    xg: float
+    distance_m: float
+    angle_deg: float
+    assist: Literal["through_ball", "cutback", "pass", "individual", "cross", "set_piece"]
+    body_part: Literal["right_foot", "left_foot", "head"]
+    chance: Literal["major", "minor"]
+
+
+class TeamChances(StrictModel):
+    team_id: str
+    shots: int
+    on_target: int
+    goals: int
+    xg: float
+    xg_against: float
+    major_chances: int
+    xg_per_shot: float | None
+
+
+class LineFigures(StrictModel):
+    seconds: float
+    deepest_m: float | None
+    back_four_m: float | None
+    centroid_m: float | None
+    gap_m: float | None
+    width_m: float | None
+
+
+class LineInterval(StrictModel):
+    start_ms: int
+    end_ms: int
+    seconds: float
+    back_four_m: float | None
+    deepest_m: float | None
+
+
+class DefensiveLine(StrictModel):
+    team_id: str
+    block: Literal["high", "mid", "low", "insufficient_evidence"]
+    match: LineFigures
+    recent: LineFigures
+    settled: LineFigures
+    after_loss: LineFigures
+    before_shots: LineFigures
+    shots_faced: int
+    intervals: list[LineInterval]
+
+
+class PlayerWorkload(StrictModel):
+    player_id: str
+    team_id: str
+    minutes: float
+    distance_m: float
+    hsr_m: float
+    sprint_m: float
+    sprints: int
+    accelerations: int
+    decelerations: int
+    load: float
+    top_speed_mps: float
+    metres_per_min: float | None
+    recent_metres_per_min: float | None
+    trend_pct: float | None
+    flag: Literal["intensity_drop"] | None
+
+
+class ValuedAction(StrictModel):
+    event_ref: str
+    time_ms: int
+    team_id: str
+    player_id: str
+    action: Literal["pass", "carry", "shot", "lost_pass", "dispossessed"]
+    start: Point
+    end: Point | None
+    value_before: float
+    value_after: float
+    pv: float
+
+
+class PlayerValue(StrictModel):
+    player_id: str
+    team_id: str
+    actions: int
+    pv: float
+    positive_actions: int
+    best_ref: str | None
+
+
+class TeamValue(StrictModel):
+    team_id: str
+    actions: int
+    possessions: int
+    pv: float
+    pv_per_action: float | None
+    by_action: dict[str, float]
+
+
+class MatchAnalytics(StrictModel):
+    session_id: str
+    generation: int
+    data_epoch: int
+    playhead_ms: int
+    next_cursor: str
+    engine_version: Literal["analytics_v1"] = ANALYTICS_VERSION
+    provenance: Literal["synthetic_events_and_tracking"] = "synthetic_events_and_tracking"
+    territory: Territory
+    chances: dict[str, TeamChances]
+    shots: list[ShotValue]
+    defensive_line: dict[str, DefensiveLine]
+    workload: list[PlayerWorkload]
+    team_value: dict[str, TeamValue]
+    player_value: list[PlayerValue]
+    top_actions: list[ValuedAction]
     definitions: dict[str, str]
     limitations: list[str]
