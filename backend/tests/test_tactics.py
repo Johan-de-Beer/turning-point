@@ -180,3 +180,14 @@ def test_tactics_endpoint_is_capability_scoped_and_advances_with_the_replay(clie
 
 
 from .test_api import client  # noqa: E402,F401  (shared API fixture)
+
+
+def test_frontend_contract_sample_matches_the_backend_report(engine, fixture):
+    from pathlib import Path
+    from backend.models import TacticalReport
+    path = Path(__file__).resolve().parents[2] / "frontend" / "src" / "lib" / "fixtures" / "tactics-15min.json"
+    sample = json.loads(path.read_text(encoding="utf-8"))
+    cutoff = sample["playhead_ms"]
+    report = TacticalReport(session_id="sample", generation=1, data_epoch=1, playhead_ms=cutoff, next_cursor="c",
+                            **engine.report(records_until(fixture, cutoff), cutoff))
+    assert report.model_dump(mode="json") == sample

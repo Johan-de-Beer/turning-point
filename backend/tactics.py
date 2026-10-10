@@ -78,6 +78,10 @@ def avg(values) -> float | None:
     return mean(values) if values else None
 
 
+def plural(count: int, word: str, words: str | None = None) -> str:
+    return f"{count} {word if count == 1 else words or word + 's'}"
+
+
 def name(match: Match, pid: str) -> str:
     return next((p.display_name for p in match.roster if p.player_id == pid), pid)
 
@@ -481,7 +485,7 @@ class Report:
         if len(traps) >= 3:
             self.observe("offside_trap", "tendency", team, opponent, f"{team_name(self.match, team)} stepped up as a line in {len(traps)} of {len(faced)} attacks",
                 f"Mean step speed {trap.mean_step_speed_mps} m/s; the line sat a mean {trap.mean_line_height_m} m from goal. "
-                f"{trap.caught_offside} trap(s) left a runner in an offside position and {trap.broken} were broken by a late step.",
+                f"{plural(trap.caught_offside, 'trap')} left a runner in an offside position; {plural(trap.broken, 'trap was', 'traps were')} broken by a late step.",
                 [], len(faced), [m.episode.episode_id for m in traps])
         for row in defenders:
             share = row.late_steps / row.traps if row.traps else 0
@@ -505,9 +509,9 @@ class Report:
                         [d, runner], m.offside_line)
                 side = "left" if role(d) in ("LB", "LCB") else "right"
                 detail = (f"{label(self.match, d)} started the step a mean {row.mean_lag_ms:.0f} ms after the rest of the line in {row.late_steps} of {row.traps} traps "
-                          f"and was {row.mean_depth_at_pass_m} m deeper than the line at the pass. A late step there kept {row.runners_played_onside} runner(s) onside.")
+                          f"and was {row.mean_depth_at_pass_m} m deeper than the line at the pass. Those late steps kept {plural(row.runners_played_onside, 'runner')} onside.")
                 if exploit:
-                    detail += f" {label(self.match, exploit)} made {runners[exploit]} run(s) in that channel during those traps."
+                    detail += f" {label(self.match, exploit)} made {plural(runners[exploit], 'run')} in that channel during those traps."
                 self.observe("offside_trap", "opportunity", team, opponent, f"{team_name(self.match, team)}'s line steps up late on its {side}",
                     detail, [d] + ([exploit] if exploit else []), row.traps, [m.episode.episode_id for m in episodes],
                     [m.episode.anchor_ref for m in episodes], moment)
@@ -651,13 +655,13 @@ class Report:
                 f"{(top.mean_time_to_pressure_ms or 0) / 1000:.1f} s at {top.mean_closing_speed_mps} m/s.",
                 [top.player_id], result.presses, [x.episode.episode_id for x in triggers[top.player_id]], moment=moment)
             wp, wn = result.when_pressing, result.when_not_pressing
-            if wp.possessions >= 3:
+            if wp.possessions >= 5:
                 keeper_rate = 100 * wp.forced_to_keeper / wp.possessions
                 calm_rate = 100 * wn.forced_to_keeper / wn.possessions if wn.possessions else 0
                 timing = f" in a mean {wp.mean_time_to_keeper_ms / 1000:.1f} s" if wp.mean_time_to_keeper_ms else ""
                 self.observe("press", "tendency", team, opponent, f"Pressed, {team_name(self.match, opponent)} went back to the keeper {keeper_rate:.0f}% of the time",
                     f"{wp.forced_to_keeper} of {wp.possessions} pressed possessions were recycled to the goalkeeper{timing}, against {calm_rate:.0f}% "
-                    f"when not pressed. {wp.regained} were regained and {wp.played_through} were played past halfway.",
+                    f"when not pressed. Regained: {wp.regained}. Played past halfway: {wp.played_through}.",
                     [], wp.possessions, [m.episode.episode_id for m in pressed])
             base = [t for t in target_rows if t.possessions >= 3]
             if base:
@@ -700,8 +704,8 @@ class Report:
                 moment = self.moment(pick.episode, pick.t0, "runs", f"{name(self.match, top.player_id)}'s run pulls {name(self.match, run.defender_id)} back",
                     [top.player_id, run.defender_id], pick.offside_line)
             self.observe("runs", "tendency", team, team, f"{name(self.match, top.player_id)} makes the most runs in behind",
-                f"{label(self.match, top.player_id)} made {top.runs} runs ({top.in_behind} got beyond the line, {top.targeted} were found by the pass, "
-                f"{decoys} were not). A defender dropped with {top.drew_defender} of them.", [top.player_id], top.runs, episodes[top.player_id], moment=moment)
+                f"{label(self.match, top.player_id)} made {plural(top.runs, 'run')}: {top.in_behind} got in behind onside, {top.targeted} found by the pass and "
+                f"{decoys} not. Outside offside traps a defender dropped with {top.drew_defender} of them.", [top.player_id], top.runs, episodes[top.player_id], moment=moment)
         if total >= 5:
             self.observe("runs", "opportunity" if drawn / total >= .5 else "tendency", opponent, team, f"{team_name(self.match, opponent)} defenders drop with {100 * drawn / total:.0f}% of runs",
                 f"Outside offside traps, a back-four defender in the runner's channel retreated with {drawn} of {total} {team_name(self.match, team)} runs, "

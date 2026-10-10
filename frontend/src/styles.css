@@ -523,6 +523,69 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .recap-cutoff { color: var(--text-3); font-size: 13px; }
 
 /* ---------- Responsive ---------- */
+
+/* ---------- Tactical analysis ---------- */
+.tactics-panel { display: grid; gap: var(--space-4); }
+.tactics-panel .section-heading { margin-bottom: 0; }
+.tactics-controls { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.tactics-controls .segmented-control button { gap: 8px; }
+.tactics-controls .segmented-control button.active .team-dot { outline: 1px solid var(--teal-ink); }
+.tactics-empty { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 15px; }
+.tactics-lead { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--space-5); align-items: start; }
+.tactics-findings { min-width: 0; }
+.tactics-findings h3, .tactics-sections h3 { font-family: var(--display); font-size: 17px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: var(--text-2); margin-bottom: var(--space-3); }
+.tactics-findings ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-height: 560px; overflow-y: auto; }
+.finding { display: grid; gap: 6px; padding: var(--space-3) 0 var(--space-3) var(--space-3); border-left: 3px solid var(--border-strong); border-bottom: 1px solid var(--border); }
+.finding-opportunity { border-left-color: var(--teal); }
+.finding-weakness { border-left-color: var(--warning); }
+.finding strong { font-size: 16px; line-height: 1.35; }
+.finding p { color: var(--text-2); font-size: 14px; line-height: 1.55; }
+.finding .text-button { justify-self: start; }
+.finding-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--text-3); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.finding-tag { color: var(--text); }
+.finding-opportunity .finding-tag { color: var(--teal); }
+.finding-weakness .finding-tag { color: var(--warning); }
+.tactics-moment { position: sticky; top: 96px; min-width: 0; }
+.moment-figure { margin: 0; display: grid; gap: var(--space-2); }
+.moment-figure svg { display: block; width: 100%; height: auto; border-radius: var(--radius); }
+.moment-figure figcaption { display: grid; gap: 2px; font-size: 14px; }
+.moment-figure figcaption span { color: var(--text-3); font-size: 13px; }
+.moment-grass { fill: #1a4a30; }
+.moment-lines { stroke: #e2ece4; stroke-opacity: .6; }
+.moment-ball { fill: #fffdf5; stroke: #0b1220; }
+.moment-player text { font-size: 1.5px; font-weight: 700; text-anchor: middle; fill: #0b1220; }
+.moment-player circle { stroke: #0b1220; stroke-width: .25; }
+.moment-player.is-highlighted circle { stroke: #f8fafc; stroke-width: .45; }
+.moment-label { font-size: 2.1px; font-weight: 650; text-anchor: middle; fill: #f8fafc; paint-order: stroke; stroke: #0b1220; stroke-width: .5; }
+.moment-offside line { stroke: var(--warning); stroke-width: .35; stroke-dasharray: 1.2 .8; }
+.moment-offside text { font-size: 2px; fill: var(--warning); }
+.moment-path { fill: none; stroke: #fffdf5; stroke-width: .35; stroke-dasharray: .8 .6; }
+.moment-placeholder { display: grid; place-items: center; gap: var(--space-2); aspect-ratio: 111 / 74; border: 1px dashed var(--border-strong); border-radius: var(--radius); color: var(--text-3); font-size: 14px; text-align: center; padding: var(--space-4); }
+.tactics-numbers > summary, .tactics-limits > summary { cursor: pointer; color: var(--teal); font-size: 14px; font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+.tactics-sections { display: grid; gap: var(--space-5); margin-top: var(--space-3); }
+.tactics-sections section { display: grid; gap: var(--space-3); min-width: 0; }
+.tactics-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3) var(--space-4); margin: 0; }
+.tactics-stats div { display: grid; gap: 2px; padding-top: var(--space-2); border-top: 1px solid var(--border); }
+.tactics-stats dt { color: var(--text-3); font-size: 13px; }
+.tactics-stats dd { margin: 0; font-family: var(--display); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tactics-compare { color: var(--text-2); font-size: 14px; line-height: 1.7; }
+.table-scroll { overflow-x: auto; max-width: 100%; }
+.tactics-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tactics-table caption { text-align: left; color: var(--text-3); font-size: 13px; padding-bottom: var(--space-2); }
+.tactics-table th, .tactics-table td { padding: 8px 10px 8px 0; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.tactics-table thead th { color: var(--text-3); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.tactics-table tbody th { font-weight: 600; }
+.tactics-limits ul { margin: var(--space-2) 0 0; padding-left: 20px; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+.tactics-definitions { display: grid; gap: var(--space-2); margin-top: var(--space-3); font-size: 13px; }
+.tactics-definitions dt { color: var(--text); font-weight: 600; text-transform: capitalize; }
+.tactics-definitions dd { margin: 0; color: var(--text-2); line-height: 1.5; }
+@media (max-width: 960px) {
+  .tactics-lead { grid-template-columns: 1fr; }
+  .tactics-moment { position: static; order: -1; }
+  .moment-placeholder { display: none; }
+  .tactics-findings ol { max-height: none; }
+}
+
 @media (max-width: 1240px) {
   .match-layout { grid-template-columns: minmax(0, 1fr) 340px; gap: var(--space-5); }
   .header-controls { grid-template-columns: 1fr; gap: var(--space-2); }
