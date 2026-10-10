@@ -10,6 +10,11 @@ from __future__ import annotations
 
 ROLES = {1: "GK", 2: "RB", 3: "LB", 4: "RCB", 5: "LCB", 6: "DM", 7: "RCM", 8: "LCM", 9: "ST", 10: "RW", 11: "LW"}
 BACK_FOUR = ("RB", "RCB", "LCB", "LB")
+# Public playing positions shown with every event (standard broadcast abbreviations).
+# Both sides line up 4-3-3; Vale's left-sided eight plays as an attacking midfielder.
+POSITIONS = {"GK": "GK", "RB": "RB", "LB": "LB", "RCB": "CB", "LCB": "CB", "DM": "CDM", "RCM": "CM", "LCM": "CM",
+             "ST": "ST", "RW": "RW", "LW": "LW"}
+POSITION_OVERRIDES = {"vale_08": "CAM"}
 FORWARDS = ("RW", "ST", "LW")
 MIDFIELD = ("RCM", "DM", "LCM")
 
@@ -30,6 +35,10 @@ def number(player_id: str) -> int:
 
 def role(player_id: str) -> str:
     return ROLES[number(player_id)]
+
+
+def position(player_id: str) -> str:
+    return POSITION_OVERRIDES.get(player_id, POSITIONS[role(player_id)])
 
 
 def foot(player_id: str) -> str:
@@ -54,6 +63,11 @@ _TENDENCIES = {
         "short_build_up": .85, "pass_speed_mps": 18.0,
         "corner": {"accuracy": {"harbor_07": 1.4, "harbor_11": 2.0}, "speed_mps": {"harbor_07": 24.0, "harbor_11": 22.0},
                    "onset_ms": {"harbor_04": -450, "harbor_09": 250, "harbor_05": -100}},
+        # Continuous movement: back-four depth (units from own goal) with the ball at halfway,
+        # each player's speed in the 5 s after the ball changes hands, their usual speed when
+        # repositioning off the ball, and late-match fades (start time, share of pace lost).
+        "movement": {"line_base": 37.0, "transition_mps": {"harbor_02": 7.4, "harbor_10": 7.0, "harbor_09": 6.0},
+                     "cruise_mps": {"harbor_02": 4.2}, "fade": {}},
     },
     "vale": {
         "trap_rate": .7, "step_lag_ms": {"vale_03": 440}, "follow_runner": .8, "follow_lag_ms": {"vale_04": 650},
@@ -64,6 +78,8 @@ _TENDENCIES = {
         "short_build_up": .15, "pass_speed_mps": 15.0,
         "corner": {"accuracy": {"vale_08": 3.2}, "speed_mps": {"vale_08": 18.5},
                    "onset_ms": {"vale_04": -150, "vale_09": 400, "vale_05": 0}},
+        "movement": {"line_base": 25.0, "transition_mps": {"vale_11": 3.4, "vale_03": 6.2},
+                     "cruise_mps": {"vale_11": 2.4}, "fade": {"vale_08": (3_000_000, .65)}},
     },
 }
 

@@ -3,12 +3,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .chances import shot_quality
 from .ingest import IngestionError, canonical_order, validate_state_sequence
 from .models import Baseline, Coverage, EventEnvelope, EvidenceFact, Match, MetricSnapshot, PERIOD_MS, PlayerStats, TeamMetrics, WINDOW_MS, Window
 
 DEFINITIONS = {
     "shots": "SHOT event count; a goal is one shot and is never counted twice.",
-    "on_target": "SHOT outcomes goal or saved.",
+    "on_target": "Shots on target: SHOT outcomes goal or saved.",
+    "duels": "Ground and aerial duels the team contested: every TACKLE event, whichever side made it.",
+    "duels_won": "Duels the team won: its successful challenges plus the opponent's unsuccessful ones (the player in possession kept the ball).",
+    "field_tilt": "The team's share of both teams' final-third passes (attempted passes into or within the attacking final third). Unavailable when neither team made one.",
+    "final_third_passes": "Attempted passes that start or end in the attacking final third (x ≥ 66.67).",
+    "xg": "Sum of the heuristic xG of the team's shots (see the chance-quality definitions).",
     "pass_accuracy": "Completed passes divided by attempted passes × 100; unavailable when no passes were attempted.",
     "final_third_entries": "Completed PASS or CARRY crossing x < 66.67 to x ≥ 66.67, once per event.",
     "box_entries": "Completed PASS or CARRY moving from outside to inside x ≥ 83 and 20 ≤ y ≤ 80, once per event.",
@@ -23,6 +29,11 @@ DEFINITIONS = {
 
 def in_box(point) -> bool:
     return point.x >= 83 and 20 <= point.y <= 80
+
+
+def final_third_pass(event) -> bool:
+    """An attempted pass into or within the attacking final third."""
+    return event.kind == "PASS" and max(event.detail.start.x, event.detail.end.x) >= 66.67
 
 
 def crossing(e: EventEnvelope, metric: str) -> bool:
@@ -123,8 +134,14 @@ def calculate_window(records: dict[str, EventEnvelope], team_ids: list[str], per
                         eligible=eligible, known_in_play_ms=known, owned_in_play_ms=owned,
                         stoppage_ms=stoppage, unknown_state_ms=unknown, state_valid=state_valid)
     result = {}
+    quality = shot_quality(records, all_events)
+    third = {team: [r for r in events if r.payload.team_id == team and final_third_pass(r.payload)]
+             for team in team_ids}
+    tilt_total = sum(len(v) for v in third.values())
     for team in team_ids:
         selected = [r for r in events if r.payload.team_id == team]
+        tackles = [r for r in events if r.payload.kind == "TACKLE"]
+        won = [r for r in tackles if (r.payload.team_id == team) == r.payload.detail.successful]
         shots = [r for r in selected if r.payload.kind == "SHOT"]
         passes = [r for r in selected if r.payload.kind == "PASS"]
         completed = [r for r in passes if r.payload.detail.completed]
@@ -136,10 +153,17 @@ def calculate_window(records: dict[str, EventEnvelope], team_ids: list[str], per
                              ("completed_passes", completed), ("final_third_entries", entries), ("box_entries", boxes), ("goals", goals)):
             sources[(team, metric)] = [r.ref for r in refs]
         sources[(team, "pass_accuracy")] = [r.ref for r in passes]
+        sources[(team, "duels")] = [r.ref for r in tackles]
+        sources[(team, "duels_won")] = [r.ref for r in won]
+        sources[(team, "final_third_passes")] = [r.ref for r in third[team]]
+        sources[(team, "field_tilt")] = [r.ref for rows in third.values() for r in rows]
+        sources[(team, "xg")] = [r.ref for r in shots]
         result[team] = TeamMetrics(shots=len(shots), on_target=len(on_target), completed_passes=len(completed),
             attempted_passes=len(passes), pass_accuracy=100 * len(completed) / len(passes) if passes else None,
             final_third_entries=len(entries), box_entries=len(boxes), possession_share=100 * owned[team] / known if known else None,
-            goals=len(goals))
+            goals=len(goals), duels=len(tackles), duels_won=len(won), final_third_passes=len(third[team]),
+            field_tilt=100 * len(third[team]) / tilt_total if tilt_total else None,
+            xg=round(sum(quality[r.event_id].xg for r in shots if r.event_id in quality), 2))
     sources[("match", "live_turnovers")] = list(dict.fromkeys(turnovers))
     evidence.update(turnovers)
     sources = {k: list(dict.fromkeys(v)) for k, v in sources.items()}
@@ -175,7 +199,7 @@ def facts_for_snapshot(match: Match, records: dict[str, EventEnvelope], snap: Me
         if metric == "possession_share":
             refs = result.sources.get(("match", "possession_duration"), [])
         facts.append(EvidenceFact(fact_id=f"f_{snap.snapshot_id}_{team}_{metric}", metric=metric,
-            subject_id=team, numeric_value=value, unit="percent" if metric in ("possession_share", "pass_accuracy") else "count",
+            subject_id=team, numeric_value=value, unit="percent" if metric in ("possession_share", "pass_accuracy", "field_tilt") else "count",
             window=snap.window, source_event_refs=refs))
     return facts
 
@@ -191,7 +215,8 @@ def score(match: Match, records: dict[str, EventEnvelope], cutoff_ms: int | None
 
 def player_statistics(match: Match, records: dict[str, EventEnvelope], cutoff_ms: int | None = None) -> dict[str, PlayerStats]:
     result = {p.player_id: PlayerStats(player_id=p.player_id, team_id=p.team_id, involvement=0, touches=0,
-        passes_attempted=0, passes_completed=0, passes_received=0, carries=0, shots=0, on_target=0, goals=0, tackles=0, event_refs=[]) for p in match.roster}
+        passes_attempted=0, passes_completed=0, passes_received=0, carries=0, shots=0, on_target=0, goals=0, tackles=0,
+        duels=0, duels_won=0, event_refs=[]) for p in match.roster}
     for record in canonical_order(records):
         e = record.payload
         if cutoff_ms is not None and e.event_time_ms > cutoff_ms:
@@ -218,5 +243,7 @@ def player_statistics(match: Match, records: dict[str, EventEnvelope], cutoff_ms
             elif e.kind == "CARRY":
                 actor.carries += 1
             elif e.kind == "TACKLE":
-                actor.tackles += 1
+                actor.tackles += int(e.detail.contest == "ground")
+                actor.duels += 1
+                actor.duels_won += int(e.detail.successful)
     return result

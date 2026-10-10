@@ -328,11 +328,13 @@
      "recipient_id": "harbor_06",
      "completed": true,
      "length_m": 17.9,
-     "angle_deg": -175.2,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.249,
+     "shot_ref": "evt_00027@1"
     },
     {
      "event_ref": "evt_00034@1",
@@ -341,11 +343,13 @@
      "recipient_id": "harbor_09",
      "completed": true,
      "length_m": 21.6,
-     "angle_deg": -9.4,
      "speed_mps": 21.6,
      "through_ball": true,
      "recipient_ran": false,
-     "led_to_chance": false
+     "led_to_chance": false,
+     "chance": null,
+     "xg": null,
+     "shot_ref": null
     },
     {
      "event_ref": "evt_00038@1",
@@ -354,11 +358,13 @@
      "recipient_id": "harbor_10",
      "completed": true,
      "length_m": 20.8,
-     "angle_deg": 34.7,
      "speed_mps": 14.8,
      "through_ball": true,
      "recipient_ran": true,
-     "led_to_chance": false
+     "led_to_chance": false,
+     "chance": null,
+     "xg": null,
+     "shot_ref": null
     },
     {
      "event_ref": "evt_00039@1",
@@ -367,11 +373,13 @@
      "recipient_id": "harbor_07",
      "completed": true,
      "length_m": 14.0,
-     "angle_deg": 167.7,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.212,
+     "shot_ref": "evt_00041@1"
     },
     {
      "event_ref": "evt_00047@1",
@@ -380,11 +388,13 @@
      "recipient_id": "harbor_07",
      "completed": true,
      "length_m": 30.8,
-     "angle_deg": 119.7,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.114,
+     "shot_ref": "evt_00049@1"
     },
     {
      "event_ref": "evt_00061@1",
@@ -393,11 +403,13 @@
      "recipient_id": "harbor_07",
      "completed": true,
      "length_m": 16.4,
-     "angle_deg": 155.3,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.069,
+     "shot_ref": "evt_00063@1"
     },
     {
      "event_ref": "evt_00069@1",
@@ -406,11 +418,13 @@
      "recipient_id": "harbor_06",
      "completed": true,
      "length_m": 20.6,
-     "angle_deg": -151.4,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.081,
+     "shot_ref": "evt_00071@1"
     },
     {
      "event_ref": "evt_00077@1",
@@ -419,11 +433,13 @@
      "recipient_id": "harbor_08",
      "completed": true,
      "length_m": 12.9,
-     "angle_deg": 172.2,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.126,
+     "shot_ref": "evt_00079@1"
     },
     {
      "event_ref": "evt_00105@1",
@@ -432,11 +448,13 @@
      "recipient_id": "harbor_10",
      "completed": true,
      "length_m": 53.0,
-     "angle_deg": 13.3,
      "speed_mps": 22.0,
      "through_ball": true,
      "recipient_ran": true,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "major",
+     "xg": 0.35,
+     "shot_ref": "evt_00106@1"
     }
    ],
    "build_up": {
@@ -820,11 +838,13 @@
      "recipient_id": "vale_06",
      "completed": true,
      "length_m": 36.9,
-     "angle_deg": -59.5,
      "speed_mps": null,
      "through_ball": null,
      "recipient_ran": null,
-     "led_to_chance": true
+     "led_to_chance": true,
+     "chance": "minor",
+     "xg": 0.054,
+     "shot_ref": "evt_00008@1"
     }
    ],
    "build_up": {
@@ -1038,7 +1058,7 @@
    "subject_team_id": "harbor",
    "for_team_id": "harbor",
    "headline": "Harbor Athletic's decisive passes travel at 19.5 m/s",
-   "detail": "Across 3 through balls and final passes, the mean angle was 19\u00b0 off straight and 3 went beyond the defensive line. Quickest: Leon Reed to Dario Finch at 22.0 m/s.",
+   "detail": "Across 3 through balls and final passes, 3 went beyond the defensive line and 1 major chance followed. Quickest: Leon Reed to Dario Finch at 22.0 m/s.",
    "player_ids": [
     "harbor_06",
     "harbor_10"
@@ -1951,7 +1971,9 @@
   "build_up": "A sequence from the goalkeeper's possession or receipt until the possession ends or 20 s. Lines broken counts opponent lines (forwards, midfield, back four mean x) a completed pass crosses.",
   "attack_initiator": "In a possession that reaches the final third or a chance, the first player to complete a pass or carry gaining \u226512 units or entering the final third.",
   "chance": "A shot or a completed entry into the box. Time to chance is measured from the start of the possession.",
-  "pass_angle": "Direction of a pass relative to straight at goal: 0\u00b0 is straight forward, positive toward the passer's right.",
+  "decisive_chance": "The chance a decisive pass led to: major or minor by the xG of the first shot later in that possession; a box entry with no shot is minor without xG.",
+  "xg": "Expected goals: a heuristic probability (0\u20131) that a shot is scored, from distance to goal, the angle the goal mouth subtends, how the shot was set up and the body part. Coefficients are illustrative, not fitted to data.",
+  "chance_type": "Major when the shot's xG is at least 0.30 (a chance a player would usually be expected to score), minor below that or when the box was entered without a shot.",
   "pass_speed": "Mean ball speed between leaving the passer and arriving, from 5 Hz synthetic ball positions.",
   "corner_swing": "Measured from the ball's curve: bending toward the goal line is an inswinger. Expected swing follows the kicking foot and corner side.",
   "corner_accuracy": "Distance from where the delivery arrives to the nearest attacker at that moment.",
