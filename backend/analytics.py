@@ -112,6 +112,7 @@ class AnalyticsReport(AdvancedMetrics):
         self._touches = self.collect_touches()
         self._interceptions = self.interceptions()
         self._possessions = self.possessions()
+        self._regains = self.regains()
 
     def other(self, team: str) -> str:
         return self.teams[1] if team == self.teams[0] else self.teams[0]
@@ -157,7 +158,9 @@ class AnalyticsReport(AdvancedMetrics):
             xg = round(sum(s.xg for s in own), 2)
             result[team] = TeamChances(team_id=team, shots=len(own), on_target=sum(s.outcome in ("goal", "saved") for s in own),
                 goals=sum(s.outcome == "goal" for s in own), xg=xg, xg_against=round(sum(s.xg for s in against), 2),
-                major_chances=sum(s.chance == "major" for s in own), xg_per_shot=round(xg / len(own), 3) if own else None)
+                major_chances=sum(s.chance == "major" for s in own), xg_per_shot=round(xg / len(own), 3) if own else None,
+                goals_against=sum(s.outcome == "goal" for s in against),
+                goals_minus_xg_against=round(sum(s.outcome == "goal" for s in against) - sum(s.xg for s in against), 2))
         return result, shots
 
     # ------------------------------------------------------- defensive line
@@ -319,7 +322,8 @@ class AnalyticsReport(AdvancedMetrics):
     def build(self) -> dict:
         chances, shots = self.chances()
         team_value, player_value, top_actions, actions, top_vaep = self.possession_value()
-        creation, player_creation = self.creation(shots, self.quality)
+        creating = self.creating_actions()
+        creation, player_creation = self.creation(shots, self.quality, creating)
         packing, player_packing, top_packing = self.packing()
         limitations = list(LIMITATIONS)
         if self.movement:
@@ -336,4 +340,5 @@ class AnalyticsReport(AdvancedMetrics):
                 "game_state": self.game_state(shots, actions), "heatmaps": self.heatmaps(), "goalkeeping": self.goalkeeping(shots),
                 "tempo": self.tempo(), "pressing": self.pressing(), "creation": creation, "player_creation": player_creation,
                 "packing": packing, "player_packing": player_packing, "top_packing": top_packing,
+                "creating_actions": creating, "pass_networks": self.pass_networks(), "defensive_actions": self.defensive_actions(),
                 "definitions": DEFINITIONS, "limitations": limitations}

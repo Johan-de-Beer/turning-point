@@ -836,6 +836,9 @@ class TeamChances(StrictModel):
     xg_against: float
     major_chances: int
     xg_per_shot: float | None
+    goals_against: int
+    # Goals conceded minus xG conceded: negative means fewer goals let in than the chances allowed.
+    goals_minus_xg_against: float
 
 
 class LineFigures(StrictModel):
@@ -1046,6 +1049,9 @@ class PlayerCreation(StrictModel):
     xa: float
     shots: int
     xg: float
+    progressive_passes: int
+    sca: int
+    gca: int
 
 
 class TeamCreation(StrictModel):
@@ -1061,6 +1067,60 @@ class TeamCreation(StrictModel):
     key_pass_types: dict[str, int]
     key_pass_origins: dict[str, int]
     xg_per_box_touch: float | None
+    progressive_passes: int
+    sca: int
+    gca: int
+    sca_types: dict[str, int]
+    gca_types: dict[str, int]
+
+
+class CreatingAction(StrictModel):
+    """One of the (up to) two offensive actions directly before a shot: a shot- or goal-creating action."""
+    shot_ref: str
+    time_ms: int
+    team_id: str
+    player_id: str
+    kind: Literal["pass_live", "pass_dead", "take_on", "shot", "defensive"]
+    goal: bool
+
+
+class NetworkNode(StrictModel):
+    player_id: str
+    x: float
+    y: float
+    touches: int
+    passes: int
+    received: int
+
+
+class NetworkEdge(StrictModel):
+    a: str
+    b: str
+    passes: int     # completed passes between the two, both directions
+    a_to_b: int
+
+
+class PassNetwork(StrictModel):
+    team_id: str
+    completed_passes: int
+    nodes: list[NetworkNode]
+    edges: list[NetworkEdge]
+    width_m: float | None   # spread of the average positions across the pitch
+    depth_m: float | None   # and along it
+
+
+class DefensiveRow(StrictModel):
+    player_id: str
+    team_id: str
+    minutes: float
+    tackles_won: int
+    tackles_lost: int
+    aerials_won: int
+    interceptions: int
+    recoveries: int
+    total: int
+    per90: float | None
+    by_third: dict[str, int]
 
 
 class PackingAction(StrictModel):
@@ -1126,5 +1186,8 @@ class MatchAnalytics(StrictModel):
     packing: dict[str, TeamPacking]
     player_packing: list[PlayerPacking]
     top_packing: list[PackingAction]
+    creating_actions: list[CreatingAction]
+    pass_networks: dict[str, PassNetwork]
+    defensive_actions: list[DefensiveRow]
     definitions: dict[str, str]
     limitations: list[str]

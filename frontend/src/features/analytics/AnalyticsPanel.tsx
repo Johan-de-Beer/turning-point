@@ -4,18 +4,18 @@ import type { Match, Session } from '../../lib/contracts';
 import { matchClock } from '../../lib/format';
 import { positionLabel } from '../../lib/events';
 import {
-  actionLabel, assistLabel, blockLabel, bodyPartLabel, chanceText, heatmapLabel, heatmapZones, keyPassLabel, km, kmh, num1, num2, pct, pvText,
+  actionLabel, assistLabel, blockLabel, bodyPartLabel, chanceText, creatingLabel, heatmapLabel, heatmapZones, keyPassLabel, km, kmh, num1, num2, pct, pvText,
   scoreline, signed2, stateLabel, stateSummary, teamWorkload, tiltSummary, xgText,
-  type Analytics, type AnalyticsView, type DefensiveLine, type Heatmap,
+  type Analytics, type AnalyticsView, type DefensiveLine, type Heatmap, type PassNetwork,
 } from '../../lib/analytics';
 import { metres } from '../../lib/tactics';
 import { useLiveReport } from '../../lib/useLiveReport';
 import { Stats, Table } from '../tactics/TacticsPanel';
 
 const views: { id: AnalyticsView; label: string }[] = [
-  { id: 'territory', label: 'Field tilt' }, { id: 'state', label: 'Game state' }, { id: 'heatmap', label: 'Heatmaps' },
+  { id: 'territory', label: 'Field tilt' }, { id: 'state', label: 'Game state' }, { id: 'heatmap', label: 'Heatmaps' }, { id: 'network', label: 'Pass network' },
   { id: 'chances', label: 'Chances (xG)' }, { id: 'keepers', label: 'Goalkeeping (xGoT)' }, { id: 'creation', label: 'Chance creation' },
-  { id: 'tempo', label: 'Tempo & press' }, { id: 'packing', label: 'Packing' }, { id: 'line', label: 'Defensive line' },
+  { id: 'tempo', label: 'Tempo & press' }, { id: 'packing', label: 'Packing' }, { id: 'defending', label: 'Defensive actions' }, { id: 'line', label: 'Defensive line' },
   { id: 'workload', label: 'Workload' }, { id: 'value', label: 'Value (xOVA, VAEP)' },
 ];
 
@@ -52,11 +52,13 @@ export function AnalyticsPanel({ state, match, getAnalytics }: Props) {
         {view === 'territory' && <Territory {...section} />}
         {view === 'state' && <GameStateView {...section} />}
         {view === 'heatmap' && <HeatmapView {...section} />}
+        {view === 'network' && <Network {...section} />}
         {view === 'chances' && <Chances {...section} />}
         {view === 'keepers' && <Goalkeeping {...section} />}
         {view === 'creation' && <Creation {...section} />}
         {view === 'tempo' && <Tempo {...section} />}
         {view === 'packing' && <Packing {...section} />}
+        {view === 'defending' && <Defending {...section} />}
         {view === 'line' && <Line {...section} />}
         {view === 'workload' && <WorkloadView {...section} />}
         {view === 'value' && <Value {...section} />}
@@ -257,6 +259,18 @@ function Goalkeeping({ report, team, opponent, name }: Section) {
         rows={faced.map((item) => [matchClock(item.time_ms), name(item.player_id), item.outcome, xgText(item.xg), xgText(item.xgot),
           item.placement ? `${Math.abs(item.placement.y_m).toFixed(1)} m ${item.placement.y_m >= 0 ? 'right' : 'left'} of centre` : '—', item.placement ? metres(item.placement.z_m) : '—', item.placement ? kmh(item.placement.speed_mps) : '—'])} />}
     </section>
+    <section><h3>xG conceded against goals conceded</h3>
+      {(() => {
+        const row = report.chances[team.team_id];
+        if (!row) return null;
+        const gap = row.goals_minus_xg_against;
+        const text = Math.abs(gap) < .3 ? 'about as many goals as the chances they allowed' : gap < 0 ? `${Math.abs(gap).toFixed(2)} fewer goals than the chances they allowed: good goalkeeping, last-ditch defending or poor finishing, which may not last` : `${gap.toFixed(2)} more goals than the chances they allowed: errors, poor goalkeeping or bad luck`;
+        return <>
+          <p className="tactics-compare">{team.display_name} have let in {text}.</p>
+          <Stats items={[['xG conceded', xgText(row.xg_against)], ['Goals conceded', row.goals_against], ['Goals − xG conceded', signed2(gap)], ['Shots faced', report.chances[opponent.team_id]?.shots ?? 0]]} />
+        </>;
+      })()}
+    </section>
     <section><h3>{team.display_name} shooting</h3>
       <Stats items={[['Shots on target', shooting.shots_on_target], ['xG of those shots', num2(shooting.xg_on_target)], ['xGoT', num2(shooting.xgot)], ['Placement added (xGoT − xG)', signed2(shooting.placement_added)]]} />
     </section>
@@ -269,12 +283,15 @@ function Creation({ report, team, name }: Section) {
   if (!row) return null;
   const types = Object.entries(row.key_pass_types).map(([key, value]) => `${keyPassLabel[key] ?? key} ${value}`).join(', ') || '—';
   return <section><h3>Chance creation</h3>
-    <p className="tactics-compare">Touches in the box show how often {team.display_name} get the ball where most chances come from; key passes and xA credit the players who set the shots up, scored or not.</p>
+    <p className="tactics-compare">Touches in the box show how often {team.display_name} get the ball where most chances come from. Key passes and xA credit the players who set shots up, scored or not; SCA and GCA also credit the action before that (the pre-assist, a take-on or the regain).</p>
     <Stats items={[['Touches in the box', row.box_touches], ['Box entries', row.box_entries], ['Zone 14 touches', row.zone14_touches], ['Zone 14 entries', row.zone14_entries],
       ['Key passes', `${row.key_passes} (${row.first_time_key_passes} first time)`], ['Assists', row.assists], ['xA', xgText(row.xa)], ['xG per box touch', num2(row.xg_per_box_touch)],
-      ['Key passes from wide / central', `${row.key_pass_origins.wide ?? 0} / ${row.key_pass_origins.central ?? 0}`], ['Key-pass types', types]]} />
-    <Table caption="Creators and box presence" head={['Player', 'Key passes', 'xA', 'Assists', 'Box touches', 'Zone 14 touches', 'Shots', 'xG']}
-      rows={players.map((item) => [name(item.player_id), item.key_passes, xgText(item.xa), item.assists, item.box_touches, item.zone14_touches, item.shots, xgText(item.xg)])} />
+      ['Key passes from wide / central', `${row.key_pass_origins.wide ?? 0} / ${row.key_pass_origins.central ?? 0}`], ['Key-pass types', types],
+      ['Shot-creating actions (SCA)', row.sca], ['Goal-creating actions (GCA)', row.gca], ['Progressive passes', row.progressive_passes]]} />
+    <Table caption="Shot- and goal-creating actions by type: the two actions before each shot" head={['Type', 'SCA', 'GCA']}
+      rows={Object.keys(row.sca_types).map((key) => [creatingLabel[key] ?? key, row.sca_types[key], row.gca_types[key] ?? 0])} />
+    <Table caption="Creators, highest SCA first" head={['Player', 'SCA', 'GCA', 'Key passes', 'xA', 'Assists', 'Assists − xA', 'Progressive passes', 'Box touches', 'Zone 14', 'Shots', 'xG']}
+      rows={players.map((item) => [name(item.player_id), item.sca, item.gca, item.key_passes, xgText(item.xa), item.assists, signed2(item.assists - item.xa), item.progressive_passes, item.box_touches, item.zone14_touches, item.shots, xgText(item.xg)])} />
   </section>;
 }
 
@@ -316,5 +333,48 @@ function Packing({ report, team, name }: Section) {
       rows={players.map((item) => [name(item.player_id), num2(item.passing_rate), item.passes, item.packed_by_passes, num2(item.dribbling_rate), item.carries, item.packed_by_carries, item.defenders_packed])} />
     {top.length > 0 && <Table caption="Actions that bypassed the most opponents" head={['Time', 'Player', 'Action', 'Opponents', 'Defenders']}
       rows={top.map((item) => [matchClock(item.time_ms), name(item.player_id), item.action === 'pass' ? 'Pass' : 'Carry', item.packed, item.defenders_packed])} />}
+  </section>;
+}
+
+/** Players at their average on-ball spot, linked by completed passes; line width follows the pass count. */
+function Network({ report, team, name }: Section) {
+  const net: PassNetwork | undefined = report.pass_networks[team.team_id];
+  if (!net) return null;
+  const spot = Object.fromEntries(net.nodes.map((n) => [n.player_id, n]));
+  const most = Math.max(1, ...net.edges.map((e) => e.passes));
+  const busiest = Math.max(1, ...net.nodes.map((n) => n.passes + n.received));
+  const number = (id: string) => String(Number(id.split('_').pop()));
+  const connectors = [...net.nodes].sort((a, b) => (b.passes + b.received) - (a.passes + a.received)).slice(0, 3);
+  return <section><h3>Pass network</h3>
+    <p className="tactics-compare">Each {team.short_name} player sits at the average spot of their passes and receptions (attacking left to right). Thicker lines mean more completed passes between the two, and bigger dots mean more involvement. It shows shape and connections, not pass quality or off-ball runs.</p>
+    {net.nodes.length ? <svg className="heatmap-pitch" viewBox="-2 -2 109 72" role="img" aria-label={`Pass network for ${team.display_name}, attacking left to right`}>
+      <rect x="0" y="0" width="105" height="68" className="heatmap-surface" />
+      <g className="heatmap-lines" fill="none">
+        <rect x="0" y="0" width="105" height="68" /><path d="M52.5 0V68" /><circle cx="52.5" cy="34" r="9.15" />
+        <rect x="0" y="13.84" width="16.5" height="40.32" /><rect x="88.5" y="13.84" width="16.5" height="40.32" />
+      </g>
+      {net.edges.map((e) => <line key={`${e.a}-${e.b}`} x1={spot[e.a].x * 1.05} y1={spot[e.a].y * .68} x2={spot[e.b].x * 1.05} y2={spot[e.b].y * .68}
+        stroke={team.color} strokeOpacity={.25 + .6 * e.passes / most} strokeWidth={.3 + 1.6 * e.passes / most} strokeLinecap="round"><title>{`${name(e.a)} – ${name(e.b)}: ${e.passes} passes`}</title></line>)}
+      {net.nodes.map((n) => <g key={n.player_id}>
+        <circle cx={n.x * 1.05} cy={n.y * .68} r={1.6 + 2 * (n.passes + n.received) / busiest} fill={team.color} stroke="var(--bg)" strokeWidth=".5"><title>{`${name(n.player_id)}: ${n.passes} passes, ${n.received} received`}</title></circle>
+        <text x={n.x * 1.05} y={n.y * .68 + .9} textAnchor="middle" className="network-label">{number(n.player_id)}</text>
+      </g>)}
+    </svg> : <p className="tactics-empty">No completed passes yet.</p>}
+    <Stats items={[['Completed passes', net.completed_passes], ['Shape width', metres(net.width_m)], ['Shape depth', metres(net.depth_m)], ['Main connectors', connectors.map((n) => name(n.player_id)).join(', ') || '—']]} />
+    <Table caption="Strongest connections" head={['Pair', 'Passes', 'Direction']}
+      rows={net.edges.slice(0, 8).map((e) => [`${name(e.a)} – ${name(e.b)}`, e.passes, `${e.a_to_b} → · ${e.passes - e.a_to_b} ←`])} />
+  </section>;
+}
+
+function Defending({ report, team, name }: Section) {
+  const rows = report.defensive_actions.filter((row) => row.team_id === team.team_id);
+  const total = rows.reduce((sum, row) => sum + row.total, 0);
+  const thirds = ['defensive', 'middle', 'final'].map((key) => rows.reduce((sum, row) => sum + (row.by_third[key] ?? 0), 0));
+  const minutes = rows[0]?.minutes ?? 0;
+  return <section><h3>Defensive actions</h3>
+    <p className="tactics-compare">How often {team.display_name} players step in without the ball. More is not automatically better: a deep block makes more last-ditch actions, a possession side fewer. Read it with the game state and the block height.</p>
+    <Stats items={[['Team defensive actions', total], ['Per 90', minutes >= 10 ? (total / minutes * 90).toFixed(1) : '—'], ['In own / middle / final third', thirds.join(' / ')]]} />
+    <Table caption="Players, most defensive actions first" head={['Player', 'Total', 'Per 90', 'Tackles won', 'Tackles lost', 'Aerials won', 'Interceptions', 'Recoveries']}
+      rows={rows.filter((row) => row.total).map((row) => [name(row.player_id), row.total, num1(row.per90), row.tackles_won, row.tackles_lost, row.aerials_won, row.interceptions, row.recoveries])} />
   </section>;
 }

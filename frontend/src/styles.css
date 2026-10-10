@@ -707,3 +707,4 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .heatmap-pitch { display: block; width: 100%; max-width: 640px; margin: var(--space-3) 0; }
 .heatmap-surface { fill: var(--surface-2); }
 .heatmap-lines { stroke: var(--text-3); stroke-opacity: .55; stroke-width: .35; }
+.network-label { fill: var(--ink); font: 700 2.4px var(--font); pointer-events: none; }

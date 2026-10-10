@@ -169,3 +169,58 @@ def test_advanced_metrics_use_only_the_observed_prefix(engine, fixture):
 def test_advanced_metrics_never_read_the_generator_tendencies():
     source = inspect.getsource(advanced_module)
     assert "tendencies(" not in source and "_TENDENCIES" not in source and "generate_plans" not in source
+
+
+def test_shot_and_goal_creating_actions(full):
+    actions = full["creating_actions"]
+    shots = {s.event_ref: s for s in full["shots"]}
+    per_shot = {}
+    for a in actions:
+        shot = shots[a.shot_ref]
+        assert a.team_id == shot.team_id and a.goal == (shot.outcome == "goal")
+        assert full["player_creation"] and next(p for p in full["player_creation"] if p.player_id == a.player_id).team_id == a.team_id
+        per_shot[a.shot_ref] = per_shot.get(a.shot_ref, 0) + 1
+    assert per_shot and max(per_shot.values()) <= 2
+    kinds = {a.kind for a in actions}
+    assert {"pass_live", "take_on", "defensive"} <= kinds
+    for team, row in full["creation"].items():
+        own = [a for a in actions if a.team_id == team]
+        assert row.sca == len(own) == sum(row.sca_types.values())
+        assert row.gca == sum(a.goal for a in own) == sum(row.gca_types.values())
+    assert sum(r.gca for r in full["creation"].values()) > 0
+
+
+def test_pass_networks(full):
+    for team, net in full["pass_networks"].items():
+        ids = {n.player_id for n in net.nodes}
+        assert all(n.player_id.startswith(team) and 0 <= n.x <= 100 and 0 <= n.y <= 100 for n in net.nodes)
+        assert sum(n.passes for n in net.nodes) == net.completed_passes == sum(n.received for n in net.nodes)
+        for edge in net.edges:
+            assert {edge.a, edge.b} <= ids and edge.passes >= 2 and edge.a_to_b <= edge.passes
+        assert sum(e.passes for e in net.edges) <= net.completed_passes
+        keeper = next(n for n in net.nodes if n.player_id.endswith("_01"))
+        assert keeper.x < min(n.x for n in net.nodes if n is not keeper)
+    # Harbor build short (planted): their midfield three link far more often than Vale's.
+    best = {team: net.edges[0].passes for team, net in full["pass_networks"].items()}
+    assert best["harbor"] > best["vale"]
+
+
+def test_defensive_actions_and_goals_against(full, fixture):
+    rows = full["defensive_actions"]
+    for r in rows:
+        assert r.total == r.tackles_won + r.tackles_lost + r.aerials_won + r.interceptions + r.recoveries == sum(r.by_third.values())
+        assert r.per90 == pytest.approx(r.total, abs=.06)       # a full match observed
+    _, events = fixture
+    ground_won = sum(1 for e in events if e.payload.kind == "TACKLE" and e.payload.detail.contest == "ground" and e.payload.detail.successful)
+    assert sum(r.tackles_won for r in rows) == ground_won
+    for row in full["chances"].values():
+        assert row.goals_minus_xg_against == pytest.approx(row.goals_against - row.xg_against, abs=.011)
+
+
+def test_progressive_pass_definition():
+    from types import SimpleNamespace as P
+    from backend.advanced import progressive
+    assert progressive(P(x=40, y=50), P(x=50, y=50))          # 10.5 m from outside the final third
+    assert not progressive(P(x=40, y=50), P(x=48, y=50))
+    assert progressive(P(x=70, y=50), P(x=75, y=50))          # 5.25 m inside the final third
+    assert not progressive(P(x=60, y=10), P(x=59, y=50))      # closer to goal but not forward

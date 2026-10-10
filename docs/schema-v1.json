@@ -6065,6 +6065,53 @@
   },
   "MatchAnalytics": {
     "$defs": {
+      "CreatingAction": {
+        "additionalProperties": false,
+        "description": "One of the (up to) two offensive actions directly before a shot: a shot- or goal-creating action.",
+        "properties": {
+          "shot_ref": {
+            "title": "Shot Ref",
+            "type": "string"
+          },
+          "time_ms": {
+            "title": "Time Ms",
+            "type": "integer"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "pass_live",
+              "pass_dead",
+              "take_on",
+              "shot",
+              "defensive"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "goal": {
+            "title": "Goal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "shot_ref",
+          "time_ms",
+          "team_id",
+          "player_id",
+          "kind",
+          "goal"
+        ],
+        "title": "CreatingAction",
+        "type": "object"
+      },
       "DefensiveLine": {
         "additionalProperties": false,
         "properties": {
@@ -6121,6 +6168,80 @@
           "intervals"
         ],
         "title": "DefensiveLine",
+        "type": "object"
+      },
+      "DefensiveRow": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "number"
+          },
+          "tackles_won": {
+            "title": "Tackles Won",
+            "type": "integer"
+          },
+          "tackles_lost": {
+            "title": "Tackles Lost",
+            "type": "integer"
+          },
+          "aerials_won": {
+            "title": "Aerials Won",
+            "type": "integer"
+          },
+          "interceptions": {
+            "title": "Interceptions",
+            "type": "integer"
+          },
+          "recoveries": {
+            "title": "Recoveries",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "per90": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Per90"
+          },
+          "by_third": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Third",
+            "type": "object"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "minutes",
+          "tackles_won",
+          "tackles_lost",
+          "aerials_won",
+          "interceptions",
+          "recoveries",
+          "total",
+          "per90",
+          "by_third"
+        ],
+        "title": "DefensiveRow",
         "type": "object"
       },
       "GameState": {
@@ -6589,6 +6710,74 @@
         "title": "LineInterval",
         "type": "object"
       },
+      "NetworkEdge": {
+        "additionalProperties": false,
+        "properties": {
+          "a": {
+            "title": "A",
+            "type": "string"
+          },
+          "b": {
+            "title": "B",
+            "type": "string"
+          },
+          "passes": {
+            "title": "Passes",
+            "type": "integer"
+          },
+          "a_to_b": {
+            "title": "A To B",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "a",
+          "b",
+          "passes",
+          "a_to_b"
+        ],
+        "title": "NetworkEdge",
+        "type": "object"
+      },
+      "NetworkNode": {
+        "additionalProperties": false,
+        "properties": {
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "touches": {
+            "title": "Touches",
+            "type": "integer"
+          },
+          "passes": {
+            "title": "Passes",
+            "type": "integer"
+          },
+          "received": {
+            "title": "Received",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "player_id",
+          "x",
+          "y",
+          "touches",
+          "passes",
+          "received"
+        ],
+        "title": "NetworkNode",
+        "type": "object"
+      },
       "PackingAction": {
         "additionalProperties": false,
         "properties": {
@@ -6645,6 +6834,65 @@
         "title": "PackingAction",
         "type": "object"
       },
+      "PassNetwork": {
+        "additionalProperties": false,
+        "properties": {
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "completed_passes": {
+            "title": "Completed Passes",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/$defs/NetworkNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/$defs/NetworkEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "width_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width M"
+          },
+          "depth_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Depth M"
+          }
+        },
+        "required": [
+          "team_id",
+          "completed_passes",
+          "nodes",
+          "edges",
+          "width_m",
+          "depth_m"
+        ],
+        "title": "PassNetwork",
+        "type": "object"
+      },
       "PlayerCreation": {
         "additionalProperties": false,
         "properties": {
@@ -6683,6 +6931,18 @@
           "xg": {
             "title": "Xg",
             "type": "number"
+          },
+          "progressive_passes": {
+            "title": "Progressive Passes",
+            "type": "integer"
+          },
+          "sca": {
+            "title": "Sca",
+            "type": "integer"
+          },
+          "gca": {
+            "title": "Gca",
+            "type": "integer"
           }
         },
         "required": [
@@ -6694,7 +6954,10 @@
           "assists",
           "xa",
           "shots",
-          "xg"
+          "xg",
+          "progressive_passes",
+          "sca",
+          "gca"
         ],
         "title": "PlayerCreation",
         "type": "object"
@@ -7226,6 +7489,14 @@
               }
             ],
             "title": "Xg Per Shot"
+          },
+          "goals_against": {
+            "title": "Goals Against",
+            "type": "integer"
+          },
+          "goals_minus_xg_against": {
+            "title": "Goals Minus Xg Against",
+            "type": "number"
           }
         },
         "required": [
@@ -7236,7 +7507,9 @@
           "xg",
           "xg_against",
           "major_chances",
-          "xg_per_shot"
+          "xg_per_shot",
+          "goals_against",
+          "goals_minus_xg_against"
         ],
         "title": "TeamChances",
         "type": "object"
@@ -7304,6 +7577,32 @@
               }
             ],
             "title": "Xg Per Box Touch"
+          },
+          "progressive_passes": {
+            "title": "Progressive Passes",
+            "type": "integer"
+          },
+          "sca": {
+            "title": "Sca",
+            "type": "integer"
+          },
+          "gca": {
+            "title": "Gca",
+            "type": "integer"
+          },
+          "sca_types": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Sca Types",
+            "type": "object"
+          },
+          "gca_types": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Gca Types",
+            "type": "object"
           }
         },
         "required": [
@@ -7318,7 +7617,12 @@
           "xa",
           "key_pass_types",
           "key_pass_origins",
-          "xg_per_box_touch"
+          "xg_per_box_touch",
+          "progressive_passes",
+          "sca",
+          "gca",
+          "sca_types",
+          "gca_types"
         ],
         "title": "TeamCreation",
         "type": "object"
@@ -8024,6 +8328,27 @@
         "title": "Top Packing",
         "type": "array"
       },
+      "creating_actions": {
+        "items": {
+          "$ref": "#/$defs/CreatingAction"
+        },
+        "title": "Creating Actions",
+        "type": "array"
+      },
+      "pass_networks": {
+        "additionalProperties": {
+          "$ref": "#/$defs/PassNetwork"
+        },
+        "title": "Pass Networks",
+        "type": "object"
+      },
+      "defensive_actions": {
+        "items": {
+          "$ref": "#/$defs/DefensiveRow"
+        },
+        "title": "Defensive Actions",
+        "type": "array"
+      },
       "definitions": {
         "additionalProperties": {
           "type": "string"
@@ -8064,6 +8389,9 @@
       "packing",
       "player_packing",
       "top_packing",
+      "creating_actions",
+      "pass_networks",
+      "defensive_actions",
       "definitions",
       "limitations"
     ],

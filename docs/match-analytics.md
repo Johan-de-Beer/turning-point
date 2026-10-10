@@ -94,7 +94,7 @@ with an intercept of −2.4, clipped to 0.02–0.97 (a central, soft shot from t
 - **Vertical progression:** net metres the ball moved toward goal per second of possession.
 - **Passes per final-third entry:** completed passes in a possession before it first reaches x ≥ 66.67 (counting the entering pass), for possessions starting outside it.
 - **Directness:** forward ÷ (lateral + backward) passes, where forward or backward means at least 5 m of depth.
-- **Possession length** by the third it started in; **progressive passes** (at least 30 m closer to goal within the own half, 15 m across halfway, 10 m in the opponent's half); **regain to progressive pass** (median seconds after an open-play regain). Also by 15 minutes, to show tempo changes.
+- **Possession length** by the third it started in; **progressive passes** (completed forward passes at least 10 m closer to the goal centre from outside the final third, 5 m from inside it); **regain to progressive pass** (median seconds after an open-play regain). Also by 15 minutes, to show tempo changes.
 - **PPDA:** the opponent's attempted passes in their own 60% of the pitch ÷ this team's duels and interceptions there.
 
 These recover planted behaviour: Harbor build short from the back (longer possessions from their own third) and press more (lower PPDA).
@@ -102,6 +102,18 @@ These recover planted behaviour: Harbor build short from the back (longer posses
 ## Chance creation
 
 **Touches in the box** (x ≥ 83, 20 ≤ y ≤ 80, receptions included), **box entries**, **Zone 14** touches and entries (66.67 ≤ x < 83, 33.3 ≤ y ≤ 66.7), **key passes** (the last completed pass to a teammate who then shoots; the receiver may carry first but no one else may touch it, and the pass must reach the final third unless the shot is first time), **first-time key passes** (the article's stricter count), **assists**, **xA** (xG of the shots a player's key passes set up), key-pass type (cross, cutback, through ball, pass, corner) and origin (wide or central), and xG per box touch. In the synthetic end-to-end spells the keepers' long balls go straight to a forward who carries and shoots, so the keepers show up as creators there.
+
+## Shot- and goal-creating actions (SCA, GCA)
+
+The two offensive actions directly before each shot, by the shooting team in the same possession: a live-ball pass, a dead-ball pass (the first pass after a restart, corners included), a take-on (a carry that beat a challenge, i.e. the defender lost the ground duel), an earlier shot whose rebound was shot again, or the tackle or interception that won the ball. GCA are the same for scored shots. Fouls drawn cannot be credited: the events record a foul stoppage but not who was fouled. The creator table also shows **assists − xA**, positive when a player's chances were finished better than their quality suggests.
+
+## Pass networks
+
+Each player sits at the average spot of their passes and receptions in the team's attacking direction; teammates who completed at least 2 passes between them (both directions together) are linked, line width following the count, dot size the player's passes plus receptions. Width and depth are the spread of the outfield players' spots. It shows shape and connections, not pass quality, pressure or off-ball runs.
+
+## Defensive actions per 90 and xG conceded
+
+Per player: tackles won and lost (challenges on the carrier), aerial duels won, interceptions and loose-ball recoveries, with the total per 90 once 10 minutes have been observed and the split by third. Clearances and blocks are not in the event data. **Goals − xG conceded** compares the goals a team let in with the xG of the shots it allowed (shown with goalkeeping): below zero means fewer goals than the chances allowed, which may not last.
 
 ## Packing
 

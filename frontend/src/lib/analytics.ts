@@ -12,7 +12,7 @@ const territoryWindow = z.strictObject({ start_ms: count, end_ms: count, final_t
 const gameStateName = z.enum(['winning', 'drawing', 'losing']);
 const placement = z.strictObject({ y_m: num.min(-3.66).max(3.66), z_m: num.min(0).max(2.44), speed_mps: num.min(0) });
 const shot = z.strictObject({ event_ref: id, time_ms: count, team_id: id, player_id: id, outcome: z.enum(['goal', 'saved', 'blocked', 'off_target']), xg: num.min(0).max(1), distance_m: num, angle_deg: num, assist: z.enum(['through_ball', 'cutback', 'pass', 'individual', 'cross', 'set_piece']), body_part: z.enum(['right_foot', 'left_foot', 'head']), chance: z.enum(['major', 'minor']), xgot: num.min(0).max(1).nullable(), placement: placement.nullable(), key_passer_id: id.nullable(), game_state: gameStateName });
-const teamChances = z.strictObject({ team_id: id, shots: count, on_target: count, goals: count, xg: num.min(0), xg_against: num.min(0), major_chances: count, xg_per_shot: maybe });
+const teamChances = z.strictObject({ team_id: id, shots: count, on_target: count, goals: count, xg: num.min(0), xg_against: num.min(0), major_chances: count, xg_per_shot: maybe, goals_against: count, goals_minus_xg_against: num });
 const lineFigures = z.strictObject({ seconds: num.min(0), deepest_m: maybe, back_four_m: maybe, centroid_m: maybe, gap_m: maybe, width_m: maybe });
 const lineInterval = z.strictObject({ start_ms: count, end_ms: count, seconds: num.min(0), back_four_m: maybe, deepest_m: maybe });
 const defensiveLine = z.strictObject({ team_id: id, block: z.enum(['high', 'mid', 'low', 'insufficient_evidence']), match: lineFigures, recent: lineFigures, settled: lineFigures, after_loss: lineFigures, before_shots: lineFigures, shots_faced: count, intervals: z.array(lineInterval) });
@@ -29,8 +29,11 @@ const shooting = z.strictObject({ team_id: id, shots_on_target: count, xg_on_tar
 const tempoFigures = z.strictObject({ possessions: count, vertical_mps: maybe, final_third_entries: count, passes_per_entry: maybe, forward_passes: count, lateral_passes: count, backward_passes: count, directness: maybe, possession_s: z.record(z.string(), maybe), progressive_passes: count, regain_to_progressive_s: maybe });
 const tempo = z.strictObject({ team_id: id, match: tempoFigures, intervals: z.array(z.strictObject({ start_ms: count, end_ms: count, vertical_mps: maybe, directness: maybe, passes_per_entry: maybe })) });
 const pressing = z.strictObject({ team_id: id, ppda: maybe, opponent_passes: count, defensive_actions: count });
-const playerCreation = z.strictObject({ player_id: id, team_id: id, box_touches: count, zone14_touches: count, key_passes: count, assists: count, xa: num.min(0), shots: count, xg: num.min(0) });
-const creation = z.strictObject({ team_id: id, box_touches: count, box_entries: count, zone14_touches: count, zone14_entries: count, key_passes: count, first_time_key_passes: count, assists: count, xa: num.min(0), key_pass_types: z.record(z.string(), count), key_pass_origins: z.record(z.string(), count), xg_per_box_touch: maybe });
+const playerCreation = z.strictObject({ player_id: id, team_id: id, box_touches: count, zone14_touches: count, key_passes: count, assists: count, xa: num.min(0), shots: count, xg: num.min(0), progressive_passes: count, sca: count, gca: count });
+const creation = z.strictObject({ team_id: id, box_touches: count, box_entries: count, zone14_touches: count, zone14_entries: count, key_passes: count, first_time_key_passes: count, assists: count, xa: num.min(0), key_pass_types: z.record(z.string(), count), key_pass_origins: z.record(z.string(), count), xg_per_box_touch: maybe, progressive_passes: count, sca: count, gca: count, sca_types: z.record(z.string(), count), gca_types: z.record(z.string(), count) });
+const creatingAction = z.strictObject({ shot_ref: id, time_ms: count, team_id: id, player_id: id, kind: z.enum(['pass_live', 'pass_dead', 'take_on', 'shot', 'defensive']), goal: z.boolean() });
+const passNetwork = z.strictObject({ team_id: id, completed_passes: count, nodes: z.array(z.strictObject({ player_id: id, x: num.min(0).max(100), y: num.min(0).max(100), touches: count, passes: count, received: count })), edges: z.array(z.strictObject({ a: id, b: id, passes: count, a_to_b: count })), width_m: maybe, depth_m: maybe });
+const defensiveRow = z.strictObject({ player_id: id, team_id: id, minutes: num.min(0), tackles_won: count, tackles_lost: count, aerials_won: count, interceptions: count, recoveries: count, total: count, per90: maybe, by_third: z.record(z.string(), count) });
 const packingAction = z.strictObject({ event_ref: id, time_ms: count, team_id: id, player_id: id, action: z.enum(['pass', 'carry']), packed: count, defenders_packed: count, start: point, end: point });
 const playerPacking = z.strictObject({ player_id: id, team_id: id, passes: count, packed_by_passes: count, carries: count, packed_by_carries: count, passing_rate: maybe, dribbling_rate: maybe, defenders_packed: count });
 const teamPacking = z.strictObject({ team_id: id, passes: count, packed_by_passes: count, carries: count, packed_by_carries: count, passing_rate: maybe, dribbling_rate: maybe, defenders_packed: count, line_breaking: count });
@@ -44,11 +47,12 @@ export const analyticsSchema = z.strictObject({
   top_vaep: z.array(action), game_state: gameState, heatmaps, goalkeeping: z.strictObject({ keepers: z.array(keeper), shooting: z.record(z.string(), shooting) }),
   tempo: z.record(z.string(), tempo), pressing: z.record(z.string(), pressing), creation: z.record(z.string(), creation), player_creation: z.array(playerCreation),
   packing: z.record(z.string(), teamPacking), player_packing: z.array(playerPacking), top_packing: z.array(packingAction),
+  creating_actions: z.array(creatingAction), pass_networks: z.record(z.string(), passNetwork), defensive_actions: z.array(defensiveRow),
   definitions: z.record(z.string(), z.string()), limitations: z.array(z.string()),
 }).superRefine((report, ctx) => {
   const future = report.shots.some((item) => item.time_ms > report.playhead_ms) || report.top_actions.some((item) => item.time_ms > report.playhead_ms)
     || report.territory.intervals.some((item) => item.end_ms > report.playhead_ms) || report.top_vaep.some((item) => item.time_ms > report.playhead_ms)
-    || report.top_packing.some((item) => item.time_ms > report.playhead_ms) || report.game_state.segments.some((item) => item.end_ms > report.playhead_ms);
+    || report.top_packing.some((item) => item.time_ms > report.playhead_ms) || report.creating_actions.some((item) => item.time_ms > report.playhead_ms) || report.game_state.segments.some((item) => item.end_ms > report.playhead_ms);
   const cells = report.heatmaps.grid_x * report.heatmaps.grid_y;
   if (report.heatmaps.maps.some((item) => item.cells.length !== cells)) ctx.addIssue({ code: 'custom', message: 'Heatmap grid size mismatch' });
   if (future) ctx.addIssue({ code: 'custom', message: 'Analytics cannot come from the future' });
@@ -61,7 +65,8 @@ export type DefensiveLine = z.infer<typeof defensiveLine>;
 export type ValuedAction = z.infer<typeof action>;
 export type Heatmap = z.infer<typeof heatmap>;
 export type GameStateName = z.infer<typeof gameStateName>;
-export type AnalyticsView = 'territory' | 'state' | 'heatmap' | 'chances' | 'keepers' | 'tempo' | 'creation' | 'packing' | 'line' | 'workload' | 'value';
+export type PassNetwork = z.infer<typeof passNetwork>;
+export type AnalyticsView = 'territory' | 'state' | 'heatmap' | 'network' | 'chances' | 'keepers' | 'tempo' | 'creation' | 'packing' | 'defending' | 'line' | 'workload' | 'value';
 
 export const blockLabel: Record<DefensiveLine['block'], string> = { high: 'High line', mid: 'Mid-block', low: 'Low block', insufficient_evidence: 'Not yet clear' };
 export const assistLabel: Record<Shot['assist'], string> = { through_ball: 'Through ball', cutback: 'Cutback', pass: 'Pass', individual: 'Individual', cross: 'Cross', set_piece: 'Corner' };
@@ -70,6 +75,7 @@ export const actionLabel: Record<ValuedAction['action'], string> = { pass: 'Pass
 export const stateLabel: Record<GameStateName, string> = { winning: 'Winning', drawing: 'Drawing', losing: 'Losing' };
 export const heatmapLabel: Record<Heatmap['kind'], string> = { touches: 'Touches', tracking: 'Positions (tracking)', received: 'Passes received', defensive: 'Defensive actions' };
 export const keyPassLabel: Record<string, string> = { through_ball: 'Through ball', cutback: 'Cutback', pass: 'Pass', cross: 'Cross', set_piece: 'Corner' };
+export const creatingLabel: Record<string, string> = { pass_live: 'Live-ball pass', pass_dead: 'Dead-ball pass', take_on: 'Take-on', shot: 'Rebounded shot', defensive: 'Tackle or interception' };
 export const num1 = (value: number | null | undefined) => value == null ? '—' : value.toFixed(1);
 export const num2 = (value: number | null | undefined) => value == null ? '—' : value.toFixed(2);
 export const signed2 = (value: number | null | undefined) => value == null ? '—' : `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(2)}`;

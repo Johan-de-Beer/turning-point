@@ -15,7 +15,8 @@ from statistics import median
 
 from .chances import X_M, in_box
 from .metrics import calculate_window
-from .models import (GameState, GameStateRow, Goalkeeping, Heatmap, Heatmaps, KeeperRow, PackingAction, PERIOD_MS, PlayerCreation,
+from .models import (CreatingAction, DefensiveRow, GameState, GameStateRow, Goalkeeping, Heatmap, Heatmaps, KeeperRow, NetworkEdge, NetworkNode,
+                     PackingAction, PassNetwork, PERIOD_MS, PlayerCreation,
                      PlayerPacking, Pressing, ScoreSegment, TeamCreation, TeamGameState, TeamPacking, TeamShooting, TeamTempo,
                      TempoFigures, TempoInterval)
 from .movement import GRID_X, GRID_Y, cell
@@ -27,6 +28,8 @@ PPDA_ZONE_X = 60.0          # opponent passes in their own 60% of the pitch
 LINE_BREAKING = 3           # packed opponents for a line-breaking action
 INTERVAL_MS = 900_000
 TOP_PACKING = 10
+NETWORK_MIN_PASSES = 2      # pass-network links shown from this many completed passes
+PER90_MIN_MINUTES = 10      # per-90 rates need at least this much observed play
 
 ADVANCED_DEFINITIONS = {
     "game_state": "The scoreline from each team's point of view: winning, drawing or losing. A goal's own shot counts in the state before it. Every game-state row covers only the minutes spent in that state.",
@@ -37,7 +40,11 @@ ADVANCED_DEFINITIONS = {
     "passes_per_entry": "Average completed passes in a possession before it first enters the final third (x ≥ 66.67), counting the entering pass, for possessions that start outside it.",
     "directness": f"Forward passes divided by lateral and backward passes. Forward or backward means at least {FORWARD_M:.0f} m of depth gained or lost.",
     "possession_s": "Average possession length in seconds, by the third where the possession started.",
-    "progressive_pass": "A completed pass that moves the ball at least 30 m closer to goal within the own half, 15 m when it crosses halfway, or 10 m within the opponent's half.",
+    "progressive_pass": "A completed forward pass that moves the ball at least 10 m closer to the goal centre when played from outside the final third, or at least 5 m when played from inside it.",
+    "sca": "Shot-creating actions: the two offensive actions directly before a shot, by the shooting team in the same possession: a live-ball pass, a dead-ball pass (the first pass after a restart, corners included), a take-on (a carry that beat a challenge), an earlier shot whose rebound was shot again, or the tackle or interception that won the ball. Goal-creating actions (GCA) are the same for shots that were scored.",
+    "pass_network": f"Each player at the average spot of their passes and receptions, linked to teammates they completed at least {NETWORK_MIN_PASSES} passes with (both directions together). Width and depth are the spread of the outfield players' spots.",
+    "defensive_actions": f"Tackles won and lost (challenges on the ball carrier), aerial duels won, interceptions and loose-ball recoveries. Per 90 scales the count to a full match once {PER90_MIN_MINUTES} minutes have been observed. Clearances and blocks are not in the event data.",
+    "goals_minus_xg_against": "Goals conceded minus the xG of the shots conceded. Below zero, the team let in fewer goals than its chances allowed (good goalkeeping, last-ditch defending or poor finishing); above zero, more.",
     "regain_to_progressive_s": "Median seconds from winning the ball in open play to the first progressive pass of that possession.",
     "ppda": f"Passes allowed per defensive action: the opponent's attempted passes in their own {PPDA_ZONE_X:.0f}% of the pitch divided by this team's duels and interceptions in that area. Lower means a more aggressive press.",
     "box_touches": "On-ball touches inside the opponent's penalty area (x ≥ 83, 20 ≤ y ≤ 80), including receptions.",
@@ -53,6 +60,7 @@ ADVANCED_LIMITATIONS = [
     "Game-state splits are small samples: one match has a handful of goals, so a state may last only minutes. Read them as context for the other numbers, not as a verdict.",
     "xGoT uses the synthetic recorded placement (side, height, pace) of goals and saved shots and illustrative coefficients. It is not a fitted post-shot model.",
     "Packing uses the continuous synthetic positions at the frame nearest each action and counts outfield opponents only. It treats every bypassed opponent alike, whatever their position.",
+    "Shot- and goal-creating actions cannot include fouls drawn: the synthetic events record a foul stoppage but not who was fouled.",
     "VAEP here is a transparent analogue built on the location value surface with a fixed counter-attack risk, not the trained VAEP model.",
 ]
 
@@ -71,11 +79,7 @@ def metres_to_goal(x: float, y: float) -> float:
 
 def progressive(start, end) -> bool:
     gain = metres_to_goal(start.x, start.y) - metres_to_goal(end.x, end.y)
-    if start.x < 50 and end.x < 50:
-        return gain >= 30
-    if start.x < 50 <= end.x:
-        return gain >= 15
-    return gain >= 10
+    return end.x > start.x and gain >= (5 if start.x >= 66.67 else 10)
 
 
 def in_zone14(x: float, y: float) -> bool:
@@ -203,6 +207,143 @@ class AdvancedMetrics:
                 result[record.event_id] = previous.event_id
             if e.kind != "TACKLE":
                 previous = record
+        return result
+
+    def regains(self) -> dict[str, tuple[str, str]]:
+        """Each open-play regain (a POSSESSION event id) -> (how: tackle, interception or recovery, the player who won it)."""
+        result, previous, tackle = {}, None, None
+        for record in self.ordered:
+            e = record.payload
+            if e.kind == "TACKLE":
+                tackle = record
+                continue
+            if e.kind == "POSSESSION" and previous is not None and previous.payload.kind not in ("STOPPAGE", "PERIOD_START", "PERIOD_END") \
+                    and previous.payload.team_id not in (None, e.team_id):
+                t = tackle.payload if tackle else None
+                if t and t.detail.successful and t.team_id == e.team_id and e.event_time_ms - t.event_time_ms <= 1_000:
+                    result[record.event_id] = ("tackle", t.player_id)
+                elif record.event_id in self._interceptions:
+                    result[record.event_id] = ("interception", e.player_id)
+                else:
+                    result[record.event_id] = ("recovery", e.player_id)
+            previous = record
+        return result
+
+    def take_ons(self) -> set[str]:
+        """Carries that beat a challenge on the way (the defender lost the ground duel)."""
+        carries, result = [], set()
+        for record in self.ordered:
+            e = record.payload
+            if e.kind == "CARRY":
+                carries.append(record)
+            elif e.kind == "TACKLE" and not e.detail.successful and e.detail.contest == "ground":
+                for carry in carries[-2:]:
+                    c = carry.payload
+                    if c.possession_id == e.possession_id and 0 < e.event_time_ms - c.event_time_ms <= 1_500:
+                        result.add(carry.event_id)
+        return result
+
+    # ------------------------------------------------- shot- and goal-creating actions
+    def creating_actions(self) -> list[CreatingAction]:
+        regains, take_ons = self._regains, self.take_ons()
+        chains: dict[str, list[tuple[str, str]]] = {}     # possession id -> qualifying (kind, player) so far
+        after_restart: set[str] = set()
+        previous = None
+        result = []
+        for record in self.ordered:
+            e = record.payload
+            if e.kind == "TACKLE":
+                continue
+            if e.kind == "POSSESSION":
+                chain = chains.setdefault(e.possession_id, [])
+                if record.event_id in regains:
+                    how, player = regains[record.event_id]
+                    if how != "recovery":
+                        chain.append(("defensive", player))
+                if previous is None or previous.payload.kind in ("STOPPAGE", "PERIOD_START"):
+                    after_restart.add(e.possession_id)
+            elif e.kind in ("PASS", "CARRY", "SHOT") and e.possession_id:
+                chain = chains.setdefault(e.possession_id, [])
+                if e.kind == "SHOT":
+                    goal = e.detail.outcome == "goal"
+                    for kind, player in chain[-2:]:
+                        result.append(CreatingAction(shot_ref=record.ref, time_ms=e.event_time_ms, team_id=e.team_id, player_id=player, kind=kind, goal=goal))
+                    chain.append(("shot", e.player_id))
+                elif e.kind == "PASS":
+                    dead = e.possession_id in after_restart and not any(k.startswith("pass") for k, _ in chain)
+                    if e.detail.completed:
+                        chain.append(("pass_dead" if dead else "pass_live", e.player_id))
+                    after_restart.discard(e.possession_id)
+                elif record.event_id in take_ons:
+                    chain.append(("take_on", e.player_id))
+            previous = record
+        return result
+
+    # ----------------------------------------------------------- pass networks
+    def pass_networks(self) -> dict[str, PassNetwork]:
+        result = {}
+        for team in self.teams:
+            spots: dict[str, list[tuple[float, float]]] = {}
+            made: dict[str, int] = {}
+            received: dict[str, int] = {}
+            pairs: dict[tuple[str, str], int] = {}
+            for player, side, x, y, _t, kind in self._touches:
+                if side == team and kind in ("pass", "received"):
+                    spots.setdefault(player, []).append((x, y))
+            completed = 0
+            for record in self.ordered:
+                e = record.payload
+                if e.kind == "PASS" and e.team_id == team and e.detail.completed and e.detail.recipient_id != e.player_id:
+                    completed += 1
+                    made[e.player_id] = made.get(e.player_id, 0) + 1
+                    received[e.detail.recipient_id] = received.get(e.detail.recipient_id, 0) + 1
+                    pairs[(e.player_id, e.detail.recipient_id)] = pairs.get((e.player_id, e.detail.recipient_id), 0) + 1
+            nodes = [NetworkNode(player_id=pid, x=round(sum(p[0] for p in pts) / len(pts), 1), y=round(sum(p[1] for p in pts) / len(pts), 1),
+                                 touches=len(pts), passes=made.get(pid, 0), received=received.get(pid, 0))
+                     for pid, pts in sorted(spots.items())]
+            edges = []
+            for a, b in sorted({tuple(sorted(k)) for k in pairs}):
+                total = pairs.get((a, b), 0) + pairs.get((b, a), 0)
+                if total >= NETWORK_MIN_PASSES:
+                    edges.append(NetworkEdge(a=a, b=b, passes=total, a_to_b=pairs.get((a, b), 0)))
+            edges.sort(key=lambda edge: (-edge.passes, edge.a, edge.b))
+            outfield = [n for n in nodes if role(n.player_id) != "GK"]
+            width = round((max(n.y for n in outfield) - min(n.y for n in outfield)) * .68, 1) if len(outfield) > 1 else None
+            depth = round((max(n.x for n in outfield) - min(n.x for n in outfield)) * X_M, 1) if len(outfield) > 1 else None
+            result[team] = PassNetwork(team_id=team, completed_passes=completed, nodes=nodes, edges=edges, width_m=width, depth_m=depth)
+        return result
+
+    # ------------------------------------------------------- defensive actions
+    def defensive_actions(self) -> list[DefensiveRow]:
+        minutes = self.playhead / 60_000
+        rows = {p.player_id: {"tackles_won": 0, "tackles_lost": 0, "aerials_won": 0, "interceptions": 0, "recoveries": 0,
+                              "thirds": {"defensive": 0, "middle": 0, "final": 0}} for p in self.match.roster}
+        for record in self.ordered:
+            e = record.payload
+            if e.kind == "TACKLE":
+                row = rows[e.player_id]
+                if e.detail.contest == "aerial":
+                    if not e.detail.successful:
+                        continue
+                    row["aerials_won"] += 1
+                else:
+                    row["tackles_won" if e.detail.successful else "tackles_lost"] += 1
+                row["thirds"][third(e.detail.position.x)] += 1
+            elif e.kind == "POSSESSION" and record.event_id in self._regains:
+                how, _player = self._regains[record.event_id]
+                if how == "tackle":
+                    continue
+                row = rows[e.player_id]
+                row["interceptions" if how == "interception" else "recoveries"] += 1
+                row["thirds"][third(e.detail.start.x)] += 1
+        result = []
+        for p in self.match.roster:
+            row = rows[p.player_id]
+            total = row["tackles_won"] + row["tackles_lost"] + row["aerials_won"] + row["interceptions"] + row["recoveries"]
+            result.append(DefensiveRow(player_id=p.player_id, team_id=p.team_id, minutes=round(minutes, 1), tackles_won=row["tackles_won"],
+                tackles_lost=row["tackles_lost"], aerials_won=row["aerials_won"], interceptions=row["interceptions"], recoveries=row["recoveries"],
+                total=total, per90=round(total / minutes * 90, 1) if minutes >= PER90_MIN_MINUTES else None, by_third=row["thirds"]))
+        result.sort(key=lambda r: (-r.total, r.player_id))
         return result
 
     # -------------------------------------------------------------- heatmaps
@@ -375,10 +516,20 @@ class AdvancedMetrics:
         return result
 
     # -------------------------------------------------------------- creation
-    def creation(self, shots, quality) -> tuple[dict[str, TeamCreation], list[PlayerCreation]]:
-        players = {p.player_id: {"box": 0, "z14": 0, "kp": 0, "assists": 0, "xa": 0.0, "shots": 0, "xg": 0.0} for p in self.match.roster}
+    def creation(self, shots, quality, creating) -> tuple[dict[str, TeamCreation], list[PlayerCreation]]:
+        players = {p.player_id: {"box": 0, "z14": 0, "kp": 0, "assists": 0, "xa": 0.0, "shots": 0, "xg": 0.0, "prog": 0, "sca": 0, "gca": 0}
+                   for p in self.match.roster}
         teams = {team: {"box": 0, "entries": 0, "z14": 0, "z14_entries": 0, "kp": 0, "first_time": 0, "assists": 0, "xa": 0.0,
-                        "types": {}, "origins": {"wide": 0, "central": 0}} for team in self.teams}
+                        "types": {}, "origins": {"wide": 0, "central": 0},
+                        "prog": 0, "sca": 0, "gca": 0, "sca_types": {}, "gca_types": {}} for team in self.teams}
+        for a in creating:
+            for row in (players[a.player_id], teams[a.team_id]):
+                row["sca"] += 1
+                row["gca"] += a.goal
+            side = teams[a.team_id]
+            side["sca_types"][a.kind] = side["sca_types"].get(a.kind, 0) + 1
+            if a.goal:
+                side["gca_types"][a.kind] = side["gca_types"].get(a.kind, 0) + 1
         for player, team, x, y, _t, _kind in self._touches:
             if in_box(x, y):
                 players[player]["box"] += 1
@@ -388,6 +539,9 @@ class AdvancedMetrics:
                 teams[team]["z14"] += 1
         for record in self.ordered:
             e = record.payload
+            if e.kind == "PASS" and e.detail.completed and progressive(e.detail.start, e.detail.end):
+                players[e.player_id]["prog"] += 1
+                teams[e.team_id]["prog"] += 1
             if e.kind == "CARRY" or (e.kind == "PASS" and e.detail.completed):
                 a, b = e.detail.start, e.detail.end
                 if in_box(b.x, b.y) and not in_box(a.x, a.y):
@@ -416,12 +570,15 @@ class AdvancedMetrics:
             xg = sum(s.xg for s in shots if s.team_id == team)
             result[team] = TeamCreation(team_id=team, box_touches=row["box"], box_entries=row["entries"], zone14_touches=row["z14"],
                 zone14_entries=row["z14_entries"], key_passes=row["kp"], first_time_key_passes=row["first_time"], assists=row["assists"], xa=round(row["xa"], 2),
-                key_pass_types=dict(sorted(row["types"].items())), key_pass_origins=row["origins"], xg_per_box_touch=ratio(xg, row["box"], 3))
+                key_pass_types=dict(sorted(row["types"].items())), key_pass_origins=row["origins"], xg_per_box_touch=ratio(xg, row["box"], 3),
+                progressive_passes=row["prog"], sca=row["sca"], gca=row["gca"], sca_types=dict(sorted(row["sca_types"].items())),
+                gca_types=dict(sorted(row["gca_types"].items())))
         rows = [PlayerCreation(player_id=p.player_id, team_id=p.team_id, box_touches=players[p.player_id]["box"], zone14_touches=players[p.player_id]["z14"],
                 key_passes=players[p.player_id]["kp"], assists=players[p.player_id]["assists"], xa=round(players[p.player_id]["xa"], 2),
-                shots=players[p.player_id]["shots"], xg=round(players[p.player_id]["xg"], 2)) for p in self.match.roster]
-        rows = [r for r in rows if r.box_touches or r.zone14_touches or r.key_passes or r.shots]
-        rows.sort(key=lambda r: (-r.xa, -r.key_passes, -r.box_touches, r.player_id))
+                shots=players[p.player_id]["shots"], xg=round(players[p.player_id]["xg"], 2), progressive_passes=players[p.player_id]["prog"],
+                sca=players[p.player_id]["sca"], gca=players[p.player_id]["gca"]) for p in self.match.roster]
+        rows = [r for r in rows if r.box_touches or r.zone14_touches or r.key_passes or r.shots or r.sca or r.progressive_passes]
+        rows.sort(key=lambda r: (-r.sca, -r.xa, -r.key_passes, -r.box_touches, r.player_id))
         return result, rows
 
     # --------------------------------------------------------------- packing
