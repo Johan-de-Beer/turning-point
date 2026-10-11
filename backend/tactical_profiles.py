@@ -68,7 +68,13 @@ _TENDENCIES = {
         # repositioning off the ball, late-match fades (start time, share of pace lost) and how
         # far the line drops (units) while protecting a lead.
         "movement": {"line_base": 42.0, "transition_mps": {"harbor_02": 7.4, "harbor_10": 7.0, "harbor_09": 6.0},
-                     "cruise_mps": {"harbor_02": 4.2}, "fade": {}, "lead_drop": 8.0},
+                     "cruise_mps": {"harbor_02": 4.2}, "fade": {}, "lead_drop": 8.0,
+                     # Phases round: how many of the nearest outfield players hunt the ball after a loss
+                     # (within reach, for the window), each full-back's habit in possession, positional
+                     # rotations, and whether the keeper sweeps behind a high line.
+                     "counter_press": {"players": 3, "window_ms": 4_000, "reach_m": 30.0, "rate": .8},
+                     "fullbacks": {"harbor_02": "overlap", "harbor_03": "invert"},
+                     "rotations": {"harbor_06": "drop_in"}, "sweeper": True},
         # Share of the saves this side's goalkeeper makes from well-placed, hard-hit shots.
         "goalkeeping": {"hard_save_rate": .55},
     },
@@ -82,7 +88,10 @@ _TENDENCIES = {
         "corner": {"accuracy": {"vale_08": 3.2}, "speed_mps": {"vale_08": 18.5},
                    "onset_ms": {"vale_04": -150, "vale_09": 400, "vale_05": 0}},
         "movement": {"line_base": 25.0, "transition_mps": {"vale_11": 3.4, "vale_03": 6.2},
-                     "cruise_mps": {"vale_11": 2.4}, "fade": {"vale_08": (3_000_000, .65)}, "lead_drop": 0.0},
+                     "cruise_mps": {"vale_11": 2.4}, "fade": {"vale_08": (3_000_000, .65)}, "lead_drop": 0.0,
+                     "counter_press": {"players": 1, "window_ms": 1_200, "reach_m": 10.0, "rate": .4},
+                     "fullbacks": {"vale_03": "underlap", "vale_02": "hold"},
+                     "rotations": {"vale_09": "drop_deep"}, "sweeper": False},
         "goalkeeping": {"hard_save_rate": .15},
     },
 }

@@ -1,0 +1,2041 @@
+{
+ "session_id": "sample",
+ "generation": 1,
+ "data_epoch": 1,
+ "playhead_ms": 1200000,
+ "next_cursor": "c",
+ "engine_version": "phases_v1",
+ "provenance": "synthetic_events_and_tracking",
+ "phases": {
+  "harbor": {
+   "team_id": "harbor",
+   "live_seconds": 1161.0,
+   "rows": [
+    {
+     "phase": "attacking",
+     "seconds": 428.0,
+     "share": 36.9,
+     "passes": 51,
+     "final_third_entries": 0,
+     "xt": -0.149,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "attacking_transition",
+     "seconds": 278.6,
+     "share": 24.0,
+     "passes": 40,
+     "final_third_entries": 14,
+     "xt": 0.877,
+     "shots_for": 7,
+     "xg_for": 1.2,
+     "goals_for": 1,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "attacking_set_piece",
+     "seconds": 16.0,
+     "share": 1.4,
+     "passes": 4,
+     "final_third_entries": 0,
+     "xt": 0.007,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "defending",
+     "seconds": 194.0,
+     "share": 16.7,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 1,
+     "xg_against": 0.05,
+     "goals_against": 0
+    },
+    {
+     "phase": "defensive_transition",
+     "seconds": 244.4,
+     "share": 21.1,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "defending_set_piece",
+     "seconds": 0.0,
+     "share": 0.0,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    }
+   ],
+   "restarts": {
+    "corner": 3,
+    "goal_kick": 1
+   }
+  },
+  "vale": {
+   "team_id": "vale",
+   "live_seconds": 1161.0,
+   "rows": [
+    {
+     "phase": "attacking",
+     "seconds": 194.0,
+     "share": 16.7,
+     "passes": 9,
+     "final_third_entries": 1,
+     "xt": 0.066,
+     "shots_for": 1,
+     "xg_for": 0.05,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "attacking_transition",
+     "seconds": 244.4,
+     "share": 21.1,
+     "passes": 28,
+     "final_third_entries": 0,
+     "xt": -0.065,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "attacking_set_piece",
+     "seconds": 0.0,
+     "share": 0.0,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "defending",
+     "seconds": 428.0,
+     "share": 36.9,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    },
+    {
+     "phase": "defensive_transition",
+     "seconds": 278.6,
+     "share": 24.0,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 7,
+     "xg_against": 1.2,
+     "goals_against": 1
+    },
+    {
+     "phase": "defending_set_piece",
+     "seconds": 16.0,
+     "share": 1.4,
+     "passes": 0,
+     "final_third_entries": 0,
+     "xt": 0.0,
+     "shots_for": 0,
+     "xg_for": 0.0,
+     "goals_for": 0,
+     "shots_against": 0,
+     "xg_against": 0.0,
+     "goals_against": 0
+    }
+   ],
+   "restarts": {}
+  }
+ },
+ "transitions": {
+  "harbor": {
+   "team_id": "harbor",
+   "attacking": {
+    "regains": 26,
+    "counters": 8,
+    "counter_shots": 7,
+    "counter_xg": 1.2,
+    "recycled": 12,
+    "lost_quickly": 1,
+    "median_to_final_third_s": 4.0,
+    "by_third": {
+     "defensive": 0,
+     "middle": 25,
+     "final": 1
+    },
+    "counters_by_third": {
+     "defensive": 0,
+     "middle": 8,
+     "final": 0
+    },
+    "moments": [
+     {
+      "time_ms": 600000,
+      "event_ref": "evt_00104@1",
+      "label": "Won in the middle third, final third in 8.0 s, shot worth 0.35 xG"
+     },
+     {
+      "time_ms": 180000,
+      "event_ref": "evt_00023@1",
+      "label": "Won in the middle third, final third in 4.0 s, shot worth 0.25 xG"
+     },
+     {
+      "time_ms": 220000,
+      "event_ref": "evt_00037@1",
+      "label": "Won in the middle third, final third in 4.0 s, shot worth 0.21 xG"
+     }
+    ]
+   },
+   "defensive": {
+    "losses": 26,
+    "tracked": 26,
+    "pressed": 21,
+    "press_rate": 80.8,
+    "median_pressure_s": 1.2,
+    "pack_2s": 3.2,
+    "regained_5s": 2,
+    "regained_10s": 17,
+    "bypassed": 7,
+    "shots_conceded": 0,
+    "xg_conceded": 0.0,
+    "rest_defence": 6.3,
+    "rest_defenders": 3.5,
+    "by_third": {
+     "defensive": 0,
+     "middle": 18,
+     "final": 8
+    },
+    "moments": [
+     {
+      "time_ms": 201000,
+      "event_ref": "evt_00031@1",
+      "label": "Lost in the final third, pressed in 0.2 s, won back in 2.2 s"
+     },
+     {
+      "time_ms": 281000,
+      "event_ref": "evt_00053@1",
+      "label": "Lost in the final third, pressed in 1.2 s, won back in 2.2 s"
+     }
+    ]
+   }
+  },
+  "vale": {
+   "team_id": "vale",
+   "attacking": {
+    "regains": 26,
+    "counters": 0,
+    "counter_shots": 0,
+    "counter_xg": 0.0,
+    "recycled": 12,
+    "lost_quickly": 2,
+    "median_to_final_third_s": null,
+    "by_third": {
+     "defensive": 8,
+     "middle": 18,
+     "final": 0
+    },
+    "counters_by_third": {
+     "defensive": 0,
+     "middle": 0,
+     "final": 0
+    },
+    "moments": []
+   },
+   "defensive": {
+    "losses": 26,
+    "tracked": 25,
+    "pressed": 13,
+    "press_rate": 52.0,
+    "median_pressure_s": 1.2,
+    "pack_2s": 2.4,
+    "regained_5s": 0,
+    "regained_10s": 2,
+    "bypassed": 7,
+    "shots_conceded": 7,
+    "xg_conceded": 1.2,
+    "rest_defence": 5.4,
+    "rest_defenders": 4.0,
+    "by_third": {
+     "defensive": 1,
+     "middle": 25,
+     "final": 0
+    },
+    "moments": [
+     {
+      "time_ms": 600000,
+      "event_ref": "evt_00104@1",
+      "label": "Lost in the middle third, not won back: shot conceded worth 0.35 xG"
+     },
+     {
+      "time_ms": 180000,
+      "event_ref": "evt_00023@1",
+      "label": "Lost in the middle third, not won back: shot conceded worth 0.25 xG"
+     },
+     {
+      "time_ms": 220000,
+      "event_ref": "evt_00037@1",
+      "label": "Lost in the middle third, not won back: shot conceded worth 0.21 xG"
+     }
+    ]
+   }
+  }
+ },
+ "blocks": {
+  "harbor": {
+   "team_id": "harbor",
+   "settled_seconds": 194.0,
+   "rows": [
+    {
+     "block": "high",
+     "seconds": 8.0,
+     "share": 4.1,
+     "back_four_m": 43.2,
+     "length_m": 23.3,
+     "width_m": 33.4,
+     "line_gap_m": 15.4,
+     "box_defenders": null,
+     "opponent_entries": 0,
+     "wide_entry_share": null,
+     "opponent_shots": 0,
+     "long_shot_share": null,
+     "xg_against": 0.0,
+     "goals_against": 0,
+     "crosses_faced": 0,
+     "ppda": null,
+     "regains": 0,
+     "counters": 0
+    },
+    {
+     "block": "mid",
+     "seconds": 159.0,
+     "share": 82.0,
+     "back_four_m": 36.0,
+     "length_m": 29.7,
+     "width_m": 33.8,
+     "line_gap_m": 15.1,
+     "box_defenders": 0.7,
+     "opponent_entries": 1,
+     "wide_entry_share": 0.0,
+     "opponent_shots": 1,
+     "long_shot_share": 100.0,
+     "xg_against": 0.05,
+     "goals_against": 0,
+     "crosses_faced": 0,
+     "ppda": 1.4,
+     "regains": 9,
+     "counters": 2
+    },
+    {
+     "block": "low",
+     "seconds": 27.0,
+     "share": 13.9,
+     "back_four_m": 27.2,
+     "length_m": 23.9,
+     "width_m": 34.9,
+     "line_gap_m": 15.7,
+     "box_defenders": 0.0,
+     "opponent_entries": 0,
+     "wide_entry_share": null,
+     "opponent_shots": 0,
+     "long_shot_share": null,
+     "xg_against": 0.0,
+     "goals_against": 0,
+     "crosses_faced": 0,
+     "ppda": null,
+     "regains": 0,
+     "counters": 0
+    }
+   ],
+   "snapshots": [
+    {
+     "situation": "settled",
+     "seconds": 194.0,
+     "back_four_m": 35.1,
+     "front_line_m": 59.5,
+     "length_m": 28.6
+    },
+    {
+     "situation": "opponent_build_up",
+     "seconds": 0.0,
+     "back_four_m": null,
+     "front_line_m": null,
+     "length_m": null
+    },
+    {
+     "situation": "high_press",
+     "seconds": 36.0,
+     "back_four_m": 55.5,
+     "front_line_m": 81.1,
+     "length_m": 45.2
+    }
+   ],
+   "recovery": {
+    "balls_in_behind": 1,
+    "tracked": 1,
+    "retreat_m": 12.4,
+    "top_speed_mps": 3.8,
+    "keeper_start_m": 3.2,
+    "keeper_max_m": 3.2,
+    "sweeps": 0,
+    "shots_conceded": 0,
+    "moments": []
+   }
+  },
+  "vale": {
+   "team_id": "vale",
+   "settled_seconds": 428.0,
+   "rows": [
+    {
+     "block": "high",
+     "seconds": 0.0,
+     "share": 0.0,
+     "back_four_m": null,
+     "length_m": null,
+     "width_m": null,
+     "line_gap_m": null,
+     "box_defenders": null,
+     "opponent_entries": 0,
+     "wide_entry_share": null,
+     "opponent_shots": 0,
+     "long_shot_share": null,
+     "xg_against": 0.0,
+     "goals_against": 0,
+     "crosses_faced": 0,
+     "ppda": null,
+     "regains": 0,
+     "counters": 0
+    },
+    {
+     "block": "mid",
+     "seconds": 30.4,
+     "share": 7.1,
+     "back_four_m": 33.7,
+     "length_m": 30.7,
+     "width_m": 32.5,
+     "line_gap_m": 14.7,
+     "box_defenders": null,
+     "opponent_entries": 0,
+     "wide_entry_share": null,
+     "opponent_shots": 0,
+     "long_shot_share": null,
+     "xg_against": 0.0,
+     "goals_against": 0,
+     "crosses_faced": 0,
+     "ppda": 4.0,
+     "regains": 1,
+     "counters": 0
+    },
+    {
+     "block": "low",
+     "seconds": 397.6,
+     "share": 92.9,
+     "back_four_m": 23.3,
+     "length_m": 30.0,
+     "width_m": 33.8,
+     "line_gap_m": 14.2,
+     "box_defenders": 4.7,
+     "opponent_entries": 0,
+     "wide_entry_share": null,
+     "opponent_shots": 1,
+     "long_shot_share": 0.0,
+     "xg_against": 0.35,
+     "goals_against": 1,
+     "crosses_faced": 0,
+     "ppda": 2.6,
+     "regains": 21,
+     "counters": 0
+    }
+   ],
+   "snapshots": [
+    {
+     "situation": "settled",
+     "seconds": 428.0,
+     "back_four_m": 24.1,
+     "front_line_m": 50.9,
+     "length_m": 30.0
+    },
+    {
+     "situation": "opponent_build_up",
+     "seconds": 8.2,
+     "back_four_m": 39.6,
+     "front_line_m": 66.5,
+     "length_m": 33.6
+    },
+    {
+     "situation": "high_press",
+     "seconds": 0.0,
+     "back_four_m": null,
+     "front_line_m": null,
+     "length_m": null
+    }
+   ],
+   "recovery": {
+    "balls_in_behind": 3,
+    "tracked": 3,
+    "retreat_m": 13.4,
+    "top_speed_mps": 5.6,
+    "keeper_start_m": 2.2,
+    "keeper_max_m": 5.1,
+    "sweeps": 0,
+    "shots_conceded": 2,
+    "moments": [
+     {
+      "time_ms": 608000,
+      "event_ref": "evt_00105@1",
+      "label": "Ball in behind, shot conceded worth 0.35 xG"
+     },
+     {
+      "time_ms": 304000,
+      "event_ref": "evt_00060@1",
+      "label": "Ball in behind, shot conceded worth 0.07 xG"
+     }
+    ]
+   }
+  }
+ },
+ "progression": {
+  "harbor": {
+   "team_id": "harbor",
+   "progressive_passes": 27,
+   "progressive_carries": 6,
+   "carry_share": 18.2,
+   "progressive_carry_m": 166.0,
+   "carries_final_third": 6,
+   "carries_box": 6,
+   "take_ons": 1,
+   "xt": 0.734,
+   "xt_passes": 0.05,
+   "xt_carries": 0.684,
+   "xt_by_channel": {
+    "left": 0.243,
+    "centre": 0.383,
+    "right": 0.109
+   },
+   "xt_intervals": [
+    0.739,
+    -0.004
+   ]
+  },
+  "vale": {
+   "team_id": "vale",
+   "progressive_passes": 15,
+   "progressive_carries": 1,
+   "carry_share": 6.2,
+   "progressive_carry_m": 24.6,
+   "carries_final_third": 1,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt": 0.001,
+   "xt_passes": -0.068,
+   "xt_carries": 0.07,
+   "xt_by_channel": {
+    "left": 0.058,
+    "centre": -0.045,
+    "right": -0.012
+   },
+   "xt_intervals": [
+    0.017,
+    -0.016
+   ]
+  }
+ },
+ "player_progression": [
+  {
+   "player_id": "harbor_08",
+   "team_id": "harbor",
+   "progressive_passes": 12,
+   "progressive_carries": 1,
+   "progressive_carry_m": 25.9,
+   "carries": 1,
+   "carries_final_third": 1,
+   "carries_box": 1,
+   "take_ons": 1,
+   "xt_passes": 0.203,
+   "xt_carries": 0.138,
+   "xt": 0.342
+  },
+  {
+   "player_id": "harbor_07",
+   "team_id": "harbor",
+   "progressive_passes": 8,
+   "progressive_carries": 3,
+   "progressive_carry_m": 80.2,
+   "carries": 3,
+   "carries_final_third": 3,
+   "carries_box": 3,
+   "take_ons": 0,
+   "xt_passes": 0.196,
+   "xt_carries": 0.337,
+   "xt": 0.533
+  },
+  {
+   "player_id": "harbor_06",
+   "team_id": "harbor",
+   "progressive_passes": 5,
+   "progressive_carries": 2,
+   "progressive_carry_m": 59.9,
+   "carries": 2,
+   "carries_final_third": 2,
+   "carries_box": 2,
+   "take_ons": 0,
+   "xt_passes": 0.03,
+   "xt_carries": 0.209,
+   "xt": 0.24
+  },
+  {
+   "player_id": "vale_07",
+   "team_id": "vale",
+   "progressive_passes": 5,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.026,
+   "xt_carries": 0.0,
+   "xt": -0.026
+  },
+  {
+   "player_id": "vale_02",
+   "team_id": "vale",
+   "progressive_passes": 3,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.018,
+   "xt_carries": 0.0,
+   "xt": -0.018
+  },
+  {
+   "player_id": "vale_06",
+   "team_id": "vale",
+   "progressive_passes": 1,
+   "progressive_carries": 1,
+   "progressive_carry_m": 24.6,
+   "carries": 1,
+   "carries_final_third": 1,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": 0.0,
+   "xt_carries": 0.07,
+   "xt": 0.07
+  },
+  {
+   "player_id": "vale_08",
+   "team_id": "vale",
+   "progressive_passes": 2,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.008,
+   "xt_carries": 0.0,
+   "xt": -0.008
+  },
+  {
+   "player_id": "vale_04",
+   "team_id": "vale",
+   "progressive_passes": 1,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": 0.009,
+   "xt_carries": 0.0,
+   "xt": 0.009
+  },
+  {
+   "player_id": "vale_05",
+   "team_id": "vale",
+   "progressive_passes": 1,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": 0.008,
+   "xt_carries": 0.0,
+   "xt": 0.008
+  },
+  {
+   "player_id": "harbor_05",
+   "team_id": "harbor",
+   "progressive_passes": 1,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.004,
+   "xt_carries": 0.0,
+   "xt": -0.004
+  },
+  {
+   "player_id": "vale_03",
+   "team_id": "vale",
+   "progressive_passes": 1,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.015,
+   "xt_carries": 0.0,
+   "xt": -0.015
+  },
+  {
+   "player_id": "vale_01",
+   "team_id": "vale",
+   "progressive_passes": 1,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.017,
+   "xt_carries": 0.0,
+   "xt": -0.017
+  },
+  {
+   "player_id": "harbor_04",
+   "team_id": "harbor",
+   "progressive_passes": 1,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.062,
+   "xt_carries": 0.0,
+   "xt": -0.062
+  },
+  {
+   "player_id": "harbor_01",
+   "team_id": "harbor",
+   "progressive_passes": 0,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.01,
+   "xt_carries": 0.0,
+   "xt": -0.01
+  },
+  {
+   "player_id": "harbor_10",
+   "team_id": "harbor",
+   "progressive_passes": 0,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.073,
+   "xt_carries": 0.0,
+   "xt": -0.073
+  },
+  {
+   "player_id": "harbor_09",
+   "team_id": "harbor",
+   "progressive_passes": 0,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.114,
+   "xt_carries": 0.0,
+   "xt": -0.114
+  },
+  {
+   "player_id": "harbor_11",
+   "team_id": "harbor",
+   "progressive_passes": 0,
+   "progressive_carries": 0,
+   "progressive_carry_m": 0.0,
+   "carries": 0,
+   "carries_final_third": 0,
+   "carries_box": 0,
+   "take_ons": 0,
+   "xt_passes": -0.117,
+   "xt_carries": 0.0,
+   "xt": -0.117
+  }
+ ],
+ "top_threat": [
+  {
+   "event_ref": "evt_00026@1",
+   "time_ms": 192000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "action": "carry",
+   "xt": 0.1412,
+   "start": {
+    "x": 60.1,
+    "y": 60.98
+   },
+   "end": {
+    "x": 89.89,
+    "y": 53.27
+   }
+  },
+  {
+   "event_ref": "evt_00048@1",
+   "time_ms": 272000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "carry",
+   "xt": 0.1386,
+   "start": {
+    "x": 63.11,
+    "y": 60.02
+   },
+   "end": {
+    "x": 84.43,
+    "y": 49.36
+   }
+  },
+  {
+   "event_ref": "evt_00078@1",
+   "time_ms": 392000,
+   "team_id": "harbor",
+   "player_id": "harbor_08",
+   "action": "carry",
+   "xt": 0.1383,
+   "start": {
+    "x": 60.82,
+    "y": 28.5
+   },
+   "end": {
+    "x": 85.44,
+    "y": 45.41
+   }
+  },
+  {
+   "event_ref": "evt_00105@1",
+   "time_ms": 608000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "action": "pass",
+   "xt": 0.1364,
+   "start": {
+    "x": 40.26,
+    "y": 34.02
+   },
+   "end": {
+    "x": 89.38,
+    "y": 51.96
+   }
+  },
+  {
+   "event_ref": "evt_00040@1",
+   "time_ms": 232000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "carry",
+   "xt": 0.1345,
+   "start": {
+    "x": 59.31,
+    "y": 63.94
+   },
+   "end": {
+    "x": 88.95,
+    "y": 45.94
+   }
+  },
+  {
+   "event_ref": "evt_00007@1",
+   "time_ms": 43000,
+   "team_id": "vale",
+   "player_id": "vale_06",
+   "action": "carry",
+   "xt": 0.0695,
+   "start": {
+    "x": 58.47,
+    "y": 23.3
+   },
+   "end": {
+    "x": 81.91,
+    "y": 35.29
+   }
+  },
+  {
+   "event_ref": "evt_00070@1",
+   "time_ms": 352000,
+   "team_id": "harbor",
+   "player_id": "harbor_06",
+   "action": "carry",
+   "xt": 0.0682,
+   "start": {
+    "x": 59.04,
+    "y": 32.84
+   },
+   "end": {
+    "x": 86.3,
+    "y": 33.64
+   }
+  },
+  {
+   "event_ref": "evt_00062@1",
+   "time_ms": 312000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "carry",
+   "xt": 0.0635,
+   "start": {
+    "x": 62.3,
+    "y": 71.91
+   },
+   "end": {
+    "x": 87.76,
+    "y": 70.44
+   }
+  },
+  {
+   "event_ref": "evt_00082@1",
+   "time_ms": 400000,
+   "team_id": "harbor",
+   "player_id": "harbor_07",
+   "action": "pass",
+   "xt": 0.0615,
+   "start": {
+    "x": 99.5,
+    "y": 0.5
+   },
+   "end": {
+    "x": 94.84,
+    "y": 55.22
+   }
+  },
+  {
+   "event_ref": "evt_00068@1",
+   "time_ms": 344000,
+   "team_id": "harbor",
+   "player_id": "harbor_08",
+   "action": "pass",
+   "xt": 0.0589,
+   "start": {
+    "x": 54.56,
+    "y": 73.75
+   },
+   "end": {
+    "x": 76.24,
+    "y": 47.32
+   }
+  }
+ ],
+ "xt_grid": {
+  "grid_x": 12,
+  "grid_y": 8,
+  "values": [
+   0.0,
+   0.0,
+   0.05808,
+   0.04299,
+   0.04266,
+   0.06778,
+   0.0,
+   0.0,
+   0.0,
+   0.02975,
+   0.03746,
+   0.04075,
+   0.03774,
+   0.0402,
+   0.02318,
+   0.0,
+   0.0,
+   0.02413,
+   0.03342,
+   0.03984,
+   0.0397,
+   0.03241,
+   0.02344,
+   0.0,
+   0.0,
+   0.02416,
+   0.02009,
+   0.0207,
+   0.0205,
+   0.02331,
+   0.02153,
+   0.0,
+   0.0,
+   0.02575,
+   0.02812,
+   0.02784,
+   0.029,
+   0.02578,
+   0.02485,
+   0.0,
+   0.0,
+   0.02713,
+   0.02499,
+   0.02397,
+   0.02512,
+   0.02565,
+   0.0258,
+   0.0,
+   0.0,
+   0.02033,
+   0.02201,
+   0.02203,
+   0.02265,
+   0.02419,
+   0.0206,
+   0.0,
+   0.0,
+   0.01685,
+   0.02359,
+   0.02531,
+   0.02333,
+   0.02741,
+   0.01394,
+   0.0,
+   0.0,
+   0.06257,
+   0.07765,
+   0.07687,
+   0.06744,
+   0.08776,
+   0.05221,
+   0.0,
+   0.0,
+   0.0566,
+   0.08635,
+   0.08308,
+   0.08192,
+   0.08646,
+   0.05967,
+   0.0,
+   0.0,
+   0.0435,
+   0.09178,
+   0.16189,
+   0.16449,
+   0.09089,
+   0.05549,
+   0.0,
+   0.05311,
+   0.07687,
+   0.09065,
+   0.11592,
+   0.11459,
+   0.06921,
+   0.06712,
+   0.06664
+  ],
+  "training": {
+   "matches": 24,
+   "seeds": [
+    1,
+    24
+   ],
+   "actions": 18460,
+   "shots": 1270,
+   "moves": 17190
+  }
+ },
+ "fullbacks": [
+  {
+   "player_id": "harbor_02",
+   "team_id": "harbor",
+   "side": "right",
+   "style": "overlapping",
+   "seconds": 722.8,
+   "depth_m": 57.8,
+   "attack_depth_m": 78.7,
+   "touchline_m": 11.6,
+   "inside_share": 1.8,
+   "overlaps": 15,
+   "underlaps": 0,
+   "depth_at_loss_m": 65.2,
+   "crosses": 0,
+   "progressive_actions": 0,
+   "xt": 0.0,
+   "moments": [
+    {
+     "time_ms": 193600,
+     "event_ref": "evt_00027@1",
+     "label": "Overlaps outside the winger (3:13\u20133:14)"
+    },
+    {
+     "time_ms": 198000,
+     "event_ref": "evt_00029@1",
+     "label": "Overlaps outside the winger (3:18\u20133:20)"
+    },
+    {
+     "time_ms": 208400,
+     "event_ref": null,
+     "label": "Overlaps outside the winger (3:28\u20133:29)"
+    }
+   ]
+  },
+  {
+   "player_id": "harbor_03",
+   "team_id": "harbor",
+   "side": "left",
+   "style": "inverted",
+   "seconds": 722.8,
+   "depth_m": 50.3,
+   "attack_depth_m": 61.3,
+   "touchline_m": 24.8,
+   "inside_share": 95.7,
+   "overlaps": 0,
+   "underlaps": 0,
+   "depth_at_loss_m": 54.9,
+   "crosses": 0,
+   "progressive_actions": 0,
+   "xt": 0.0,
+   "moments": [
+    {
+     "time_ms": 4200,
+     "event_ref": "evt_00003@1",
+     "label": "Steps inside into midfield (0:04\u20130:29)"
+    },
+    {
+     "time_ms": 64600,
+     "event_ref": "evt_00012@1",
+     "label": "Steps inside into midfield (1:04\u20131:29)"
+    },
+    {
+     "time_ms": 121400,
+     "event_ref": "evt_00018@1",
+     "label": "Steps inside into midfield (2:01\u20132:29)"
+    }
+   ]
+  },
+  {
+   "player_id": "vale_02",
+   "team_id": "vale",
+   "side": "right",
+   "style": "holding",
+   "seconds": 438.4,
+   "depth_m": 25.1,
+   "attack_depth_m": 33.1,
+   "touchline_m": 17.0,
+   "inside_share": 29.2,
+   "overlaps": 0,
+   "underlaps": 0,
+   "depth_at_loss_m": 25.9,
+   "crosses": 0,
+   "progressive_actions": 3,
+   "xt": -0.018,
+   "moments": [
+    {
+     "time_ms": 109200,
+     "event_ref": null,
+     "label": "Runs ahead of the winger (1:49\u20131:51)"
+    }
+   ]
+  },
+  {
+   "player_id": "vale_03",
+   "team_id": "vale",
+   "side": "left",
+   "style": "balanced",
+   "seconds": 438.4,
+   "depth_m": 36.1,
+   "attack_depth_m": 61.0,
+   "touchline_m": 17.0,
+   "inside_share": 31.9,
+   "overlaps": 0,
+   "underlaps": 0,
+   "depth_at_loss_m": 40.1,
+   "crosses": 0,
+   "progressive_actions": 1,
+   "xt": -0.015,
+   "moments": [
+    {
+     "time_ms": 111000,
+     "event_ref": null,
+     "label": "Runs ahead of the winger (1:51\u20131:59)"
+    },
+    {
+     "time_ms": 468800,
+     "event_ref": null,
+     "label": "Runs ahead of the winger (7:48\u20137:59)"
+    },
+    {
+     "time_ms": 524400,
+     "event_ref": null,
+     "label": "Runs ahead of the winger (8:44\u20138:47)"
+    }
+   ]
+  }
+ ],
+ "rotations": {
+  "harbor": {
+   "team_id": "harbor",
+   "rows": [
+    {
+     "kind": "fullback_inverts",
+     "players": [
+      "harbor_03"
+     ],
+     "episodes": 31,
+     "seconds": 563.0,
+     "possessions": 25,
+     "final_third_rate": 28.0,
+     "baseline_rate": 83.3,
+     "moments": [
+      {
+       "time_ms": 4200,
+       "event_ref": "evt_00003@1",
+       "label": "Left-back steps inside (0:04\u20130:29)"
+      },
+      {
+       "time_ms": 64600,
+       "event_ref": "evt_00012@1",
+       "label": "Left-back steps inside (1:04\u20131:29)"
+      },
+      {
+       "time_ms": 121400,
+       "event_ref": "evt_00018@1",
+       "label": "Left-back steps inside (2:01\u20132:29)"
+      }
+     ]
+    },
+    {
+     "kind": "wide_overlap",
+     "players": [
+      "harbor_02",
+      "harbor_10"
+     ],
+     "episodes": 15,
+     "seconds": 54.6,
+     "possessions": 14,
+     "final_third_rate": 71.4,
+     "baseline_rate": 11.8,
+     "moments": [
+      {
+       "time_ms": 193600,
+       "event_ref": "evt_00027@1",
+       "label": "Right-back overlaps the winger (3:13\u20133:14)"
+      },
+      {
+       "time_ms": 198000,
+       "event_ref": "evt_00029@1",
+       "label": "Right-back overlaps the winger (3:18\u20133:20)"
+      },
+      {
+       "time_ms": 208400,
+       "event_ref": null,
+       "label": "Right-back overlaps the winger (3:28\u20133:29)"
+      }
+     ]
+    },
+    {
+     "kind": "striker_drops",
+     "players": [
+      "harbor_09",
+      "harbor_07",
+      "harbor_08"
+     ],
+     "episodes": 9,
+     "seconds": 32.8,
+     "possessions": 8,
+     "final_third_rate": 12.5,
+     "baseline_rate": 47.8,
+     "moments": [
+      {
+       "time_ms": 260000,
+       "event_ref": "evt_00045@1",
+       "label": "Striker drops behind the midfield (4:20\u20134:22)"
+      },
+      {
+       "time_ms": 272400,
+       "event_ref": "evt_00049@1",
+       "label": "Striker drops behind the midfield (4:32\u20134:34)"
+      },
+      {
+       "time_ms": 800200,
+       "event_ref": "evt_00135@1",
+       "label": "Striker drops behind the midfield (13:20\u201313:27)"
+      }
+     ]
+    },
+    {
+     "kind": "holding_midfielder_drops",
+     "players": [
+      "harbor_06",
+      "harbor_04",
+      "harbor_05"
+     ],
+     "episodes": 7,
+     "seconds": 37.2,
+     "possessions": 7,
+     "final_third_rate": 14.3,
+     "baseline_rate": 45.8,
+     "moments": [
+      {
+       "time_ms": 68800,
+       "event_ref": null,
+       "label": "Holding midfielder drops between the centre-backs (1:08\u20131:13)"
+      },
+      {
+       "time_ms": 404800,
+       "event_ref": null,
+       "label": "Holding midfielder drops between the centre-backs (6:44\u20136:49)"
+      },
+      {
+       "time_ms": 485000,
+       "event_ref": "evt_00093@1",
+       "label": "Holding midfielder drops between the centre-backs (8:05\u20138:09)"
+      }
+     ]
+    }
+   ]
+  },
+  "vale": {
+   "team_id": "vale",
+   "rows": [
+    {
+     "kind": "striker_drops",
+     "players": [
+      "vale_09",
+      "vale_07",
+      "vale_08"
+     ],
+     "episodes": 21,
+     "seconds": 213.2,
+     "possessions": 18,
+     "final_third_rate": 5.6,
+     "baseline_rate": 0.0,
+     "moments": [
+      {
+       "time_ms": 34200,
+       "event_ref": "evt_00006@1",
+       "label": "Striker drops behind the midfield (0:34\u20130:48)"
+      },
+      {
+       "time_ms": 94200,
+       "event_ref": "evt_00015@1",
+       "label": "Striker drops behind the midfield (1:34\u20131:57)"
+      },
+      {
+       "time_ms": 154600,
+       "event_ref": "evt_00021@1",
+       "label": "Striker drops behind the midfield (2:34\u20132:43)"
+      }
+     ]
+    },
+    {
+     "kind": "fullback_inverts",
+     "players": [
+      "vale_02",
+      "vale_03"
+     ],
+     "episodes": 8,
+     "seconds": 48.2,
+     "possessions": 7,
+     "final_third_rate": 0.0,
+     "baseline_rate": 5.0,
+     "moments": [
+      {
+       "time_ms": 109200,
+       "event_ref": null,
+       "label": "Right-back steps inside (1:49\u20131:51)"
+      },
+      {
+       "time_ms": 111000,
+       "event_ref": null,
+       "label": "Left-back steps inside (1:51\u20131:59)"
+      },
+      {
+       "time_ms": 468800,
+       "event_ref": null,
+       "label": "Left-back steps inside (7:48\u20137:59)"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "control": {
+  "harbor": {
+   "team_id": "harbor",
+   "possession_share": 62.2,
+   "field_tilt": 100.0,
+   "final_third_entries": 8,
+   "box_entries": 8,
+   "progressive_actions": 33,
+   "xg": 1.2,
+   "ppda": 1.7,
+   "possessions": 31,
+   "purposeful": 12,
+   "sterile": 9,
+   "sterile_passes": 54,
+   "read": "control_with_territory"
+  },
+  "vale": {
+   "team_id": "vale",
+   "possession_share": 37.8,
+   "field_tilt": 0.0,
+   "final_third_entries": 1,
+   "box_entries": 0,
+   "progressive_actions": 16,
+   "xg": 0.05,
+   "ppda": 4.5,
+   "possessions": 27,
+   "purposeful": 1,
+   "sterile": 0,
+   "sterile_passes": 0,
+   "read": "pinned_back"
+  }
+ },
+ "pressing": {
+  "harbor": {
+   "team_id": "harbor",
+   "halves": [
+    {
+     "start_ms": 0,
+     "end_ms": 1200000,
+     "ppda": 1.7,
+     "opponent_passes": 37,
+     "defensive_actions": 22,
+     "high_regains": 2
+    }
+   ],
+   "intervals": [
+    {
+     "start_ms": 0,
+     "end_ms": 900000,
+     "ppda": 1.6,
+     "opponent_passes": 26,
+     "defensive_actions": 16,
+     "high_regains": 2
+    },
+    {
+     "start_ms": 900000,
+     "end_ms": 1200000,
+     "ppda": 1.8,
+     "opponent_passes": 11,
+     "defensive_actions": 6,
+     "high_regains": 0
+    }
+   ],
+   "high_regains": 2,
+   "high_regain_shots": 0,
+   "high_regain_xg": 0.0,
+   "regains_by_third": {
+    "defensive": 0,
+    "middle": 25,
+    "final": 1
+   }
+  },
+  "vale": {
+   "team_id": "vale",
+   "halves": [
+    {
+     "start_ms": 0,
+     "end_ms": 1200000,
+     "ppda": 4.5,
+     "opponent_passes": 77,
+     "defensive_actions": 17,
+     "high_regains": 0
+    }
+   ],
+   "intervals": [
+    {
+     "start_ms": 0,
+     "end_ms": 900000,
+     "ppda": 4.5,
+     "opponent_passes": 50,
+     "defensive_actions": 11,
+     "high_regains": 0
+    },
+    {
+     "start_ms": 900000,
+     "end_ms": 1200000,
+     "ppda": 4.5,
+     "opponent_passes": 27,
+     "defensive_actions": 6,
+     "high_regains": 0
+    }
+   ],
+   "high_regains": 0,
+   "high_regain_shots": 0,
+   "high_regain_xg": 0.0,
+   "regains_by_third": {
+    "defensive": 8,
+    "middle": 18,
+    "final": 0
+   }
+  }
+ },
+ "finishing": [
+  {
+   "player_id": "harbor_07",
+   "team_id": "harbor",
+   "shots": 3,
+   "goals": 0,
+   "xg": 0.4,
+   "goals_minus_xg": -0.4,
+   "xg_per_shot": 0.132
+  },
+  {
+   "player_id": "harbor_10",
+   "team_id": "harbor",
+   "shots": 1,
+   "goals": 1,
+   "xg": 0.35,
+   "goals_minus_xg": 0.65,
+   "xg_per_shot": 0.35
+  },
+  {
+   "player_id": "harbor_06",
+   "team_id": "harbor",
+   "shots": 2,
+   "goals": 0,
+   "xg": 0.33,
+   "goals_minus_xg": -0.33,
+   "xg_per_shot": 0.165
+  },
+  {
+   "player_id": "harbor_08",
+   "team_id": "harbor",
+   "shots": 1,
+   "goals": 0,
+   "xg": 0.13,
+   "goals_minus_xg": -0.13,
+   "xg_per_shot": 0.126
+  },
+  {
+   "player_id": "vale_06",
+   "team_id": "vale",
+   "shots": 1,
+   "goals": 0,
+   "xg": 0.05,
+   "goals_minus_xg": -0.05,
+   "xg_per_shot": 0.054
+  }
+ ],
+ "xg": {
+  "harbor": {
+   "team_id": "harbor",
+   "intervals": [
+    1.2,
+    0.0
+   ],
+   "intervals_against": [
+    0.05,
+    0.0
+   ],
+   "against_by_setup": {
+    "individual": 0.05
+   },
+   "goals_minus_xg": -0.2
+  },
+  "vale": {
+   "team_id": "vale",
+   "intervals": [
+    0.05,
+    0.0
+   ],
+   "intervals_against": [
+    1.2,
+    0.0
+   ],
+   "against_by_setup": {
+    "individual": 0.85,
+    "through_ball": 0.35
+   },
+   "goals_minus_xg": -0.05
+  }
+ },
+ "notes": [
+  {
+   "note_id": "harbor_01",
+   "team_id": "harbor",
+   "topic": "Counter-press after losing the ball",
+   "quantitative": "Harbor Athletic pressed the ball within 3 s after 21 of 26 tracked losses (81%), with 3.2 players within 10 m of the ball after 2 s on average. They won it back within 5 s twice and the opponent moved it 20 m upfield within 10 s 7 times.",
+   "look_for": "Whether the nearest players press together or one at a time, and whether the players behind squeeze up or leave gaps (compactness) and how many stay goal-side as rest defence.",
+   "moments": [
+    {
+     "time_ms": 201000,
+     "event_ref": "evt_00031@1",
+     "label": "Lost in the final third, pressed in 0.2 s, won back in 2.2 s"
+    },
+    {
+     "time_ms": 281000,
+     "event_ref": "evt_00053@1",
+     "label": "Lost in the final third, pressed in 1.2 s, won back in 2.2 s"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_02",
+   "team_id": "harbor",
+   "topic": "Attacking transitions",
+   "quantitative": "Of 26 open-play regains, 8 became counters that reached the final third within 10 s (median 4.0 s); 12 were recycled sideways or back and 1 was lost again within 5 s. Shots within 15 s: 7 (1.20 xG).",
+   "look_for": "Where the space was when the ball was won (behind the opponent's advanced full-backs, through the middle) and whether the first pass went forward or the team chose to settle.",
+   "moments": [
+    {
+     "time_ms": 600000,
+     "event_ref": "evt_00104@1",
+     "label": "Won in the middle third, final third in 8.0 s, shot worth 0.35 xG"
+    },
+    {
+     "time_ms": 180000,
+     "event_ref": "evt_00023@1",
+     "label": "Won in the middle third, final third in 4.0 s, shot worth 0.25 xG"
+    },
+    {
+     "time_ms": 220000,
+     "event_ref": "evt_00037@1",
+     "label": "Won in the middle third, final third in 4.0 s, shot worth 0.21 xG"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_03",
+   "team_id": "harbor",
+   "topic": "Defensive block",
+   "quantitative": "Harbor Athletic sat in a mid block for 82% of settled defending (back four at 36.0 m, 29.7 m from deepest to highest player); 0% of the opponent's final-third entries against it went wide; 1 shot faced, 100% from outside the box.",
+   "look_for": "How the lines shift together toward the ball, whether the block lets passes through the middle or only around it, and who steps out to press and who covers.",
+   "moments": [
+    {
+     "time_ms": 48000,
+     "event_ref": "evt_00008@1",
+     "label": "Shot faced against a mid block: 0.05 xG"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_04",
+   "team_id": "harbor",
+   "topic": "Where the threat comes from",
+   "quantitative": "Harbor Athletic added 0.73 expected threat with completed passes and carries, most from the centre (0.38); 18% of their 33 progressive actions were carries.",
+   "look_for": "The movement that opened the passing lane or the carrying space: a run that dragged a marker away, a rotation, or a defender stepping out.",
+   "moments": [
+    {
+     "time_ms": 192000,
+     "event_ref": "evt_00026@1",
+     "label": "Leon Reed carry: +0.141 xT"
+    },
+    {
+     "time_ms": 272000,
+     "event_ref": "evt_00048@1",
+     "label": "Asher Pike carry: +0.139 xT"
+    },
+    {
+     "time_ms": 392000,
+     "event_ref": "evt_00078@1",
+     "label": "Rafi Moss carry: +0.138 xT"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_05",
+   "team_id": "harbor",
+   "topic": "Right-back role",
+   "quantitative": "Jules Carden played as an overlapping full-back: 2% of build-up time inside, 15 overlaps and 0 underlaps, 78.7 m from goal on average with the ball in the final third, 65.2 m when the ball was lost.",
+   "look_for": "Who covers the space the full-back leaves behind, and whether the winger's movement inside or wide is what frees the run.",
+   "moments": [
+    {
+     "time_ms": 193600,
+     "event_ref": "evt_00027@1",
+     "label": "Overlaps outside the winger (3:13\u20133:14)"
+    },
+    {
+     "time_ms": 198000,
+     "event_ref": "evt_00029@1",
+     "label": "Overlaps outside the winger (3:18\u20133:20)"
+    },
+    {
+     "time_ms": 208400,
+     "event_ref": null,
+     "label": "Overlaps outside the winger (3:28\u20133:29)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_06",
+   "team_id": "harbor",
+   "topic": "Left-back role",
+   "quantitative": "Noah Fen played as an inverted full-back: 96% of build-up time inside, 0 overlaps and 0 underlaps, 61.3 m from goal on average with the ball in the final third, 54.9 m when the ball was lost.",
+   "look_for": "Who covers the space the full-back leaves behind, and whether the winger's movement inside or wide is what frees the run.",
+   "moments": [
+    {
+     "time_ms": 4200,
+     "event_ref": "evt_00003@1",
+     "label": "Steps inside into midfield (0:04\u20130:29)"
+    },
+    {
+     "time_ms": 64600,
+     "event_ref": "evt_00012@1",
+     "label": "Steps inside into midfield (1:04\u20131:29)"
+    },
+    {
+     "time_ms": 121400,
+     "event_ref": "evt_00018@1",
+     "label": "Steps inside into midfield (2:01\u20132:29)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_07",
+   "team_id": "harbor",
+   "topic": "Rotation: full-back steps inside",
+   "quantitative": "Seen 31 times (563 s). Possessions with it reached the final third 28% of the time, against 83% without it.",
+   "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
+   "moments": [
+    {
+     "time_ms": 4200,
+     "event_ref": "evt_00003@1",
+     "label": "Left-back steps inside (0:04\u20130:29)"
+    },
+    {
+     "time_ms": 64600,
+     "event_ref": "evt_00012@1",
+     "label": "Left-back steps inside (1:04\u20131:29)"
+    },
+    {
+     "time_ms": 121400,
+     "event_ref": "evt_00018@1",
+     "label": "Left-back steps inside (2:01\u20132:29)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_08",
+   "team_id": "harbor",
+   "topic": "Rotation: full-back overlaps",
+   "quantitative": "Seen 15 times (55 s). Possessions with it reached the final third 71% of the time, against 12% without it.",
+   "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
+   "moments": [
+    {
+     "time_ms": 193600,
+     "event_ref": "evt_00027@1",
+     "label": "Right-back overlaps the winger (3:13\u20133:14)"
+    },
+    {
+     "time_ms": 198000,
+     "event_ref": "evt_00029@1",
+     "label": "Right-back overlaps the winger (3:18\u20133:20)"
+    },
+    {
+     "time_ms": 208400,
+     "event_ref": null,
+     "label": "Right-back overlaps the winger (3:28\u20133:29)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_09",
+   "team_id": "harbor",
+   "topic": "Possession against control",
+   "quantitative": "Harbor Athletic had the ball and the territory: 62% possession, 100% field tilt, 1.20 xG. 12 of 31 possessions reached the final third or a shot; 9 strung 5 or more passes without either.",
+   "look_for": "In the sterile spells: whether the opponent's block invited the passes, and whether anyone tried to break a line.",
+   "moments": [
+    {
+     "time_ms": 720000,
+     "event_ref": "evt_00116@1",
+     "label": "Sterile possession: 6 passes, no final third"
+    },
+    {
+     "time_ms": 760000,
+     "event_ref": "evt_00125@1",
+     "label": "Sterile possession: 6 passes, no final third"
+    },
+    {
+     "time_ms": 800000,
+     "event_ref": "evt_00134@1",
+     "label": "Sterile possession: 6 passes, no final third"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "harbor_10",
+   "team_id": "harbor",
+   "topic": "Chances against goals",
+   "quantitative": "Harbor Athletic scored 1 from 1.20 xG (-0.20).",
+   "look_for": "Whether the best chances were missed through rushed finishing or a good save, and whether the final pass was on time.",
+   "moments": [
+    {
+     "time_ms": 615000,
+     "event_ref": "evt_00106@1",
+     "label": "Dario Finch: 0.35 xG, goal"
+    },
+    {
+     "time_ms": 194000,
+     "event_ref": "evt_00027@1",
+     "label": "Leon Reed: 0.25 xG, saved"
+    },
+    {
+     "time_ms": 234000,
+     "event_ref": "evt_00041@1",
+     "label": "Asher Pike: 0.21 xG, blocked"
+    }
+   ],
+   "caveat": "One match is far too few shots to judge finishing."
+  },
+  {
+   "note_id": "vale_11",
+   "team_id": "vale",
+   "topic": "Counter-press after losing the ball",
+   "quantitative": "Vale United pressed the ball within 3 s after 13 of 25 tracked losses (52%), with 2.4 players within 10 m of the ball after 2 s on average. They won it back within 5 s 0 times and the opponent moved it 20 m upfield within 10 s 7 times.",
+   "look_for": "Whether the nearest players press together or one at a time, and whether the players behind squeeze up or leave gaps (compactness) and how many stay goal-side as rest defence.",
+   "moments": [
+    {
+     "time_ms": 600000,
+     "event_ref": "evt_00104@1",
+     "label": "Lost in the middle third, not won back: shot conceded worth 0.35 xG"
+    },
+    {
+     "time_ms": 180000,
+     "event_ref": "evt_00023@1",
+     "label": "Lost in the middle third, not won back: shot conceded worth 0.25 xG"
+    },
+    {
+     "time_ms": 220000,
+     "event_ref": "evt_00037@1",
+     "label": "Lost in the middle third, not won back: shot conceded worth 0.21 xG"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_12",
+   "team_id": "vale",
+   "topic": "Attacking transitions",
+   "quantitative": "Of 26 open-play regains, 0 became counters that reached the final third within 10 s (median \u2014 s); 12 were recycled sideways or back and 2 were lost again within 5 s. Shots within 15 s: 0 (0.00 xG).",
+   "look_for": "Where the space was when the ball was won (behind the opponent's advanced full-backs, through the middle) and whether the first pass went forward or the team chose to settle.",
+   "moments": [],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_13",
+   "team_id": "vale",
+   "topic": "Defensive block",
+   "quantitative": "Vale United sat in a low block for 93% of settled defending (back four at 23.3 m, 30.0 m from deepest to highest player); 1 shot faced, 0% from outside the box.",
+   "look_for": "How the lines shift together toward the ball, whether the block lets passes through the middle or only around it, and who steps out to press and who covers.",
+   "moments": [
+    {
+     "time_ms": 615000,
+     "event_ref": "evt_00106@1",
+     "label": "Shot faced against a low block: 0.35 xG"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_14",
+   "team_id": "vale",
+   "topic": "Where the threat comes from",
+   "quantitative": "Vale United added 0.00 expected threat with completed passes and carries, most from the left (0.06); 6% of their 16 progressive actions were carries.",
+   "look_for": "The movement that opened the passing lane or the carrying space: a run that dragged a marker away, a rotation, or a defender stepping out.",
+   "moments": [
+    {
+     "time_ms": 43000,
+     "event_ref": "evt_00007@1",
+     "label": "Emil Stone carry: +0.070 xT"
+    },
+    {
+     "time_ms": 1113500,
+     "event_ref": "evt_00202@1",
+     "label": "Niko Ash pass: +0.010 xT"
+    },
+    {
+     "time_ms": 1111800,
+     "event_ref": "evt_00201@1",
+     "label": "Finn Alder pass: +0.007 xT"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_15",
+   "team_id": "vale",
+   "topic": "Right-back role",
+   "quantitative": "Oren Clay played as a holding full-back: 29% of build-up time inside, 0 overlaps and 0 underlaps, 33.1 m from goal on average with the ball in the final third, 25.9 m when the ball was lost.",
+   "look_for": "Who covers the space the full-back leaves behind, and whether the winger's movement inside or wide is what frees the run.",
+   "moments": [
+    {
+     "time_ms": 109200,
+     "event_ref": null,
+     "label": "Runs ahead of the winger (1:49\u20131:51)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_16",
+   "team_id": "vale",
+   "topic": "Rotation: striker drops deep",
+   "quantitative": "Seen 21 times (213 s). Possessions with it reached the final third 6% of the time, against 0% without it.",
+   "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
+   "moments": [
+    {
+     "time_ms": 34200,
+     "event_ref": "evt_00006@1",
+     "label": "Striker drops behind the midfield (0:34\u20130:48)"
+    },
+    {
+     "time_ms": 94200,
+     "event_ref": "evt_00015@1",
+     "label": "Striker drops behind the midfield (1:34\u20131:57)"
+    },
+    {
+     "time_ms": 154600,
+     "event_ref": "evt_00021@1",
+     "label": "Striker drops behind the midfield (2:34\u20132:43)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_17",
+   "team_id": "vale",
+   "topic": "Rotation: full-back steps inside",
+   "quantitative": "Seen 8 times (48 s). Possessions with it reached the final third 0% of the time, against 5% without it.",
+   "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
+   "moments": [
+    {
+     "time_ms": 109200,
+     "event_ref": null,
+     "label": "Right-back steps inside (1:49\u20131:51)"
+    },
+    {
+     "time_ms": 111000,
+     "event_ref": null,
+     "label": "Left-back steps inside (1:51\u20131:59)"
+    },
+    {
+     "time_ms": 468800,
+     "event_ref": null,
+     "label": "Left-back steps inside (7:48\u20137:59)"
+    }
+   ],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_18",
+   "team_id": "vale",
+   "topic": "Possession against control",
+   "quantitative": "Vale United had neither the ball nor the territory: 38% possession, 0% field tilt, 0.05 xG. 1 of 27 possessions reached the final third or a shot; 0 strung 5 or more passes without either.",
+   "look_for": "In the sterile spells: whether the opponent's block invited the passes, and whether anyone tried to break a line.",
+   "moments": [],
+   "caveat": null
+  },
+  {
+   "note_id": "vale_19",
+   "team_id": "vale",
+   "topic": "Chances against goals",
+   "quantitative": "Vale United scored 0 from 0.05 xG (-0.05).",
+   "look_for": "Whether the best chances were missed through rushed finishing or a good save, and whether the final pass was on time.",
+   "moments": [
+    {
+     "time_ms": 48000,
+     "event_ref": "evt_00008@1",
+     "label": "Emil Stone: 0.05 xG, off target"
+    }
+   ],
+   "caveat": "One match is far too few shots to judge finishing."
+  }
+ ],
+ "definitions": {
+  "phases_of_play": "Each team's live-ball time split into six phases: attacking (settled possession), defending (settled out of possession), attacking and defensive transitions (the first 10 s after an open-play regain or loss, or 15 s while it is a counter that reached the final third) and set pieces (the first 10 s after a corner, free kick or throw-in, attacking or defending). Goal kicks and kick-offs start the attacking phase. Shots, xG and goals are credited to the phase in which the shot's possession was at the time.",
+  "counter": "An attacking transition that reaches the final third (x \u2265 66.67) within 10 s of an open-play regain outside it. Recycled: the first action after the regain goes sideways or backward (less than 5 m of depth). Lost quickly: the possession ends within 5 s without reaching the final third. Counter shots are shots within 15 s of a regain.",
+  "counter_press": "After each open-play loss, from the 5 Hz synthetic positions: pressed when a player other than the one who lost it gets within 3 m of the ball within 3 s; the pack is how many of the team's outfield players are within 10 m of the ball 2 s after the loss. Regained within 5 or 10 s comes from the events. Bypassed: the opponent moved the ball 20 m or more upfield within 10 s.",
+  "rest_defence": "At the moment of each loss: how many outfield players were goal-side of the ball (nearer their own goal than it), and how many of those were back-four defenders.",
+  "blocks": "Settled defending time (out of possession, outside transitions and set pieces) classed every 200 ms by the back four's mean depth: high at 42 m or more, low under 30 m, mid in between. For each block: length (deepest to highest outfield player), width, the gap between the back four and the midfield three, players in their own box while the ball is in their defending third (35 m), and what the opponent did against it.",
+  "wide_entries": "Opponent entries into its final third (completed passes and carries) ending in a wide channel (y < 33.3 or y > 66.7): the share of entries a block forced wide.",
+  "long_shots": "Shots from outside the penalty area.",
+  "crosses_faced": "Opponent passes from a wide channel of its final third into the penalty area.",
+  "line_snapshots": "The line during the opponent's first build-up (the first 8 s of a possession it starts in its own third from a restart or its goalkeeper) and during a high press (the opponent has the ball in its own third and one of the team's players is within 5 m of it), against settled defending. Front line: mean depth of the three forwards.",
+  "recovery": "Balls in behind: opponent completed passes that end nearer the team's goal than its deepest outfield player, within 45 m of goal. Retreat is the back four's mean drop in depth over the next 5 s; top speed their fastest recovery speed; the keeper's distance from the goal line as the pass is played and the furthest within 5 s. A sweep is the keeper leaving the penalty area (16.5 m) in that time.",
+  "progressive_carry": "A carry that moves the ball at least 10 m closer to the centre of the opponent's goal, or 5 m when it starts in the final 40% of the pitch (x \u2265 60), and ends further forward than it started (StatsBomb / FBref convention). Progressive carry metres add up the forward distance of those carries.",
+  "take_on": "A carry that beat a challenge on the way (the defender lost the ground duel). Unlike a progressive carry it says nothing about how far the ball moved.",
+  "xt": "Expected threat: each zone of a 12 x 8 grid has the chance that a possession there ends in a goal within the next few actions, learned by value iteration from how play moved in 24 other synthetic matches (never this one). A completed pass or carry is worth xT(end zone) \u2212 xT(start zone). Failed actions are not valued, as in the original method.",
+  "xt_vs_pv": "Possession value (in Live analytics) uses a hand-set surface that rises steadily toward goal. xT is learned from the synthetic matches, so it shows where that play really leads to shots, including quirks of the generator.",
+  "fullback_style": "From the 5 Hz synthetic positions while the team has the ball: inverted when the full-back spends 40% or more of build-up time 18 m or more from the touchline; overlapping or underlapping when it gets ahead of its winger outside (wider) or inside (narrower) at least 3 times and twice as often as the other way; holding when, with the ball in the final third, it stays under 52 m from its own goal on average; otherwise balanced. At least 60 s in possession is needed.",
+  "overlap": "A full-back at least 2 m ahead of the winger on its side and at least 3 m wider, for 1 s or more. An underlap is the same run 3 m or more inside the winger.",
+  "rotations": "Position swaps held for 2 s or more while the team has the ball: the holding midfielder dropping level with or behind the centre-backs and between them; the striker dropping behind the most advanced central midfielder; a full-back overlapping or underlapping its winger (1 s); a full-back stepping inside (18 m or more from the touchline, 5 m ahead of the centre-backs) before the final third. The final-third rate compares possessions with the rotation against those without.",
+  "control": "Possession against control. Purposeful possessions reach the final third or a shot; sterile ones string 5 or more completed passes without either. The read compares possession with field tilt: control with territory (both 55% or more), possession without penetration (55% or more of the ball, under 50% of the final-third passes), territory without the ball (45% or less of the ball, 45% or more of the territory), pinned back (both under 45% and 40%), otherwise balanced.",
+  "ppda_intervals": "PPDA as in Live analytics (opponent passes in its own 60% \u00f7 this team's duels and interceptions there), by half and by 15 minutes. High regains are open-play regains in the attacking 40% (x \u2265 60); their shots are within 15 s.",
+  "finishing": "Goals minus xG per shooter: above zero, more goals than the chances' quality suggests. One match is far too small a sample to call anyone a good or poor finisher.",
+  "analyst_notes": "Each note pairs a number (with its sample) with moments to watch on the replay: the data says what happened, the pictures show why. The notes do not explain causes; they point to where to look."
+ },
+ "limitations": [
+  "Synthetic data: the events and the 5 Hz player positions are generated from fictional tendencies. Off-ball movement between events is illustrative.",
+  "Phases, counters and set pieces are classified from the event stream with fixed windows. Real analysts judge where a transition ends by the shape of both teams, not by a timer.",
+  "Counter-pressing, blocks, recovery runs, full-back roles and rotations come from synthetic positions, so they show what the generator planted plus noise. Thresholds are documented conventions, not calibrated against real tracking data.",
+  "Expected threat is learned from 24 synthetic matches built by the same scripted generator, so it inherits the generator's habits (for example keepers' long balls that reach a forward directly). It is not a model of real football.",
+  "Free kicks and throw-ins are rare or absent in the synthetic events (fouls are recorded only as stoppages and the ball goes out mostly for goal kicks), so the set-piece phase is mostly corners.",
+  "One match is a small sample. Read rates with their counts, and the analyst notes as prompts for what to watch, not conclusions."
+ ]
+}

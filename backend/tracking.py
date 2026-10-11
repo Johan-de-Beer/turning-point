@@ -371,6 +371,14 @@ class TrackingBuilder:
         sprint = press["speed_mps"] + rng.gauss(0, .3)
         cover = next((p for p in by_role(opponent, FORWARDS) if p != trigger), None) if pressed else None
         defenders_of_team = by_role(team, ("RCB", "LCB", "RB", "LB"))
+        # Counter-press: when this possession began by winning the ball in open play, the side
+        # that lost it may send its nearest players after the ball for a few seconds.
+        previous = next((e.payload for e in reversed(self.ordered[:index]) if e.payload.kind != "TACKLE"), None)
+        regain = previous is not None and previous.kind not in ("STOPPAGE", "PERIOD_START") and previous.team_id == opponent
+        plan_cp = tendencies(opponent)["movement"].get("counter_press") if regain else None
+        if plan_cp and (t0 // FRAME_MS * 2_654_435_761) % 1000 >= plan_cp["rate"] * 1000:
+            plan_cp = None     # the same deterministic draw as the continuous layer: no counter-press this time
+        hunters: set[str] = set()
 
         def shape(r: str, bx: float, by: float, high: bool) -> Point:
             lift = max(0.0, bx - 20)
@@ -382,9 +390,22 @@ class TrackingBuilder:
                 return (min(72, (40 if high else 50) + .4 * lift), 50 + DEFEND_Y[r] * .9 + (by - 50) * .3)
             return (max(bx + (9 if high else 18), (24 if high else 36) + .45 * lift), 50 + DEFEND_Y[r] * (.4 if high else .55) + (by - 50) * .3)
 
+        if plan_cp and plan_cp["players"]:
+            near = sorted((metres(shape(role(pid), *start, pressed), start), pid) for pid in team_players(opponent)
+                          if role(pid) != "GK" and pid not in (trigger, cover))
+            hunters = {pid for distance, pid in near[:plan_cp["players"]] if distance <= plan_cp["reach_m"]}
         for pid in team_players(opponent):
             r = role(pid)
-            if pid == trigger:
+            if pid in hunters:
+                def target(t, r=r):
+                    bx, by = ball(t)
+                    return (bx + 1.0, by) if t <= t0 + plan_cp["window_ms"] else shape(r, bx, by, pressed)
+
+                def speed(t):
+                    # A brisk closing run, kept under the press detector's sprint threshold so the
+                    # planted press triggers stay what they were.
+                    return 4.2 if t <= t0 + plan_cp["window_ms"] else 3.6
+            elif pid == trigger:
                 def target(t, r=r):
                     bx, by = ball(t)
                     if t < reaction:

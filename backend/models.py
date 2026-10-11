@@ -1191,3 +1191,297 @@ class MatchAnalytics(StrictModel):
     defensive_actions: list[DefensiveRow]
     definitions: dict[str, str]
     limitations: list[str]
+
+
+# ---------------------------------------------------------------- game phases (phases_v1)
+PHASES_VERSION = "phases_v1"
+PhaseName = Literal["attacking", "attacking_transition", "attacking_set_piece", "defending", "defensive_transition", "defending_set_piece"]
+BlockName = Literal["high", "mid", "low"]
+
+
+class Moment(StrictModel):
+    """A moment to watch on the replay: the numbers point to it, the pictures explain it."""
+    time_ms: int
+    event_ref: str | None
+    label: str
+
+
+class PhaseRow(StrictModel):
+    phase: PhaseName
+    seconds: float
+    share: float | None            # of the team's live-ball time
+    passes: int
+    final_third_entries: int
+    xt: float
+    shots_for: int
+    xg_for: float
+    goals_for: int
+    shots_against: int
+    xg_against: float
+    goals_against: int
+
+
+class TeamPhases(StrictModel):
+    team_id: str
+    live_seconds: float
+    rows: list[PhaseRow]
+    restarts: dict[str, int]       # restarts taken by type: corner, free_kick, goal_kick, throw_in
+
+
+class AttackingTransitions(StrictModel):
+    regains: int
+    counters: int                  # reached the final third within the counter window
+    counter_shots: int
+    counter_xg: float
+    recycled: int                  # first action sideways or backward
+    lost_quickly: int
+    median_to_final_third_s: float | None
+    by_third: dict[str, int]       # regains by where the ball was won
+    counters_by_third: dict[str, int]
+    moments: list[Moment]
+
+
+class CounterPress(StrictModel):
+    losses: int
+    tracked: int                   # losses with synthetic positions
+    pressed: int                   # pressure within the window by someone other than the player who lost it
+    press_rate: float | None
+    median_pressure_s: float | None
+    pack_2s: float | None          # mean players within 10 m of the ball 2 s after the loss
+    regained_5s: int
+    regained_10s: int
+    bypassed: int                  # the opponent moved the ball 20 m or more upfield within 10 s
+    shots_conceded: int            # within 15 s of the loss
+    xg_conceded: float
+    rest_defence: float | None     # mean outfield players goal-side of the ball at the loss
+    rest_defenders: float | None   # of whom back-four defenders
+    by_third: dict[str, int]       # losses by where the ball was lost
+    moments: list[Moment]
+
+
+class TeamTransitions(StrictModel):
+    team_id: str
+    attacking: AttackingTransitions
+    defensive: CounterPress
+
+
+class BlockRow(StrictModel):
+    block: BlockName
+    seconds: float
+    share: float | None            # of settled defending time
+    back_four_m: float | None
+    length_m: float | None         # deepest to highest outfield player
+    width_m: float | None          # outfield spread across the pitch
+    line_gap_m: float | None
+    box_defenders: float | None    # own players in the box while the ball is in the defending third
+    opponent_entries: int          # opponent entries into its final third
+    wide_entry_share: float | None
+    opponent_shots: int
+    long_shot_share: float | None  # shots from outside the box
+    xg_against: float
+    goals_against: int
+    crosses_faced: int
+    ppda: float | None
+    regains: int
+    counters: int
+
+
+class LineSnapshot(StrictModel):
+    situation: Literal["settled", "opponent_build_up", "high_press"]
+    seconds: float
+    back_four_m: float | None
+    front_line_m: float | None
+    length_m: float | None
+
+
+class Recovery(StrictModel):
+    balls_in_behind: int
+    tracked: int
+    retreat_m: float | None        # back four's mean retreat in the 5 s after
+    top_speed_mps: float | None    # fastest back-four recovery speed in those 5 s
+    keeper_start_m: float | None   # keeper's distance from the goal line as the ball is played
+    keeper_max_m: float | None     # furthest the keeper came within 5 s
+    sweeps: int                    # the keeper left the penalty area (16.5 m) within 5 s
+    shots_conceded: int            # within 10 s
+    moments: list[Moment]
+
+
+class TeamBlocks(StrictModel):
+    team_id: str
+    settled_seconds: float
+    rows: list[BlockRow]
+    snapshots: list[LineSnapshot]
+    recovery: Recovery
+
+
+class PlayerProgression(StrictModel):
+    player_id: str
+    team_id: str
+    progressive_passes: int
+    progressive_carries: int
+    progressive_carry_m: float
+    carries: int
+    carries_final_third: int
+    carries_box: int
+    take_ons: int
+    xt_passes: float
+    xt_carries: float
+    xt: float
+
+
+class ThreatAction(StrictModel):
+    event_ref: str
+    time_ms: int
+    team_id: str
+    player_id: str
+    action: Literal["pass", "carry"]
+    xt: float
+    start: Point
+    end: Point
+
+
+class TeamProgression(StrictModel):
+    team_id: str
+    progressive_passes: int
+    progressive_carries: int
+    carry_share: float | None      # progressive carries as a share of progressive actions
+    progressive_carry_m: float
+    carries_final_third: int
+    carries_box: int
+    take_ons: int
+    xt: float
+    xt_passes: float
+    xt_carries: float
+    xt_by_channel: dict[str, float]  # left, centre, right (where the action started)
+    xt_intervals: list[float]        # by 15 minutes
+
+
+class XtGrid(StrictModel):
+    grid_x: int
+    grid_y: int
+    values: list[float]
+    training: dict[str, int | list[int]]
+
+
+class FullbackRow(StrictModel):
+    player_id: str
+    team_id: str
+    side: Literal["right", "left"]
+    style: Literal["overlapping", "underlapping", "inverted", "holding", "balanced", "insufficient_evidence"]
+    seconds: float                  # in-possession time measured
+    depth_m: float | None           # mean distance from own goal line in possession
+    attack_depth_m: float | None    # the same with the ball in the final third
+    touchline_m: float | None       # mean distance from own touchline in possession
+    inside_share: float | None      # share of build-up time 18 m or more from the touchline
+    overlaps: int
+    underlaps: int
+    depth_at_loss_m: float | None
+    crosses: int
+    progressive_actions: int
+    xt: float
+    moments: list[Moment]
+
+
+class RotationRow(StrictModel):
+    kind: Literal["holding_midfielder_drops", "striker_drops", "wide_overlap", "wide_underlap", "fullback_inverts"]
+    players: list[str]
+    episodes: int
+    seconds: float
+    possessions: int                # possessions with the rotation
+    final_third_rate: float | None  # of those, share reaching the final third
+    baseline_rate: float | None     # possessions without it
+    moments: list[Moment]
+
+
+class TeamRotations(StrictModel):
+    team_id: str
+    rows: list[RotationRow]
+
+
+class ControlRow(StrictModel):
+    team_id: str
+    possession_share: float | None
+    field_tilt: float | None
+    final_third_entries: int
+    box_entries: int
+    progressive_actions: int
+    xg: float
+    ppda: float | None
+    possessions: int
+    purposeful: int                 # reached the final third or a shot
+    sterile: int                    # five or more completed passes, no final third, no shot
+    sterile_passes: int
+    read: Literal["control_with_territory", "possession_without_penetration", "territory_without_the_ball", "pinned_back", "balanced", "insufficient_evidence"]
+
+
+class PressInterval(StrictModel):
+    start_ms: int
+    end_ms: int
+    ppda: float | None
+    opponent_passes: int
+    defensive_actions: int
+    high_regains: int
+
+
+class TeamPressing(StrictModel):
+    team_id: str
+    halves: list[PressInterval]
+    intervals: list[PressInterval]
+    high_regains: int               # open-play regains in the attacking 40%
+    high_regain_shots: int          # shots within 15 s of them
+    high_regain_xg: float
+    regains_by_third: dict[str, int]
+
+
+class FinishingRow(StrictModel):
+    player_id: str
+    team_id: str
+    shots: int
+    goals: int
+    xg: float
+    goals_minus_xg: float
+    xg_per_shot: float | None
+
+
+class TeamXg(StrictModel):
+    team_id: str
+    intervals: list[float]          # xG for by 15 minutes
+    intervals_against: list[float]
+    against_by_setup: dict[str, float]
+    goals_minus_xg: float
+
+
+class AnalystNote(StrictModel):
+    note_id: str
+    team_id: str
+    topic: str
+    quantitative: str               # the numbers, with the sample size
+    look_for: str                   # what the replay can show that the numbers cannot
+    moments: list[Moment]
+    caveat: str | None
+
+
+class GamePhases(StrictModel):
+    session_id: str
+    generation: int
+    data_epoch: int
+    playhead_ms: int
+    next_cursor: str
+    engine_version: Literal["phases_v1"] = PHASES_VERSION
+    provenance: Literal["synthetic_events_and_tracking"] = "synthetic_events_and_tracking"
+    phases: dict[str, TeamPhases]
+    transitions: dict[str, TeamTransitions]
+    blocks: dict[str, TeamBlocks]
+    progression: dict[str, TeamProgression]
+    player_progression: list[PlayerProgression]
+    top_threat: list[ThreatAction]
+    xt_grid: XtGrid
+    fullbacks: list[FullbackRow]
+    rotations: dict[str, TeamRotations]
+    control: dict[str, ControlRow]
+    pressing: dict[str, TeamPressing]
+    finishing: list[FinishingRow]
+    xg: dict[str, TeamXg]
+    notes: list[AnalystNote]
+    definitions: dict[str, str]
+    limitations: list[str]
