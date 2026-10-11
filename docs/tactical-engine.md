@@ -43,7 +43,7 @@ Man-oriented and zonal marking differ in whether a defender follows a runner out
 
 ### Press
 
-A press is an outfield player within 25 m of the ball running toward it at 4.5 m/s or faster for two frames within 3 s of a possession starting in the opponent's own half. The first such player is the trigger. The player on the ball at that moment is the target. Time to pressure runs from the trigger's onset until they are within 2.5 m of the ball.
+A press is an outfield player within 25 m of the ball running toward it at 4.5 m/s or faster for two frames within 3 s of a possession starting in the opponent's own half. The first such player is the trigger. The player on the ball at that moment is the target. Time to pressure runs from the trigger's onset until they are within 2.5 m of the ball. Since phases_v1 the synthetic counter-press hunters that chase the ball after a loss run at 4.2 m/s inside tracking episodes, under this threshold, so they do not add press triggers; see [phases of play](game-phases.md).
 
 The outcome is the first of these within 12 s: a pass back to the goalkeeper, a turnover, a pass or carry past halfway, or a stoppage. The engine compares pressed and unpressed possessions, including how quickly a press forces the ball back to the keeper. PPDA (passes allowed per defensive action) is the common public measure of pressing intensity. It needs defensive-action events the synthetic stream doesn't have, so the engine reports press rate, closing speed and outcomes instead.
 

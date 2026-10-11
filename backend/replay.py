@@ -16,11 +16,12 @@ from .agents import EditorResult, EvidenceBundle, MockProvider, bundle_for, fing
 from .ingest import IngestionError, Ingestor, canonical_order
 from .limits import ReplayLimits
 from .metrics import DEFINITIONS, facts_for_snapshot, player_statistics, score, snapshot
-from .models import AgentRun, Diagnostics, EventEnvelope, Insight, MetricSnapshot, Overlay, OverlayDisplay, PERIOD_MS, Preferences, Recap, RULES_VERSION, SessionState, TacticalReport, MatchAnalytics
+from .models import AgentRun, Diagnostics, EventEnvelope, Insight, MetricSnapshot, Overlay, OverlayDisplay, PERIOD_MS, Preferences, Recap, RULES_VERSION, SessionState, TacticalReport, MatchAnalytics, GamePhases
 from .patterns import Candidate, PatternEngine, conditions_for
 from .recaps import build_recap, locked_recap
 from .storage import Storage
 from .analytics import AnalyticsEngine
+from .phases import PhaseEngine
 from .tactics import TacticalEngine
 
 
@@ -121,6 +122,7 @@ class ReplayService:
         # Synthetic tracking is built lazily (or warmed at startup) and released by playhead.
         self.tactics = TacticalEngine(match, fixture)
         self.analytics = AnalyticsEngine(match, fixture, self.tactics)
+        self.phases = PhaseEngine(self.analytics)
         self.restore()
 
     def restore(self):
@@ -696,6 +698,12 @@ class ReplayService:
         self.reconcile(session)
         report = self.analytics.report(session.ingestor.records, session.playhead_ms)
         return MatchAnalytics(session_id=session.session_id, generation=session.generation, data_epoch=session.data_epoch,
+            playhead_ms=session.playhead_ms, next_cursor=self.cursor(session), **report)
+
+    def phases_report(self, session: Session) -> GamePhases:
+        self.reconcile(session)
+        report = self.phases.report(session.ingestor.records, session.playhead_ms)
+        return GamePhases(session_id=session.session_id, generation=session.generation, data_epoch=session.data_epoch,
             playhead_ms=session.playhead_ms, next_cursor=self.cursor(session), **report)
 
     async def drain(self):

@@ -587,6 +587,26 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .workload-alert { display: flex; align-items: center; gap: 8px; color: var(--warning); font-size: 14px; }
 .trend-drop { color: var(--warning); font-weight: 600; }
 .tactics-table small { color: var(--text-3); }
+/* Phases of play */
+.phase-bar { display: flex; height: 14px; border-radius: var(--radius-sm); overflow: hidden; background: var(--surface-2); }
+.phase-bar span { display: block; height: 100%; }
+.phase-attacking { background: var(--home); }
+.phase-attacking_transition { background: var(--teal); }
+.phase-attacking_set_piece { background: var(--success); }
+.phase-defending { background: var(--border-input); }
+.phase-defensive_transition { background: var(--warning); }
+.phase-defending_set_piece { background: var(--danger); }
+.phase-notes { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+.phase-notes > li { display: grid; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--border); }
+.phase-notes h4 { margin: 0; font-family: var(--display); font-size: 18px; font-weight: 600; }
+.phase-notes p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+.phase-notes .phase-look strong { color: var(--text); }
+.phase-caveat { color: var(--text-3) !important; font-size: 13px !important; }
+.phase-moments { display: grid; gap: var(--space-1); font-size: 13px; }
+.phase-moments > span { color: var(--text-3); }
+.phase-moments ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.phase-moments li { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; color: var(--text-2); min-height: 28px; }
+.phase-moments .moment-time { font-variant-numeric: tabular-nums; color: var(--text-3); min-width: 40px; }
 @media (max-width: 960px) {
   .tactics-lead { grid-template-columns: 1fr; }
   .tactics-moment { position: static; order: -1; }

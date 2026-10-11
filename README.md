@@ -14,6 +14,8 @@ A Tactics panel under the pitch reads a synthetic 5 Hz tracking layer and report
 
 A Live analytics panel adds field tilt (live and by 15 minutes, against possession), heuristic xG and Major/Minor chances, defensive line height by phase, external player workload and possession value, and the match numbers now include shots on target, duels won, field tilt and xG. Events show each player's position (ST, CAM, CDM…). See [match analytics](docs/match-analytics.md).
 
+A Phases of play panel splits each team's time into possession, defending, transitions and set pieces, and reports counters and counter-pressing after each loss, the defensive block and line height (also during the opponent's build-up and a high press), recovery runs and keeper sweeps behind the line, progressive carries and expected threat (xT, fitted on other synthetic matches), full-back roles and rotations, and possession against control. Analyst notes pair each number with moments to show on the pitch. See [phases of play](docs/game-phases.md).
+
 ## Run on Windows
 
 Requires Python 3.12+, Node.js 22.12+ (tested development versions: Python 3.12.3, Node 24.13.0, npm 11.6.2), and PowerShell. From the repository root:
@@ -96,6 +98,7 @@ Automatic deployment retains the named replay volume, takes a consistent private
 - [Architecture](docs/architecture.md) and [API contract](docs/api-contract.md)
 - [Tactical engine method and limitations](docs/tactical-engine.md)
 - [Live match analytics method and limitations](docs/match-analytics.md)
+- [Phases of play, xT and analyst notes](docs/game-phases.md)
 - [Blender stadium source and animation behavior](docs/stadium-assets.md)
 - [Technical decisions and verified primary sources](docs/technical-decisions.md)
 - [Public hosting and release procedure](docs/deployment.md) and [public backend bounds](docs/public-demo-backend.md)

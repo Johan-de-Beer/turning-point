@@ -15,7 +15,9 @@ team always attacks toward x = 100) on the nominal 105 x 68 m pitch. Like the
 episodes, the motion is generated from server-only fictional tendencies; the
 analysis in ``analytics`` re-measures everything from the frames and never reads them.
 
-Only per-second running totals are kept, not every position, so the layer stays small.
+Per-second running totals feed workload and line height. Every player's position, the
+ball and who owns it are also kept at every frame (``Track``, about 5 MB per fixture) for
+the phase-of-play analysis, which needs off-ball positions at arbitrary moments.
 """
 from __future__ import annotations
 
@@ -25,7 +27,7 @@ from dataclasses import dataclass, field
 
 from .ingest import canonical_order
 from .models import EventEnvelope, Match, PERIOD_MS
-from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, role, tendencies
+from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, player_for, role, tendencies
 from .tracking import FRAME_MS, X_M, Y_M, ATTACK_Y, Episode, metres
 
 DT = FRAME_MS / 1000
@@ -70,6 +72,27 @@ class LineReading:
 
 
 @dataclass
+class Track:
+    """Every frame of the layer: positions (home frame, normalised units), ball, owner and holder."""
+    players: list[str]
+    xy: array          # (frame * len(players) + k) * 2 -> x, then y
+    ball: array        # frame * 2 -> x, then y
+    owner: bytearray   # 0 dead ball, 1 home, 2 away
+    holder: bytearray  # index into players, or 255 for nobody
+
+    @property
+    def frames(self) -> int:
+        return len(self.owner)
+
+    def position(self, frame: int, k: int) -> tuple[float, float]:
+        base = (frame * len(self.players) + k) * 2
+        return self.xy[base], self.xy[base + 1]
+
+    def ball_at(self, frame: int) -> tuple[float, float]:
+        return self.ball[frame * 2], self.ball[frame * 2 + 1]
+
+
+@dataclass
 class Movement:
     players: dict[str, PlayerTotals]
     # team -> phase -> field -> running sums per second
@@ -80,6 +103,7 @@ class Movement:
     cells: dict[str, bytearray] = field(default_factory=dict)
     # Every player's position (home frame) at the frame nearest each pass and carry, by event id.
     snapshots: dict[str, dict[str, tuple[float, float]]] = field(default_factory=dict)
+    track: Track | None = None
 
 
 def cell(x: float, y: float) -> int:
@@ -171,6 +195,9 @@ class MovementBuilder:
         before: dict[str, list[LineReading]] = {self.home: [], self.away: []}
         self.cells = {pid: bytearray(SECONDS + 1) for pid in self.players}
         self.snapshots: dict[str, dict[str, tuple[float, float]]] = {}
+        count = 2 * PERIOD_MS // FRAME_MS + 1
+        self.track = Track(list(self.players), array("f", [0.0]) * (count * len(self.players) * 2), array("f", [0.0]) * (count * 2),
+                           bytearray(count), bytearray(b"\xff" * count))
         frames = 0
         for period in (1, 2):
             frames += self.run_period(period, totals, lines, before)
@@ -185,7 +212,7 @@ class MovementBuilder:
                 for values in phase.values():
                     for s in range(1, SECONDS + 1):
                         values[s] += values[s - 1]
-        return Movement(totals, lines, before, frames, self.cells, self.snapshots)
+        return Movement(totals, lines, before, frames, self.cells, self.snapshots, self.track)
 
     def run_period(self, period: int, totals, lines, before) -> int:
         start, end = (period - 1) * PERIOD_MS, period * PERIOD_MS
@@ -195,6 +222,10 @@ class MovementBuilder:
         profiles = {team: tendencies(team)["movement"] for team in (self.home, self.away)}
 
         # Static per-player setup.
+        fullbacks = {team: profiles[team].get("fullbacks", {}) for team in profiles}
+        rotations = {team: {style: pid for pid, style in profiles[team].get("rotations", {}).items()} for team in profiles}
+        # Full-back habit on each flank, so a winger can make room for an overlapping full-back.
+        flank_style = {(self.team_of[pid], ATTACK_Y[role(pid)] > 0): style for team in profiles for pid, style in fullbacks[team].items()}
         setup = {}
         for n, pid in enumerate(self.players):
             team = self.team_of[pid]
@@ -213,6 +244,8 @@ class MovementBuilder:
 
         bi = hi = oi = 0
         holder, owner, live = None, None, True
+        slot = {pid: k for k, pid in enumerate(self.players)}
+        pressers: dict[str, set[str]] = {self.home: set(), self.away: set()}
         last_change = {self.home: -10**9, self.away: -10**9}
         lost_at = {self.home: -10**9, self.away: -10**9}
         # The frame one second before each shot (snapped to the frame clock).
@@ -242,6 +275,7 @@ class MovementBuilder:
                 if new is not None and owner is not None and new != owner:
                     last_change[new] = last_change[owner] = owners[oi][0]
                     lost_at[owner] = owners[oi][0]
+                    pressers[owner] = self.counter_pressers(owner, state, bx, by, profiles[owner].get("counter_press"), owners[oi][0])
                 owner, live = new, new is not None
                 oi += 1
             covered = override.get(t)
@@ -257,7 +291,25 @@ class MovementBuilder:
 
             for pid, (team, r, group, ay, base, transition, cruise, fade, period_ms, phase) in setup.items():
                 s = state[pid]
-                if covered:
+                ox, oy = (bx, by) if team == home else (100 - bx, 100 - by)
+                wobble = math.sin(t / period_ms * 6.283 + phase) * 1.6
+                habit = self.habit(team, pid, group, ay, ox, oy, fullbacks[team], rotations[team], flank_style) \
+                    if live and owner == team and holder != pid else None
+                if live and owner not in (None, team) and pid in pressers[team] \
+                        and t - lost_at[team] <= profiles[team]["counter_press"]["window_ms"]:
+                    # Counter-press: hunt the ball straight after losing it.
+                    tx, ty, cap, amax = bx, by, max(transition, 6.5), 4.5
+                elif group == "GK" and live and owner not in (None, team) and profiles[team].get("sweeper") \
+                        and (sweep := self.sweep(team, bx, by, base - drop[team])):
+                    # Sweeper-keeper: come off the line toward a ball played in behind.
+                    tx, ty, cap, amax = *sweep, 6.5, 4.0
+                elif habit is not None:
+                    # A planted positional habit in possession (full-back role or rotation).
+                    tx, ty = to_home(team, home, clamp(habit[0] + wobble), clamp(habit[1] + wobble * .8))
+                    # Full-backs sprint to get beyond; the other habits are positional drifts.
+                    cap, amax = (6.5, 4.0) if group == "BACK" and fullbacks[team].get(pid) in ("overlap", "underlap") \
+                        else (transition, 4.5) if t - last_change[team] <= TRANSITION_MS else (max(cruise, 4.0), 3.0)
+                elif covered:
                     ex, ey = frame.players[pid]
                     tx, ty = (100 - ex, 100 - ey) if flip else (ex, ey)
                     # Match the episode's own pace rather than sprinting to close an entry offset.
@@ -269,8 +321,6 @@ class MovementBuilder:
                 elif holder == pid:
                     tx, ty, cap, amax = bx, by, 5.2, 2.5
                 else:
-                    ox, oy = (bx, by) if team == home else (100 - bx, 100 - by)
-                    wobble = math.sin(t / period_ms * 6.283 + phase) * 1.6
                     if owner == team:
                         lift = max(0.0, ox - 15)
                         if group == "GK":
@@ -353,6 +403,13 @@ class MovementBuilder:
             if t % 1000 == 0:
                 for pid in self.players:
                     self.cells[pid][t // 1000] = cell(state[pid][0], state[pid][1])
+            track, i = self.track, t // FRAME_MS
+            base_xy = i * len(self.players) * 2
+            for k, pid in enumerate(self.players):
+                track.xy[base_xy + 2 * k], track.xy[base_xy + 2 * k + 1] = state[pid][0], state[pid][1]
+            track.ball[2 * i], track.ball[2 * i + 1] = bx, by
+            track.owner[i] = 0 if not live or owner is None else 1 if owner == home else 2
+            track.holder[i] = slot.get(holder, 255) if live else 255
             for event_id in snap_at.get(t, ()):
                 self.snapshots[event_id] = {pid: (round(state[pid][0], 2), round(state[pid][1], 2)) for pid in self.players}
 
@@ -369,6 +426,58 @@ class MovementBuilder:
                     before[team].append(reading)
             count += 1
         return count
+
+    def habit(self, team: str, pid: str, group: str, ay: float, ox: float, oy: float, fullbacks: dict, rotations: dict,
+              flank_style: dict) -> tuple[float, float] | None:
+        """A planted in-possession habit (team frame), or None. These apply inside tracking episodes too:
+        the episodes stage the defending side and the ball, the continuous layer adds these habits."""
+        lift = max(0.0, ox - 15)
+        side = 1 if ay > 0 else -1
+        flank = (oy - 50) * side > 4 and ox >= 58
+        if group == "BACK":
+            style = fullbacks.get(pid)
+            if style == "overlap":
+                return (min(92.0, ox + 12), 50 + side * 46) if flank else (36 + .45 * lift, 50 + ay + side * 6 + (oy - 50) * .2)
+            if style == "underlap" and (oy - 50) * side > 0 and ox >= 60:
+                # Inside the half-space, and always inside the ball (a winger on it cuts in too).
+                return min(92.0, ox + 12), (min(69.0, oy - 6) if side > 0 else max(31.0, oy + 6))
+            if style == "invert" and ox < 66:
+                return 30 + .5 * lift, 50 + side * 11
+            if style == "hold":
+                return 14 + .3 * lift, 50 + ay + (oy - 50) * .15
+            if abs(ay) < 20 and "drop_in" in rotations and ox < 45:
+                # Centre-backs split wide when the holding midfielder drops between them.
+                return 16 + .45 * lift, 50 + ay * 2.3
+        elif group == "MID":
+            if rotations.get("drop_in") == pid and ox < 45:
+                return 15 + .45 * lift, 50.0
+            if "drop_deep" in rotations and pid == player_for(team, "LCM") and 30 <= ox <= 75:
+                # The attacking midfielder pushes into the space the striker leaves.
+                return 57 + .4 * lift, 46.0
+        elif group == "FWD":
+            if abs(ay) > 20 and flank and flank_style.get((team, ay > 0)) == "overlap":
+                # Make room on the outside for the overlapping full-back.
+                return 55 + .4 * lift, 50 + ay * .45
+            if rotations.get("drop_deep") == pid and 30 <= ox <= 75:
+                return 38 + .5 * lift, 50.0
+        return None
+
+    def sweep(self, team: str, bx: float, by: float, base: float) -> tuple[float, float] | None:
+        """Where a sweeper-keeper heads (home frame) when the ball is beyond its line, else None."""
+        ox, oy = (bx, by) if team == self.home else (100 - bx, 100 - by)
+        back = clamp(base + .45 * (ox - 50), 8, 52)
+        if ox >= min(40.0, back - 2):
+            return None
+        return to_home(team, self.home, clamp(ox - 4, 3, 26), 50 + (oy - 50) * .5)
+
+    def counter_pressers(self, team: str, state, bx: float, by: float, plan: dict | None, t: int) -> set[str]:
+        """The nearest outfield players (within reach) who hunt the ball after this team loses it.
+        Whether the team counter-presses this time is a deterministic draw from the loss time."""
+        if not plan or not plan["players"] or (t // FRAME_MS * 2_654_435_761) % 1000 >= plan["rate"] * 1000:
+            return set()
+        near = sorted((math.hypot((state[pid][0] - bx) * X_M, (state[pid][1] - by) * Y_M), pid) for pid in self.players
+                      if self.team_of[pid] == team and role(pid) != "GK")
+        return {pid for distance, pid in near[:plan["players"]] if distance <= plan["reach_m"]}
 
     def line(self, team: str, state, t: int) -> LineReading:
         """Depths from the team's own goal line in metres."""

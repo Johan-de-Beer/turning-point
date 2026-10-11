@@ -87,12 +87,17 @@ def test_workload_is_physical_and_recovers_planted_work_rates(full):
         if pid.endswith("_01"):
             assert w.distance_m < 4_000
         else:
-            assert 7_500 <= w.distance_m <= 14_000
+            # A holding full-back (planted for vale_02) covers the least ground, about 7.4 km.
+            assert 7_000 <= w.distance_m <= 14_000
     defenders = ["harbor_02", "harbor_03", "harbor_04", "harbor_05"]
     assert max(defenders, key=lambda p: rows[p].distance_m) == "harbor_02"
-    assert min(["vale_09", "vale_10", "vale_11"], key=lambda p: rows[p].distance_m) == "vale_11"
-    harbor = [w for w in full["workload"] if w.team_id == "harbor"]
-    assert max(harbor, key=lambda w: w.hsr_m).player_id == "harbor_10"
+    # vale_11's planted low work rate shows in high-speed running. (Total distance is now close to
+    # vale_09's, whose planted habit of dropping deep into midfield cuts his runs in behind.)
+    assert min(["vale_09", "vale_10", "vale_11"], key=lambda p: rows[p].hsr_m) == "vale_11"
+    # harbor_10's planted runs in behind make him the busiest forward at high speed; the planted
+    # overlapping right-back now covers similar high-speed distance up and down the flank.
+    forwards = [w for w in full["workload"] if w.player_id in ("harbor_09", "harbor_10", "harbor_11")]
+    assert max(forwards, key=lambda w: w.hsr_m).player_id == "harbor_10"
     assert [w.player_id for w in full["workload"] if w.flag] == ["vale_08"]
 
 
