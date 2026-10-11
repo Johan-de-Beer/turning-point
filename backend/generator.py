@@ -19,6 +19,7 @@ from .tactical_profiles import CORNER_TAKERS, TARGET_MEN, foot, other, player_fo
 TACTICAL_SALT = 0x7AC71C
 DUEL_SALT = 0xD0E1
 PLACEMENT_SALT = 0x5A7E
+COMBO_SALT = 0x3A11
 
 FIXTURE_PATH = Path(__file__).resolve().parent.parent / "server_data" / "fixtures" / "tp_demo_01.json"
 
@@ -47,7 +48,7 @@ class Generator:
         self.seq = 0
         # Duels carry their own id series so adding them never renumbers the other events
         # (the synthetic tracking is seeded per event id).
-        self.ids = {"evt": 0, "duel": 0}
+        self.ids = {"evt": 0, "duel": 0, "combo": 0}
         self.possession = 0
         self.owner: str | None = None
         self.live = False
@@ -65,6 +66,8 @@ class Generator:
         # Shot placement in the goal mouth draws from a fourth stream for the same reason.
         self.placements = random.Random(seed ^ PLACEMENT_SALT)
         self.header_next = False
+        # Third-man lay-offs draw from a fifth stream, and their extra passes from their own id series.
+        self.combos = random.Random(seed ^ COMBO_SALT)
 
     def point(self, x: float, y: float = 50) -> dict:
         return {"x": round(x, 2), "y": round(y, 2)}
@@ -81,11 +84,13 @@ class Generator:
         rng = rng or self.rng
         return self.point(rng.uniform(low_x, high_x), rng.uniform(low_y, high_y))
 
-    def emit(self, time_ms: int, kind: str, team: str | None = None, detail: dict | None = None, actor: str | None = None) -> str:
+    def emit(self, time_ms: int, kind: str, team: str | None = None, detail: dict | None = None, actor: str | None = None,
+             series: str | None = None) -> str:
         self.seq += 1
-        series = "duel" if kind == "TACKLE" else "evt"
+        series = series or ("duel" if kind == "TACKLE" else "evt")
         self.ids[series] += 1
-        event_id = f"evt_{self.ids[series]:05d}" if series == "evt" else f"duel_{self.ids[series]:04d}"
+        event_id = f"evt_{self.ids[series]:05d}" if series == "evt" else f"duel_{self.ids[series]:04d}" if series == "duel" \
+            else f"cmb_{self.ids[series]:04d}"
         marker = kind in ("PERIOD_START", "PERIOD_END", "STOPPAGE")
         self.events.append(EventEnvelope.model_validate({
             "delivery_seq": self.seq, "available_at_ms": time_ms, "event_id": event_id, "revision": 1,
@@ -142,12 +147,12 @@ class Generator:
         chance = press["base"] + (press["target_bonus"] if self.holder == press["target"] else 0)
         self.plans[event_id] = {"type": "possession", "pressed": self.tactics.random() < chance}
 
-    def pass_to(self, t: int, recipient: str, end: dict, completed: bool = True) -> str:
+    def pass_to(self, t: int, recipient: str, end: dict, completed: bool = True, series: str | None = None) -> str:
         """A scripted pass with an explicit recipient, outside the open-play stream."""
         assert self.live and self.owner and self.ball and self.holder
         self.header_next = False
         event_id = self.emit(t, "PASS", self.owner, {"recipient_id": recipient, "completed": completed,
-                             "start": self.ball, "end": end}, self.holder)
+                             "start": self.ball, "end": end}, self.holder, series)
         self.ball = end
         self.holder = recipient if completed else None
         return event_id
@@ -167,12 +172,18 @@ class Generator:
         return t + 1_700
 
     def short_build_up(self, t: int):
-        """Goalkeeper plays short to a centre-back split wide in the box."""
+        """Goalkeeper plays short to a centre-back split wide in the box, directly or through a third
+        man: the dropping holding midfielder sets it first time (its own stream and id series, so the
+        rest of the match keeps its shape)."""
         team = self.owner
         rng = self.tactics
         side = rng.choice(("RCB", "LCB"))
         y = rng.uniform(64, 80) if side == "RCB" else rng.uniform(20, 36)
-        self.pass_to(t, player_for(team, side), self.point(rng.uniform(15, 22), y))
+        end = self.point(rng.uniform(15, 22), y)
+        if self.combos.random() < tendencies(team)["lay_off_rate"]:
+            self.pass_to(t, player_for(team, "DM"), self.point(self.combos.uniform(11, 15), self.combos.uniform(44, 56)), series="combo")
+            t += 1_100
+        self.pass_to(t, player_for(team, side), end)
 
     def pressed_and_forced_back(self, possession_event: str) -> bool:
         plan = self.plans.get(possession_event)

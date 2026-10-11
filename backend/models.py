@@ -1485,3 +1485,194 @@ class GamePhases(StrictModel):
     notes: list[AnalystNote]
     definitions: dict[str, str]
     limitations: list[str]
+
+
+# ------------------------------------------------------------------ principles_v1
+PRINCIPLES_VERSION = "principles_v1"
+Shape = Literal["5", "1+4", "2+3", "3+2", "4+1"]
+
+
+class ShapeRow(StrictModel):
+    """One structure of the deepest five outfield players: a base line and a screen in front of it."""
+    shape: Shape
+    seconds: float
+    share: float | None
+    base: list[str]                 # most common roles in the deeper line
+    screen: list[str]               # and in the line in front of it
+
+
+class RestLossRow(StrictModel):
+    shape: Shape
+    losses: int                     # open-play losses in the final third with this rest-defence shape
+    counters_conceded: int
+    shots_conceded: int
+    xg_conceded: float
+
+
+class TeamStructure(StrictModel):
+    team_id: str
+    build_up_seconds: float
+    build_up: list[ShapeRow]
+    rest_seconds: float
+    rest_defence: list[ShapeRow]
+    behind_ball: float | None       # outfield players 10 m or more goal-side of the ball (ball in the final third)
+    overcommitted_share: float | None
+    losses: list[RestLossRow]
+    moments: list[Moment]
+
+
+class WingerRow(StrictModel):
+    player_id: str
+    team_id: str
+    side: Literal["right", "left"]
+    foot: Literal["right", "left"]
+    opposite_foot: bool             # plays on the flank opposite its stronger foot
+    style: Literal["inverted", "touchline", "balanced", "insufficient_evidence"]
+    seconds: float
+    touchline_m: float | None
+    inside_share: float | None
+    cut_ins: int
+    shots: int
+    central_shots: int
+    fullback_width_share: float | None
+    xt: float
+    moments: list[Moment]
+
+
+class TeamWidth(StrictModel):
+    team_id: str
+    width_m: float | None
+    entries: int
+    central_entry_share: float | None
+    crosses: int
+
+
+class PressUnit(StrictModel):
+    unit: Literal["front", "midfield", "back"]
+    samples: int
+    follow_share: float | None
+    distance_m: float | None
+    marking: Literal["man", "zonal", "mixed", "insufficient_evidence"]
+    markers: list[str]              # players in the unit who follow their man
+
+
+class TriggerRow(StrictModel):
+    trigger: Literal["back_pass_keeper", "to_fullback", "to_centre_back", "into_midfield", "other"]
+    passes: int
+    tracked: int
+    pressured: int
+    rate: float | None
+    median_s: float | None
+    regained_5s: int
+
+
+class TeamPressSystem(StrictModel):
+    team_id: str
+    seconds: float                  # opponent build-up time observed
+    system: Literal["man_to_man", "zonal", "hybrid", "insufficient_evidence"]
+    units: list[PressUnit]
+    spare_at_back: float | None
+    left_free: str | None
+    left_free_share: float | None
+    triggers: list[TriggerRow]
+    cover_shadow: int
+    cover_shadow_tracked: int
+    build_ups: int
+    forced_wide_share: float | None
+    regains_by_channel: dict[str, int]
+    moments: list[Moment]
+
+
+class MarkingBand(StrictModel):
+    band: Literal["near", "middle", "far"]
+    samples: int
+    distance_m: float | None
+
+
+class FreeReceiver(StrictModel):
+    player_id: str
+    free: int
+    between_lines: int
+
+
+class TeamMarking(StrictModel):
+    team_id: str
+    bands: list[MarkingBand]
+    receptions: int
+    free: int
+    free_between_lines: int
+    free_players: list[FreeReceiver]
+    moments: list[Moment]
+
+
+class MovementRow(StrictModel):
+    kind: Literal["drop_and_sprint", "opposite_runs", "decoy_run", "crisscross"]
+    players: list[str]
+    episodes: int
+    drew: int                       # a defender stepped out or was dragged with it
+    found: int                      # the ball went to the runner or into the space within 3 s
+    moments: list[Moment]
+
+
+class TeamMovements(StrictModel):
+    team_id: str
+    rows: list[MovementRow]
+    corners: int
+    crisscross_corners: int
+
+
+class ThirdManRow(StrictModel):
+    first: str
+    second: str
+    third: str
+    count: int
+
+
+class TeamThirdMan(StrictModel):
+    team_id: str
+    combinations: int
+    by_zone: dict[str, int]
+    tracked: int
+    lane_blocked: int
+    receiver_free: int
+    progress_m: float | None
+    final_third_10s: int
+    shots_15s: int
+    patterns: list[ThirdManRow]
+    moments: list[Moment]
+
+
+class ReportLine(StrictModel):
+    topic: str
+    text: str
+    moments: list[Moment]
+
+
+class MatchReportTeam(StrictModel):
+    team_id: str
+    summary: str
+    phases: list[ReportLine]
+    strengths: list[ReportLine]
+    weaknesses: list[ReportLine]
+    key_player: str | None
+    key_player_reason: str | None
+
+
+class PlayPrinciples(StrictModel):
+    session_id: str
+    generation: int
+    data_epoch: int
+    playhead_ms: int
+    next_cursor: str
+    engine_version: Literal["principles_v1"] = PRINCIPLES_VERSION
+    provenance: Literal["synthetic_events_and_tracking"] = "synthetic_events_and_tracking"
+    structures: dict[str, TeamStructure]
+    wingers: list[WingerRow]
+    width: dict[str, TeamWidth]
+    pressing: dict[str, TeamPressSystem]
+    marking: dict[str, TeamMarking]
+    movements: dict[str, TeamMovements]
+    third_man: dict[str, TeamThirdMan]
+    match_report: dict[str, MatchReportTeam]
+    definitions: dict[str, str]
+    limitations: list[str]

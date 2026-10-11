@@ -18,7 +18,8 @@ POSITION_OVERRIDES = {"vale_08": "CAM"}
 FORWARDS = ("RW", "ST", "LW")
 MIDFIELD = ("RCM", "DM", "LCM")
 
-LEFT_FOOTED = {"harbor_03", "harbor_08", "harbor_11", "vale_03", "vale_11"}
+# Harbor's right winger is left-footed: an inverted winger who cuts inside onto the stronger foot.
+LEFT_FOOTED = {"harbor_03", "harbor_08", "harbor_10", "harbor_11", "vale_03", "vale_11"}
 
 # Corner sides are named from the attacking team's view: "left" is the corner on
 # its left touchline (y = 0 in its attacking frame), "right" is y = 100.
@@ -61,6 +62,9 @@ _TENDENCIES = {
         "press": {"base": .45, "target": "vale_05", "target_bonus": .45, "force_back": .6,
                   "triggers": {"harbor_09": .6, "harbor_11": .25, "harbor_10": .15}, "reaction_ms": 300, "speed_mps": 7.2},
         "short_build_up": .85, "pass_speed_mps": 18.0,
+        # Share of short goal-kick build-ups played through a third man: the keeper lays the ball into
+        # the dropping holding midfielder, who sets it first time for the centre-back.
+        "lay_off_rate": .75,
         "corner": {"accuracy": {"harbor_07": 1.4, "harbor_11": 2.0}, "speed_mps": {"harbor_07": 24.0, "harbor_11": 22.0},
                    "onset_ms": {"harbor_04": -450, "harbor_09": 250, "harbor_05": -100}},
         # Continuous movement: back-four depth (units from own goal) with the ball at halfway,
@@ -74,7 +78,16 @@ _TENDENCIES = {
                      # rotations, and whether the keeper sweeps behind a high line.
                      "counter_press": {"players": 3, "window_ms": 4_000, "reach_m": 30.0, "rate": .8},
                      "fullbacks": {"harbor_02": "overlap", "harbor_03": "invert"},
-                     "rotations": {"harbor_06": "drop_in"}, "sweeper": True},
+                     "rotations": {"harbor_06": "drop_in"}, "sweeper": True,
+                     # Principles round: winger habits, the rest-defence shape held behind the ball in the
+                     # final third (a base line and a screen in front of it), a striker's drop-and-sprint
+                     # counter-movement, midfield man-marking against the opponent's build-up, and pressing
+                     # triggers (the nearest players hunt the receiver of certain passes in its own half).
+                     "winger_habits": {"harbor_10": "invert"},
+                     "rest_shape": {"base": ("harbor_04", "harbor_05"), "screen": ("harbor_07", "harbor_06", "harbor_03")},
+                     "drop_sprint": {"harbor_09": {"cycle_ms": 25_000, "drop_ms": 1_200, "sprint_ms": 2_400}},
+                     "man_marking": {},
+                     "trigger_hunt": {"on": ("back_pass_keeper", "to_centre_back"), "players": 2, "window_ms": 3_500, "rate": .85}},
         # Share of the saves this side's goalkeeper makes from well-placed, hard-hit shots.
         "goalkeeping": {"hard_save_rate": .55},
     },
@@ -84,14 +97,21 @@ _TENDENCIES = {
         "run_rate": {"vale_09": .6, "vale_11": .45, "vale_10": .2},
         "press": {"base": .3, "target": "harbor_04", "target_bonus": .35, "force_back": .4,
                   "triggers": {"vale_10": .55, "vale_09": .45}, "reaction_ms": 650, "speed_mps": 5.9},
-        "short_build_up": .15, "pass_speed_mps": 15.0,
+        "short_build_up": .15, "pass_speed_mps": 15.0, "lay_off_rate": 0.0,
         "corner": {"accuracy": {"vale_08": 3.2}, "speed_mps": {"vale_08": 18.5},
                    "onset_ms": {"vale_04": -150, "vale_09": 400, "vale_05": 0}},
         "movement": {"line_base": 25.0, "transition_mps": {"vale_11": 3.4, "vale_03": 6.2},
                      "cruise_mps": {"vale_11": 2.4}, "fade": {"vale_08": (3_000_000, .65)}, "lead_drop": 0.0,
                      "counter_press": {"players": 1, "window_ms": 1_200, "reach_m": 10.0, "rate": .4},
                      "fullbacks": {"vale_03": "underlap", "vale_02": "hold"},
-                     "rotations": {"vale_09": "drop_deep"}, "sweeper": False},
+                     "rotations": {"vale_09": "drop_deep"}, "sweeper": False,
+                     "winger_habits": {"vale_11": "hug"},
+                     "rest_shape": {"base": ("vale_02", "vale_04", "vale_05"), "screen": ("vale_07", "vale_06")},
+                     "drop_sprint": {},
+                     # Vale's two central midfielders follow Harbor's two central midfielders while Harbor
+                     # builds in its own half; the front three and the back four stay zonal (a hybrid press).
+                     "man_marking": {"vale_07": "LCM", "vale_08": "RCM"},
+                     "trigger_hunt": {"on": (), "players": 0, "window_ms": 0, "rate": 0.0}},
         "goalkeeping": {"hard_save_rate": .15},
     },
 }
