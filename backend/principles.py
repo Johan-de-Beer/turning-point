@@ -27,7 +27,8 @@ from .models import (FreeReceiver, MarkingBand, MatchReportTeam, Moment, Movemen
                      TeamMarking, TeamMovements, TeamPressSystem, TeamStructure, TeamThirdMan, TeamWidth, ThirdManRow, TriggerRow, WingerRow)
 from .movement import Movement
 from .advanced import ratio
-from .phases import COUNTER_SHOT_MS, MOMENTS, Features, PhaseEngine, PhaseReport, channel, clock, mean, plural, r1, times
+from .phases import COUNTER_SHOT_MS, MOMENTS, Features, PhaseEngine, PhaseReport, channel, clock, mean, plural, r1
+from .phases import times as _times
 from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, foot, role
 from .tracking import FRAME_MS
 
@@ -40,7 +41,7 @@ WINGER_INSIDE_M = 18.0      # a winger this far or more from the touchline is in
 TOUCHLINE_M = 8.0           # a touchline winger's mean distance from it
 MIN_WINGER_S = 60
 CUT_IN_M = 8.0
-FOLLOW_WINDOW_S = 2         # man-marking: does the nearest defender go with his man over 2 s
+FOLLOW_WINDOW_S = 2         # man-marking: does the nearest defender go with their man over 2 s
 FOLLOW_MOVE_M = 3.0
 FOLLOW_KEEP_M = 5.0
 MAN_SHARE, ZONAL_SHARE = 55.0, 35.0
@@ -74,7 +75,7 @@ DEFINITIONS = {
     "cut_in": f"A winger's carry that starts in its wide channel and ends in the centre, or ends {CUT_IN_M:.0f} m or more further from the touchline.",
     "fullback_width": "With the ball in the final third on a winger's side, the share of time its full-back is the wider of the two: the width the full-back provides while the winger is inside.",
     "width": "Attacking width: the outfield spread across the pitch in settled possession with the ball in the final third. Central entries: completed passes and carries into the final third that end in the centre channel. Crosses: passes from a wide channel of the final third into the box.",
-    "press_system": f"During the opponent's settled build-up in its own half, each second: does a player's nearest opponent move {FOLLOW_MOVE_M:.0f} m or more over the next {FOLLOW_WINDOW_S} s, and does the player go with him (moving the same way and staying within {FOLLOW_KEEP_M:.0f} m)? A player who follows {MAN_SHARE:.0f}% of the time or more is man-oriented, {ZONAL_SHARE:.0f}% or less zonal. A unit is man when most of its players are man-oriented, zonal when most are zonal. Man-to-man when every unit with enough samples is man, zonal when every one is zonal, hybrid when they differ.",
+    "press_system": f"During the opponent's settled build-up in its own half, each second: does a player's nearest opponent move {FOLLOW_MOVE_M:.0f} m or more over the next {FOLLOW_WINDOW_S} s, and does the player go with that opponent (moving the same way and staying within {FOLLOW_KEEP_M:.0f} m)? A player who follows {MAN_SHARE:.0f}% of the time or more is man-oriented, {ZONAL_SHARE:.0f}% or less zonal. A unit is man when most of its players are man-oriented, zonal when most are zonal. Man-to-man when every unit with enough samples is man, zonal when every one is zonal, hybrid when they differ.",
     "spare_at_back": "During the opponent's build-up: the back four minus the opponent's outfield players positioned behind the team's midfield line. +1 means one spare defender.",
     "left_free": f"The opponent outfield player most often without a defender within {FREE_M:.0f} m during its own build-up (some teams leave one centre-back free on purpose to keep a spare man at the back).",
     "press_triggers": f"Opponent completed passes that end in its own half, by type: back to the keeper, out to a full-back, to a centre-back, into midfield, other. Pressured: a player within {PRESSURE_M:.0f} m of the receiver within {PRESSURE_WINDOW_FRAMES * FRAME_MS // 1000} s of the ball arriving. Regained: the team won the ball back within 5 s.",
@@ -83,8 +84,8 @@ DEFINITIONS = {
     "marking_bands": "In settled defending, each opponent outfield player's distance to the nearest defender, by that opponent's distance from the ball: near (under 15 m), middle (15 to 30 m) and far (over 30 m). Tight near the ball and looser away from it is the usual man-marking rule.",
     "free_receptions": f"Opponent completed passes received in its middle or final third with no defender within {RECEPTION_FREE_M:.0f} m on arrival. Between the lines: received between the team's back four and its midfield line.",
     "drop_and_sprint": f"An attacker in possession drops {DROP_M:.0f} m or more toward its own goal within 1.6 s, then sprints forward at {SPRINT_MPS:.0f} m/s or more, gaining {SPRINT_GAIN_M:.0f} m or more in 2 s, starting within {SPRINT_WITHIN * FRAME_MS / 1000:.1f} s of the drop. Drew: the nearest defender stepped {STEP_M:.0f} m or more out with the drop. Found: the runner received the ball within 3 s of the sprint starting.",
-    "opposite_runs": f"Two attacking team-mates within {OPPOSITE_LATERAL_M:.0f} m of each other across the pitch: one drops {OPPOSITE_DROP_M:.0f} m or more while the other runs {OPPOSITE_RUN_M:.0f} m or more forward over 2 s, ending within {OPPOSITE_SPACE_M:.0f} m of where the dropping player started (into the space it left). Drew: the dropping player's nearest defender stepped {STEP_M:.0f} m or more out with him. Read in settled possession (5 s or more after the ball was won), like the other counter-movements. Found: either received the ball within 3 s.",
-    "decoy_run": f"An attacker runs {DECOY_RUN_M:.0f} m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within {DECOY_NEAR_M:.0f} m) retreats {DECOY_DRAG_M:.0f} m or more with him (drew). Found: within 3 s a team-mate, not the runner, received a pass within {DECOY_SPACE_M:.0f} m of where that defender started.",
+    "opposite_runs": f"Two attacking team-mates within {OPPOSITE_LATERAL_M:.0f} m of each other across the pitch: one drops {OPPOSITE_DROP_M:.0f} m or more while the other runs {OPPOSITE_RUN_M:.0f} m or more forward over 2 s, ending within {OPPOSITE_SPACE_M:.0f} m of where the dropping player started (into the space it left). Drew: the dropping player's nearest defender stepped {STEP_M:.0f} m or more out with that player. Read in settled possession (5 s or more after the ball was won), like the other counter-movements. Found: either received the ball within 3 s.",
+    "decoy_run": f"An attacker runs {DECOY_RUN_M:.0f} m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within {DECOY_NEAR_M:.0f} m) retreats {DECOY_DRAG_M:.0f} m or more with the runner (drew). Found: within 3 s a team-mate, not the runner, received a pass within {DECOY_SPACE_M:.0f} m of where that defender started.",
     "crisscross": f"At a corner: two attackers inside the final 20 m whose order across the pitch swaps in the {CRISS_MS // 1000} s before the delivery, each moving {CRISS_MOVE_M:.0f} m or more.",
     "third_man": f"A completed pass from A to B, then B passes on to C (not A) within {LAY_OFF_MS // 1000} s of A's pass, with C receiving further forward than A played from. Lane blocked: an opponent within {LANE_M} m of the straight line from A to C when A played. Free: no opponent within {RECEPTION_FREE_M:.0f} m of C on arrival. Zones: build-up (A in its own third), middle third or final third (where C receives).",
     "match_report": "A summary per team in the order a professional analyst works: in possession, out of possession, attack to defence, defence to attack and set pieces, then strengths to keep, weaknesses an opponent could target and the most influential player by expected threat. Each line is built from the numbers in this report and in Phases of play, with its sample. It describes what happened; it does not explain why.",
@@ -98,6 +99,13 @@ LIMITATIONS = [
     "Third-man combinations need two passes inside 3 s. The synthetic event stream spaces most passes further apart, so the count is mostly planted build-up combinations.",
     "The match report applies fixed rules to the numbers; it is a starting point for analysis, not a verdict. One match is a small sample.",
 ]
+
+
+KEY_PLAYER_XT = .02         # the key player needs at least this much expected threat added
+
+
+def times(n: int) -> str:
+    return "never" if n == 0 else _times(n)
 
 
 def unit_name(rows: list[str]) -> str:
@@ -803,7 +811,7 @@ class PrincipleReport(PhaseReport):
             if s.build_up:
                 top = s.build_up[0]
                 parts.append(f"built up in a {top.shape} ({top.share:.0f}% of build-up time; base {unit_name(top.base)})")
-            if prog.xt:
+            if prog.xt >= .05:
                 flank = max(prog.xt_by_channel, key=lambda k: prog.xt_by_channel[k])
                 parts.append(f"added most threat through the {flank} ({prog.xt_by_channel[flank]:+.2f} of {prog.xt:+.2f} xT)")
             tm = third[team]
@@ -835,14 +843,18 @@ class PrincipleReport(PhaseReport):
                 best = max(hot, key=lambda t: t.rate)
                 parts.append(f"pressed hardest on passes {trigger_text(best.trigger)} ({best.pressured} of {best.tracked}, {best.rate:.0f}%)")
             if p.spare_at_back is not None:
-                parts.append(f"had {p.spare_at_back:+.1f} spare at the back against the build-up")
+                spare = p.spare_at_back
+                parts.append("matched the opponent's forwards one for one at the back during its build-up" if abs(spare) < .25 else
+                             f"kept {spare:.1f} spare defenders at the back during the opponent's build-up" if spare > 0 else
+                             f"was outnumbered by {-spare:.1f} at the back during the opponent's build-up")
             lines.append(ReportLine(topic="Out of possession", text=f"{who} " + "; ".join(parts) + "." if parts else "Not enough defending observed yet.",
                                     moments=p.moments[:1]))
 
             # Attack to defence.
             parts = []
             if press.tracked:
-                parts.append(f"counter-pressed after {press.pressed} of {press.tracked} losses ({press.press_rate:.0f}%), winning the ball back within 5 s {times(press.regained_5s)}")
+                parts.append(f"counter-pressed after {press.pressed} of {plural(press.tracked, 'loss', 'losses')} ({press.press_rate:.0f}%), "
+                             + (f"winning the ball back within 5 s {times(press.regained_5s)}" if press.regained_5s else "never winning it back within 5 s"))
             if s.rest_defence:
                 top = s.rest_defence[0]
                 parts.append(f"held a {top.shape} rest defence with the ball in the final third ({top.share:.0f}%), {s.behind_ball} players behind the ball on average")
@@ -867,13 +879,14 @@ class PrincipleReport(PhaseReport):
             restarts = ph["phases"][team].restarts
             corners = restarts.get("corner", 0)
             set_row = next((r for r in ph["phases"][team].rows if r.phase == "attacking_set_piece"), None)
-            text = (f"{who} took {plural(corners, 'corner')}" + (f", with crisscross runs at {mv.crisscross_corners}" if mv.corners else "")
-                    + (f"; {plural(set_row.shots_for, 'shot')} ({set_row.xg_for:.2f} xG) came from set pieces." if set_row else "."))
+            text = (f"{who} took {plural(corners, 'corner')}" + (f", with crisscross runs at {mv.crisscross_corners}" if mv.crisscross_corners else "")
+                    + (f"; {plural(set_row.shots_for, 'shot')} ({set_row.xg_for:.2f} xG) came from set pieces." if set_row else ".")) \
+                if corners else f"{who} have not taken a corner yet."
             lines.append(ReportLine(topic="Set pieces", text=text, moments=[]))
 
             # Strengths and weaknesses (to target), with numbers.
             if press.tracked >= 5 and press.press_rate is not None and press.press_rate >= 60:
-                strengths.append(ReportLine(topic="Counter-press", text=f"Pressed the ball after {press.press_rate:.0f}% of losses and won it back within 5 s {times(press.regained_5s)}.",
+                strengths.append(ReportLine(topic="Counter-press", text=f"Pressed the ball after {press.press_rate:.0f}% of {plural(press.tracked, 'loss', 'losses')}; won it back within 5 s {times(press.regained_5s)}.",
                                             moments=press.moments[:2]))
             if tm.combinations >= 3:
                 strengths.append(ReportLine(topic="Third-man combinations", text=f"{tm.combinations} combinations, the receiver free on arrival {tm.receiver_free} of {tm.tracked} times, gaining {tm.progress_m} m on average.",
@@ -883,9 +896,10 @@ class PrincipleReport(PhaseReport):
                 r = sprint[0]
                 strengths.append(ReportLine(topic="Counter-movement", text=f"{self.names[r.players[0]]} dropped and then sprinted in behind {times(r.episodes)}; a marker stepped out with the drop {times(r.drew)}.",
                                             moments=r.moments[:2]))
-            if prog.xt > 0 and prog.xt_by_channel:
+            positive = sum(max(0.0, v) for v in prog.xt_by_channel.values())
+            if prog.xt >= .2 and positive > 0:
                 flank = max(prog.xt_by_channel, key=lambda k: prog.xt_by_channel[k])
-                share = 100 * prog.xt_by_channel[flank] / prog.xt if prog.xt else 0
+                share = 100 * max(0.0, prog.xt_by_channel[flank]) / positive
                 if share >= 45:
                     strengths.append(ReportLine(topic="Main route to goal", text=f"{share:.0f}% of the expected threat came through the {flank}.", moments=[]))
             if s.overcommitted_share is not None and s.rest_seconds >= 30 and s.overcommitted_share >= 25:
@@ -914,7 +928,7 @@ class PrincipleReport(PhaseReport):
 
             key = [r for r in ph["player_progression"] if r.team_id == team]
             key.sort(key=lambda r: -r.xt)
-            key_player = key[0].player_id if key and key[0].xt > 0 else None
+            key_player = key[0].player_id if key and key[0].xt >= KEY_PLAYER_XT else None
             reason = (f"Most expected threat added ({key[0].xt:+.3f} xT from {key[0].progressive_passes} progressive passes and "
                       f"{key[0].progressive_carries} progressive carries).") if key_player else None
             summary = " ".join(filter(None, [

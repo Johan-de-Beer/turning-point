@@ -1028,7 +1028,7 @@
     },
     {
      "topic": "Out of possession",
-     "text": "Harbor Athletic defended mostly in a mid block (back four at 35.9 m, 84% of settled defending); pressed zonally; pressed hardest on passes into midfield (5 of 13, 38%); had -0.1 spare at the back against the build-up.",
+     "text": "Harbor Athletic defended mostly in a mid block (back four at 35.9 m, 84% of settled defending); pressed zonally; pressed hardest on passes into midfield (5 of 13, 38%); matched the opponent's forwards one for one at the back during its build-up.",
      "moments": [
       {
        "time_ms": 255000,
@@ -1061,14 +1061,14 @@
     },
     {
      "topic": "Set pieces",
-     "text": "Harbor Athletic took 3 corners, with crisscross runs at 0; 0 shots (0.00 xG) came from set pieces.",
+     "text": "Harbor Athletic took 3 corners; 0 shots (0.00 xG) came from set pieces.",
      "moments": []
     }
    ],
    "strengths": [
     {
      "topic": "Counter-press",
-     "text": "Pressed the ball after 77% of losses and won it back within 5 s twice.",
+     "text": "Pressed the ball after 77% of 26 losses; won it back within 5 s twice.",
      "moments": [
       {
        "time_ms": 201000,
@@ -1147,17 +1147,17 @@
    "phases": [
     {
      "topic": "In possession",
-     "text": "Vale United built up in a 3+2 (52% of build-up time; base RB, RCB, LCB); added most threat through the left (+0.06 of -0.00 xT); 38% possession and 0% field tilt.",
+     "text": "Vale United built up in a 3+2 (52% of build-up time; base RB, RCB, LCB); 38% possession and 0% field tilt.",
      "moments": []
     },
     {
      "topic": "Out of possession",
-     "text": "Vale United defended mostly in a low block (back four at 23.3 m, 93% of settled defending); pressed with a hybrid: front zonal, midfield man, back mixed; Sami North, Ivo Brook followed their man; pressed hardest on passes into midfield (20 of 33, 61%); had +1.0 spare at the back against the build-up.",
+     "text": "Vale United defended mostly in a low block (back four at 23.3 m, 93% of settled defending); pressed with a hybrid: front zonal, midfield man, back mixed; Sami North, Ivo Brook followed their man; pressed hardest on passes into midfield (20 of 33, 61%); kept 1.0 spare defenders at the back during the opponent's build-up.",
      "moments": []
     },
     {
      "topic": "Attack to defence",
-     "text": "Vale United counter-pressed after 12 of 25 losses (48%), winning the ball back within 5 s 0 times; held a 3+2 rest defence with the ball in the final third (62%), 6.0 players behind the ball on average.",
+     "text": "Vale United counter-pressed after 12 of 25 losses (48%), never winning it back within 5 s; held a 3+2 rest defence with the ball in the final third (62%), 6.0 players behind the ball on average.",
      "moments": [
       {
        "time_ms": 600000,
@@ -1173,7 +1173,7 @@
     },
     {
      "topic": "Set pieces",
-     "text": "Vale United took 0 corners; 0 shots (0.00 xG) came from set pieces.",
+     "text": "Vale United have not taken a corner yet.",
      "moments": []
     }
    ],
@@ -1224,7 +1224,7 @@
   "cut_in": "A winger's carry that starts in its wide channel and ends in the centre, or ends 8 m or more further from the touchline.",
   "fullback_width": "With the ball in the final third on a winger's side, the share of time its full-back is the wider of the two: the width the full-back provides while the winger is inside.",
   "width": "Attacking width: the outfield spread across the pitch in settled possession with the ball in the final third. Central entries: completed passes and carries into the final third that end in the centre channel. Crosses: passes from a wide channel of the final third into the box.",
-  "press_system": "During the opponent's settled build-up in its own half, each second: does a player's nearest opponent move 3 m or more over the next 2 s, and does the player go with him (moving the same way and staying within 5 m)? A player who follows 55% of the time or more is man-oriented, 35% or less zonal. A unit is man when most of its players are man-oriented, zonal when most are zonal. Man-to-man when every unit with enough samples is man, zonal when every one is zonal, hybrid when they differ.",
+  "press_system": "During the opponent's settled build-up in its own half, each second: does a player's nearest opponent move 3 m or more over the next 2 s, and does the player go with that opponent (moving the same way and staying within 5 m)? A player who follows 55% of the time or more is man-oriented, 35% or less zonal. A unit is man when most of its players are man-oriented, zonal when most are zonal. Man-to-man when every unit with enough samples is man, zonal when every one is zonal, hybrid when they differ.",
   "spare_at_back": "During the opponent's build-up: the back four minus the opponent's outfield players positioned behind the team's midfield line. +1 means one spare defender.",
   "left_free": "The opponent outfield player most often without a defender within 8 m during its own build-up (some teams leave one centre-back free on purpose to keep a spare man at the back).",
   "press_triggers": "Opponent completed passes that end in its own half, by type: back to the keeper, out to a full-back, to a centre-back, into midfield, other. Pressured: a player within 3 m of the receiver within 3 s of the ball arriving. Regained: the team won the ball back within 5 s.",
@@ -1233,8 +1233,8 @@
   "marking_bands": "In settled defending, each opponent outfield player's distance to the nearest defender, by that opponent's distance from the ball: near (under 15 m), middle (15 to 30 m) and far (over 30 m). Tight near the ball and looser away from it is the usual man-marking rule.",
   "free_receptions": "Opponent completed passes received in its middle or final third with no defender within 5 m on arrival. Between the lines: received between the team's back four and its midfield line.",
   "drop_and_sprint": "An attacker in possession drops 4 m or more toward its own goal within 1.6 s, then sprints forward at 6 m/s or more, gaining 8 m or more in 2 s, starting within 2.0 s of the drop. Drew: the nearest defender stepped 2 m or more out with the drop. Found: the runner received the ball within 3 s of the sprint starting.",
-  "opposite_runs": "Two attacking team-mates within 15 m of each other across the pitch: one drops 4 m or more while the other runs 5 m or more forward over 2 s, ending within 8 m of where the dropping player started (into the space it left). Drew: the dropping player's nearest defender stepped 2 m or more out with him. Read in settled possession (5 s or more after the ball was won), like the other counter-movements. Found: either received the ball within 3 s.",
-  "decoy_run": "An attacker runs 6 m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within 8 m) retreats 3 m or more with him (drew). Found: within 3 s a team-mate, not the runner, received a pass within 12 m of where that defender started.",
+  "opposite_runs": "Two attacking team-mates within 15 m of each other across the pitch: one drops 4 m or more while the other runs 5 m or more forward over 2 s, ending within 8 m of where the dropping player started (into the space it left). Drew: the dropping player's nearest defender stepped 2 m or more out with that player. Read in settled possession (5 s or more after the ball was won), like the other counter-movements. Found: either received the ball within 3 s.",
+  "decoy_run": "An attacker runs 6 m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within 8 m) retreats 3 m or more with the runner (drew). Found: within 3 s a team-mate, not the runner, received a pass within 12 m of where that defender started.",
   "crisscross": "At a corner: two attackers inside the final 20 m whose order across the pitch swaps in the 3 s before the delivery, each moving 3 m or more.",
   "third_man": "A completed pass from A to B, then B passes on to C (not A) within 3 s of A's pass, with C receiving further forward than A played from. Lane blocked: an opponent within 2.5 m of the straight line from A to C when A played. Free: no opponent within 5 m of C on arrival. Zones: build-up (A in its own third), middle third or final third (where C receives).",
   "match_report": "A summary per team in the order a professional analyst works: in possession, out of possession, attack to defence, defence to attack and set pieces, then strengths to keep, weaknesses an opponent could target and the most influential player by expected threat. Each line is built from the numbers in this report and in Phases of play, with its sample. It describes what happened; it does not explain why."

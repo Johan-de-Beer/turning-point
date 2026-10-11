@@ -69,7 +69,7 @@ type Section = { report: Phases; match: Match; team: Match['home']; opponent: Ma
 const minutes = (start: number, end: number) => `${Math.round(start / 60000)}′–${Math.round(end / 60000)}′`;
 
 /** Moments to watch: the numbers point to them, the replay explains them. */
-function Moments({ items, onShowEvent, caption = 'Moments to watch' }: { items: Moment[]; onShowEvent: (eventId: string) => void; caption?: string }) {
+export function Moments({ items, onShowEvent, caption = 'Moments to watch' }: { items: Moment[]; onShowEvent: (eventId: string) => void; caption?: string }) {
   if (!items.length) return null;
   return <div className="phase-moments"><span>{caption}</span><ul>
     {items.map((item, index) => {

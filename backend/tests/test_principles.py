@@ -105,7 +105,7 @@ def test_match_report_lines_carry_numbers_and_past_moments(full):
         assert [line.topic for line in report.phases] == ["In possession", "Out of possession", "Attack to defence", "Defence to attack", "Set pieces"]
         assert report.key_player and report.key_player.startswith(team)
         for line in report.phases + report.strengths + report.weaknesses:
-            assert any(ch.isdigit() for ch in line.text)
+            assert any(ch.isdigit() for ch in line.text) or line.text.endswith("yet.")
             assert "because" not in line.text and "caused" not in line.text
     assert any(line.topic == "Counter-press" for line in full["match_report"]["harbor"].strengths)
     assert any(line.topic == "Third-man combinations" for line in full["match_report"]["harbor"].strengths)

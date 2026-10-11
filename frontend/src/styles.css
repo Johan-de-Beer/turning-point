@@ -728,3 +728,5 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .heatmap-surface { fill: var(--surface-2); }
 .heatmap-lines { stroke: var(--text-3); stroke-opacity: .55; stroke-width: .35; }
 .network-label { fill: var(--ink); font: 700 2.4px var(--font); pointer-events: none; }
+.report-heading { margin: var(--space-4) 0 var(--space-2); font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-3); }
+.phases-panel > .tactics-sections .phase-look { margin: 0 0 var(--space-2); color: var(--text-2); font-size: 14px; line-height: 1.6; }

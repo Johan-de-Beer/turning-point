@@ -17,6 +17,7 @@ import { StartScreen } from './features/start/StartScreen';
 import { TacticsPanel } from './features/tactics/TacticsPanel';
 import { AnalyticsPanel } from './features/analytics/AnalyticsPanel';
 import { PhasesPanel } from './features/phases/PhasesPanel';
+import { PrinciplesPanel } from './features/principles/PrinciplesPanel';
 import { eligibleOverlay, type Envelope, type Evidence, type Preferences } from './lib/contracts';
 import { downloadJson, matchClock, windowLabel } from './lib/format';
 import { projectPitchState } from './lib/pitchProjection';
@@ -121,6 +122,7 @@ export default function App() {
         </div>
         <AnalyticsPanel state={state} match={match} getAnalytics={controller.getAnalytics} />
         <PhasesPanel state={state} match={match} getPhases={controller.getPhases} onShowEvent={showOnPitch} />
+        <PrinciplesPanel state={state} match={match} getPrinciples={controller.getPrinciples} onShowEvent={showOnPitch} />
         <TacticsPanel state={state} match={match} getTactics={controller.getTactics} />
         <footer className="match-footer"><span>Synthetic fixture with fictional clubs and players. The event view draws only the active players from recorded endpoints. Tactical analysis, line height and workload use separate synthetic tracking, generated around recorded events; xG and possession value are heuristic models. Observed through {matchClock(state.observed_high_water_ms)}.</span><button className="text-button" onClick={() => setSurface('diagnostics')}>Provider & pipeline diagnostics</button></footer>
       </main>

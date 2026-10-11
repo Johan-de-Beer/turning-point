@@ -27,7 +27,8 @@ export const eventSchema = z.discriminatedUnion('kind', [
   z.strictObject({ ...eventBase, kind: z.literal('POSSESSION'), detail: z.strictObject({ start: point }) }),
   z.strictObject({ ...eventBase, kind: z.literal('PASS'), detail: z.strictObject({ recipient_id: id, completed: z.boolean(), start: point, end: point }) }),
   z.strictObject({ ...eventBase, kind: z.literal('CARRY'), detail: z.strictObject({ start: point, end: point }) }),
-  z.strictObject({ ...eventBase, kind: z.literal('SHOT'), detail: z.strictObject({ position: point, target: point.nullable().optional(), outcome: z.enum(['goal', 'saved', 'blocked', 'off_target']), body_part: z.enum(['right_foot', 'left_foot', 'head']).nullable().optional() }) }),
+  // Placement (height and pace in the goal mouth) is recorded on goals and saved shots since analytics_v2; null otherwise.
+  z.strictObject({ ...eventBase, kind: z.literal('SHOT'), detail: z.strictObject({ position: point, target: point.nullable().optional(), outcome: z.enum(['goal', 'saved', 'blocked', 'off_target']), body_part: z.enum(['right_foot', 'left_foot', 'head']).nullable().optional(), placement: z.strictObject({ y_m: z.number().finite().min(-3.66).max(3.66), z_m: z.number().finite().min(0).max(2.44), speed_mps: z.number().finite().min(0) }).nullable().optional() }) }),
   z.strictObject({ ...eventBase, kind: z.literal('TACKLE'), detail: z.strictObject({ position: point, successful: z.boolean(), contest: z.enum(['ground', 'aerial']).optional() }) }),
   z.strictObject({ ...eventBase, kind: z.literal('STOPPAGE'), detail: z.strictObject({ reason: z.enum(['ball_out', 'corner', 'foul', 'goal', 'interval']) }) }),
 ]).superRefine((event, ctx) => {

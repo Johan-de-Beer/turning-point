@@ -71,13 +71,13 @@ From the synthetic positions while the team has the ball:
 
 ## What the generator plants (so tests can recover it)
 
-The hidden movement profiles gained four habits this round. The analysis never reads them; `backend/tests/test_phases.py` checks that the report recovers each one.
+The hidden movement profiles gained four habits this round. The figures below were re-measured after the principles_v1 round changed some movement. The analysis never reads them; `backend/tests/test_phases.py` checks that the report recovers each one.
 
 | Habit | Harbor Athletic | Vale United | Measured result (full match) |
 | --- | --- | --- | --- |
-| Counter-press after a loss | 3 nearest players hunt the ball for 4 s, after 80% of losses | 1 player for 1.2 s, after 40% | Pressed 83% vs 27%; pack 3.0 vs 2.1 |
+| Counter-press after a loss | 3 nearest players hunt the ball for 4 s, after 80% of losses | 1 player for 1.2 s, after 40% | Pressed 80% vs 31%; pack 2.9 vs 1.9 |
 | Full-backs | RB overlaps, LB inverts | LB underlaps, RB holds | Overlapping, inverted, underlapping, holding |
-| Rotations | DM drops between the centre-backs | Striker drops deep | DM drops 52 vs 14 episodes; striker drops 92 vs 14 |
+| Rotations | DM drops between the centre-backs | Striker drops deep (in a 12 s cycle since principles_v1: 7 s dropped, 5 s up) | DM drops 53 vs 12 episodes; striker drops 80 vs 15 |
 | Keeper | Sweeps behind the line | Stays on the line | 2 sweeps vs 0 |
 
 Counter-press hunters inside the tracking episodes run at 4.2 m/s, under the 4.5 m/s press threshold the tactics engine uses, so the press triggers planted in earlier rounds are unchanged. The new habits change some running: a holding full-back covers about 7.4 km, and Vale's striker covers less ground because the striker drops into midfield instead of running in behind. The workload tests were adjusted with comments to say so.
