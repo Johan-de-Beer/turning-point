@@ -32,6 +32,12 @@ describe('versioned runtime network boundary', () => {
     expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, target: { x: 101, y: 51 } } }).success).toBe(false);
     expect(eventSchema.safeParse({ ...event.payload!, detail: { ...event.payload!.detail, target: { x: 99, y: 51 } } }).success).toBe(false);
   });
+  it('accepts the goal-mouth placement the backend sends on shots', () => {
+    const shot = { ...event.payload!, kind: 'SHOT', detail: { position: { x: 83, y: 42 }, outcome: 'saved' } };
+    expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, placement: { y_m: -2.1, z_m: 0.4, speed_mps: 24 } } }).success).toBe(true);
+    expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, placement: null } }).success).toBe(true);
+    expect(eventSchema.safeParse({ ...shot, detail: { ...shot.detail, placement: { y_m: 4, z_m: 0.4, speed_mps: 24 } } }).success).toBe(false);
+  });
 });
 
 describe('cutoff-safe replay state', () => {

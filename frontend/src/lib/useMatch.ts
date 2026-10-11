@@ -6,6 +6,7 @@ import { createCapability } from './format';
 import { tacticsSchema, type Tactics } from './tactics';
 import { analyticsSchema, type Analytics } from './analytics';
 import { phasesSchema, type Phases } from './phases';
+import { principlesSchema, type Principles } from './principles';
 
 const preferencesKey = 'turning-point:preferences:v1';
 const sessionKey = 'turning-point:session:v1';
@@ -212,6 +213,16 @@ export function useMatch() {
     return report;
   }
 
+  async function getPrinciples(signal?: AbortSignal): Promise<Principles> {
+    const current = stateRef.current;
+    const sessionAuth = authRef.current;
+    if (!current || !sessionAuth) throw new ApiError('Start the replay to see the principles of play.', 'no_session', false);
+    const report = await request(`/sessions/${current.session_id}/principles`, principlesSchema, { capability: sessionAuth.capability, signal });
+    const latest = stateRef.current;
+    if (!latest || report.session_id !== latest.session_id || report.generation !== latest.generation) throw new ApiError('The replay restarted. Refreshing the principles of play…', 'stale_principles', true);
+    return report;
+  }
+
   async function retry() {
     retryRef.current = 0;
     setConnection('reconnecting');
@@ -222,5 +233,5 @@ export function useMatch() {
     catch (reason) { fail(reason, true); }
   }
 
-  return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, getTactics, getAnalytics, getPhases, retry };
+  return { match, state, preferences, loading, busy, error, connection, start, control, updatePreferences, getEvidence, getTactics, getAnalytics, getPhases, getPrinciples, retry };
 }

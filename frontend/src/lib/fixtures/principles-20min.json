@@ -1,0 +1,1250 @@
+{
+ "session_id": "sample",
+ "generation": 1,
+ "data_epoch": 1,
+ "playhead_ms": 1200000,
+ "next_cursor": "c",
+ "engine_version": "principles_v1",
+ "provenance": "synthetic_events_and_tracking",
+ "structures": {
+  "harbor": {
+   "team_id": "harbor",
+   "build_up_seconds": 137.4,
+   "build_up": [
+    {
+     "shape": "2+3",
+     "seconds": 107.2,
+     "share": 78.0,
+     "base": [
+      "RCB",
+      "LCB"
+     ],
+     "screen": [
+      "LB",
+      "DM",
+      "LCM"
+     ]
+    },
+    {
+     "shape": "3+2",
+     "seconds": 26.6,
+     "share": 19.4,
+     "base": [
+      "RCB",
+      "LCB",
+      "DM"
+     ],
+     "screen": [
+      "LB",
+      "LCM"
+     ]
+    },
+    {
+     "shape": "4+1",
+     "seconds": 3.6,
+     "share": 2.6,
+     "base": [
+      "RB",
+      "RCB",
+      "LCB",
+      "LB"
+     ],
+     "screen": [
+      "RCM"
+     ]
+    }
+   ],
+   "rest_seconds": 48.0,
+   "rest_defence": [
+    {
+     "shape": "2+3",
+     "seconds": 32.4,
+     "share": 67.5,
+     "base": [
+      "RCB",
+      "LCB"
+     ],
+     "screen": [
+      "LB",
+      "DM",
+      "RCM"
+     ]
+    },
+    {
+     "shape": "4+1",
+     "seconds": 12.6,
+     "share": 26.2,
+     "base": [
+      "RCB",
+      "LCB",
+      "LB",
+      "DM"
+     ],
+     "screen": [
+      "RCM"
+     ]
+    },
+    {
+     "shape": "3+2",
+     "seconds": 3.0,
+     "share": 6.2,
+     "base": [
+      "RCB",
+      "LCB",
+      "LB"
+     ],
+     "screen": [
+      "RB",
+      "RCM"
+     ]
+    }
+   ],
+   "behind_ball": 6.5,
+   "overcommitted_share": 0.0,
+   "losses": [
+    {
+     "shape": "4+1",
+     "losses": 5,
+     "counters_conceded": 0,
+     "shots_conceded": 0,
+     "xg_conceded": 0.0
+    },
+    {
+     "shape": "2+3",
+     "losses": 3,
+     "counters_conceded": 0,
+     "shots_conceded": 0,
+     "xg_conceded": 0.0
+    }
+   ],
+   "moments": []
+  },
+  "vale": {
+   "team_id": "vale",
+   "build_up_seconds": 49.8,
+   "build_up": [
+    {
+     "shape": "3+2",
+     "seconds": 26.0,
+     "share": 52.2,
+     "base": [
+      "RB",
+      "RCB",
+      "LCB"
+     ],
+     "screen": [
+      "LB",
+      "RCM"
+     ]
+    },
+    {
+     "shape": "4+1",
+     "seconds": 22.6,
+     "share": 45.4,
+     "base": [
+      "RB",
+      "RCB",
+      "LCB",
+      "LB"
+     ],
+     "screen": [
+      "DM"
+     ]
+    },
+    {
+     "shape": "1+4",
+     "seconds": 1.2,
+     "share": 2.4,
+     "base": [
+      "RB"
+     ],
+     "screen": [
+      "RCB",
+      "LCB",
+      "LB",
+      "LCM"
+     ]
+    }
+   ],
+   "rest_seconds": 4.2,
+   "rest_defence": [
+    {
+     "shape": "3+2",
+     "seconds": 2.6,
+     "share": 61.9,
+     "base": [
+      "RB",
+      "RCB",
+      "LCB"
+     ],
+     "screen": [
+      "LB",
+      "RCM"
+     ]
+    },
+    {
+     "shape": "4+1",
+     "seconds": 1.4,
+     "share": 33.3,
+     "base": [
+      "RB",
+      "RCB",
+      "LCB",
+      "RCM"
+     ],
+     "screen": [
+      "LB"
+     ]
+    },
+    {
+     "shape": "1+4",
+     "seconds": 0.2,
+     "share": 4.8,
+     "base": [
+      "RB"
+     ],
+     "screen": [
+      "RCB",
+      "LCB",
+      "LB",
+      "RCM"
+     ]
+    }
+   ],
+   "behind_ball": 6.0,
+   "overcommitted_share": 0.0,
+   "losses": [],
+   "moments": []
+  }
+ },
+ "wingers": [
+  {
+   "player_id": "harbor_10",
+   "team_id": "harbor",
+   "side": "right",
+   "foot": "left",
+   "opposite_foot": true,
+   "style": "inverted",
+   "seconds": 462.6,
+   "touchline_m": 25.4,
+   "inside_share": 97.9,
+   "cut_ins": 0,
+   "shots": 1,
+   "central_shots": 1,
+   "fullback_width_share": 100.0,
+   "xt": -0.073,
+   "moments": []
+  },
+  {
+   "player_id": "harbor_11",
+   "team_id": "harbor",
+   "side": "left",
+   "foot": "left",
+   "opposite_foot": false,
+   "style": "balanced",
+   "seconds": 462.6,
+   "touchline_m": 16.1,
+   "inside_share": 18.6,
+   "cut_ins": 0,
+   "shots": 0,
+   "central_shots": 0,
+   "fullback_width_share": 3.6,
+   "xt": -0.117,
+   "moments": []
+  },
+  {
+   "player_id": "vale_10",
+   "team_id": "vale",
+   "side": "right",
+   "foot": "right",
+   "opposite_foot": false,
+   "style": "balanced",
+   "seconds": 200.8,
+   "touchline_m": 15.3,
+   "inside_share": 9.5,
+   "cut_ins": 0,
+   "shots": 0,
+   "central_shots": 0,
+   "fullback_width_share": null,
+   "xt": 0.0,
+   "moments": []
+  },
+  {
+   "player_id": "vale_11",
+   "team_id": "vale",
+   "side": "left",
+   "foot": "left",
+   "opposite_foot": false,
+   "style": "touchline",
+   "seconds": 200.8,
+   "touchline_m": 5.1,
+   "inside_share": 5.8,
+   "cut_ins": 0,
+   "shots": 0,
+   "central_shots": 0,
+   "fullback_width_share": 0.0,
+   "xt": 0.0,
+   "moments": []
+  }
+ ],
+ "width": {
+  "harbor": {
+   "team_id": "harbor",
+   "width_m": 43.5,
+   "entries": 14,
+   "central_entry_share": 78.6,
+   "crosses": 1
+  },
+  "vale": {
+   "team_id": "vale",
+   "width_m": 50.9,
+   "entries": 1,
+   "central_entry_share": 100.0,
+   "crosses": 0
+  }
+ },
+ "pressing": {
+  "harbor": {
+   "team_id": "harbor",
+   "seconds": 62.0,
+   "system": "zonal",
+   "units": [
+    {
+     "unit": "front",
+     "samples": 49,
+     "follow_share": 20.4,
+     "distance_m": 7.2,
+     "marking": "insufficient_evidence",
+     "markers": []
+    },
+    {
+     "unit": "midfield",
+     "samples": 59,
+     "follow_share": 11.9,
+     "distance_m": 5.4,
+     "marking": "insufficient_evidence",
+     "markers": []
+    },
+    {
+     "unit": "back",
+     "samples": 110,
+     "follow_share": 14.5,
+     "distance_m": 9.3,
+     "marking": "zonal",
+     "markers": []
+    }
+   ],
+   "spare_at_back": -0.1,
+   "left_free": "vale_02",
+   "left_free_share": 100.0,
+   "triggers": [
+    {
+     "trigger": "back_pass_keeper",
+     "passes": 1,
+     "tracked": 1,
+     "pressured": 1,
+     "rate": 100.0,
+     "median_s": 2.0,
+     "regained_5s": 0
+    },
+    {
+     "trigger": "to_centre_back",
+     "passes": 1,
+     "tracked": 1,
+     "pressured": 1,
+     "rate": 100.0,
+     "median_s": 0.8,
+     "regained_5s": 0
+    },
+    {
+     "trigger": "into_midfield",
+     "passes": 13,
+     "tracked": 13,
+     "pressured": 5,
+     "rate": 38.5,
+     "median_s": 0.8,
+     "regained_5s": 8
+    }
+   ],
+   "cover_shadow": 1,
+   "cover_shadow_tracked": 2,
+   "build_ups": 6,
+   "forced_wide_share": 33.3,
+   "regains_by_channel": {
+    "left": 1,
+    "centre": 8,
+    "right": 2
+   },
+   "moments": [
+    {
+     "time_ms": 255000,
+     "event_ref": "evt_00044@1",
+     "label": "Sami North pressed 3.0 s after a pass into midfield; ball won back"
+    },
+    {
+     "time_ms": 835000,
+     "event_ref": "evt_00142@1",
+     "label": "Emil Stone pressed 0.0 s after a pass into midfield; ball won back"
+    },
+    {
+     "time_ms": 955000,
+     "event_ref": "evt_00169@1",
+     "label": "Emil Stone pressed 0.8 s after a pass into midfield; ball won back"
+    }
+   ]
+  },
+  "vale": {
+   "team_id": "vale",
+   "seconds": 146.0,
+   "system": "hybrid",
+   "units": [
+    {
+     "unit": "front",
+     "samples": 224,
+     "follow_share": 24.6,
+     "distance_m": 6.0,
+     "marking": "zonal",
+     "markers": []
+    },
+    {
+     "unit": "midfield",
+     "samples": 239,
+     "follow_share": 51.0,
+     "distance_m": 5.3,
+     "marking": "man",
+     "markers": [
+      "vale_07",
+      "vale_08"
+     ]
+    },
+    {
+     "unit": "back",
+     "samples": 230,
+     "follow_share": 31.7,
+     "distance_m": 9.4,
+     "marking": "mixed",
+     "markers": []
+    }
+   ],
+   "spare_at_back": 1.0,
+   "left_free": "harbor_04",
+   "left_free_share": 97.9,
+   "triggers": [
+    {
+     "trigger": "to_centre_back",
+     "passes": 1,
+     "tracked": 1,
+     "pressured": 0,
+     "rate": 0.0,
+     "median_s": null,
+     "regained_5s": 0
+    },
+    {
+     "trigger": "into_midfield",
+     "passes": 33,
+     "tracked": 33,
+     "pressured": 20,
+     "rate": 60.6,
+     "median_s": 0.4,
+     "regained_5s": 0
+    }
+   ],
+   "cover_shadow": 0,
+   "cover_shadow_tracked": 0,
+   "build_ups": 1,
+   "forced_wide_share": 100.0,
+   "regains_by_channel": {
+    "left": 1,
+    "centre": 2,
+    "right": 1
+   },
+   "moments": []
+  }
+ },
+ "marking": {
+  "harbor": {
+   "team_id": "harbor",
+   "bands": [
+    {
+     "band": "near",
+     "samples": 569,
+     "distance_m": 5.3
+    },
+    {
+     "band": "middle",
+     "samples": 859,
+     "distance_m": 9.5
+    },
+    {
+     "band": "far",
+     "samples": 512,
+     "distance_m": 16.2
+    }
+   ],
+   "receptions": 33,
+   "free": 21,
+   "free_between_lines": 10,
+   "free_players": [
+    {
+     "player_id": "vale_08",
+     "free": 9,
+     "between_lines": 4
+    },
+    {
+     "player_id": "vale_07",
+     "free": 7,
+     "between_lines": 4
+    },
+    {
+     "player_id": "vale_06",
+     "free": 5,
+     "between_lines": 2
+    }
+   ],
+   "moments": [
+    {
+     "time_ms": 157000,
+     "event_ref": "evt_00021@1",
+     "label": "Ivo Brook free between the lines: nearest defender 14 m away"
+    },
+    {
+     "time_ms": 875000,
+     "event_ref": "evt_00151@1",
+     "label": "Emil Stone free between the lines: nearest defender 13 m away"
+    },
+    {
+     "time_ms": 37000,
+     "event_ref": "evt_00006@1",
+     "label": "Emil Stone free between the lines: nearest defender 12 m away"
+    }
+   ]
+  },
+  "vale": {
+   "team_id": "vale",
+   "bands": [
+    {
+     "band": "near",
+     "samples": 1337,
+     "distance_m": 5.6
+    },
+    {
+     "band": "middle",
+     "samples": 2056,
+     "distance_m": 9.9
+    },
+    {
+     "band": "far",
+     "samples": 887,
+     "distance_m": 12.0
+    }
+   ],
+   "receptions": 91,
+   "free": 46,
+   "free_between_lines": 8,
+   "free_players": [
+    {
+     "player_id": "harbor_10",
+     "free": 4,
+     "between_lines": 3
+    },
+    {
+     "player_id": "harbor_11",
+     "free": 2,
+     "between_lines": 2
+    },
+    {
+     "player_id": "harbor_06",
+     "free": 16,
+     "between_lines": 1
+    },
+    {
+     "player_id": "harbor_07",
+     "free": 13,
+     "between_lines": 1
+    },
+    {
+     "player_id": "harbor_08",
+     "free": 10,
+     "between_lines": 1
+    }
+   ],
+   "moments": [
+    {
+     "time_ms": 608000,
+     "event_ref": "evt_00105@1",
+     "label": "Dario Finch free between the lines: nearest defender 14 m away"
+    },
+    {
+     "time_ms": 763000,
+     "event_ref": "evt_00126@1",
+     "label": "Asher Pike free between the lines: nearest defender 10 m away"
+    },
+    {
+     "time_ms": 264000,
+     "event_ref": "evt_00046@1",
+     "label": "Dario Finch free between the lines: nearest defender 10 m away"
+    }
+   ]
+  }
+ },
+ "movements": {
+  "harbor": {
+   "team_id": "harbor",
+   "rows": [
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "harbor_09"
+     ],
+     "episodes": 16,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 15600,
+       "event_ref": null,
+       "label": "Callum Wren drops, then sprints in behind (0:15)"
+      }
+     ]
+    },
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "harbor_06"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 345400,
+       "event_ref": "evt_00068@1",
+       "label": "Leon Reed drops, then sprints in behind (5:45)"
+      }
+     ]
+    },
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "harbor_07"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 266400,
+       "event_ref": "evt_00047@1",
+       "label": "Asher Pike drops, then sprints in behind (4:26)"
+      }
+     ]
+    },
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "harbor_08"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 65000,
+       "event_ref": "cmb_0001@1",
+       "label": "Rafi Moss drops, then sprints in behind, marker steps out (1:05)"
+      }
+     ]
+    },
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "harbor_11"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 65000,
+       "event_ref": "cmb_0001@1",
+       "label": "Kai Lorne drops, then sprints in behind (1:05)"
+      }
+     ]
+    },
+    {
+     "kind": "opposite_runs",
+     "players": [
+      "harbor_06",
+      "harbor_07"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 307000,
+       "event_ref": "evt_00061@1",
+       "label": "Leon Reed drops as Asher Pike runs beyond (5:07)"
+      }
+     ]
+    },
+    {
+     "kind": "opposite_runs",
+     "players": [
+      "harbor_09",
+      "harbor_10"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 267000,
+       "event_ref": "evt_00047@1",
+       "label": "Dario Finch drops as Callum Wren runs beyond (4:27)"
+      }
+     ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "harbor_09"
+     ],
+     "episodes": 4,
+     "drew": 4,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 68600,
+       "event_ref": "evt_00012@1",
+       "label": "Callum Wren's run drags Niko Ash (1:08)"
+      }
+     ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "harbor_06"
+     ],
+     "episodes": 2,
+     "drew": 2,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 191200,
+       "event_ref": "evt_00026@1",
+       "label": "Leon Reed's run drags Jasper Dale (3:11)"
+      }
+     ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "harbor_07"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 271200,
+       "event_ref": "evt_00048@1",
+       "label": "Asher Pike's run drags Jasper Dale (4:31)"
+      }
+     ]
+    }
+   ],
+   "corners": 3,
+   "crisscross_corners": 0
+  },
+  "vale": {
+   "team_id": "vale",
+   "rows": [
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "vale_10"
+     ],
+     "episodes": 2,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1115200,
+       "event_ref": "evt_00202@1",
+       "label": "Ruben Hart drops, then sprints in behind (18:35)"
+      }
+     ]
+    },
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "vale_06"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1115400,
+       "event_ref": "evt_00202@1",
+       "label": "Emil Stone drops, then sprints in behind, marker steps out (18:35)"
+      }
+     ]
+    },
+    {
+     "kind": "drop_and_sprint",
+     "players": [
+      "vale_07"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1115000,
+       "event_ref": "evt_00202@1",
+       "label": "Sami North drops, then sprints in behind, marker steps out (18:35)"
+      }
+     ]
+    },
+    {
+     "kind": "opposite_runs",
+     "players": [
+      "vale_08",
+      "vale_09"
+     ],
+     "episodes": 19,
+     "drew": 2,
+     "found": 2,
+     "moments": [
+      {
+       "time_ms": 38000,
+       "event_ref": "evt_00006@1",
+       "label": "Jasper Dale drops as Ivo Brook runs beyond (0:38)"
+      },
+      {
+       "time_ms": 525000,
+       "event_ref": null,
+       "label": "Ivo Brook drops as Jasper Dale runs beyond (8:45)"
+      },
+      {
+       "time_ms": 585000,
+       "event_ref": null,
+       "label": "Ivo Brook drops as Jasper Dale runs beyond (9:45)"
+      }
+     ]
+    },
+    {
+     "kind": "opposite_runs",
+     "players": [
+      "vale_06",
+      "vale_09"
+     ],
+     "episodes": 3,
+     "drew": 0,
+     "found": 1,
+     "moments": [
+      {
+       "time_ms": 257000,
+       "event_ref": "evt_00044@1",
+       "label": "Jasper Dale drops as Emil Stone runs beyond (4:17)"
+      },
+      {
+       "time_ms": 1124000,
+       "event_ref": null,
+       "label": "Emil Stone drops as Jasper Dale runs beyond (18:44)"
+      }
+     ]
+    },
+    {
+     "kind": "opposite_runs",
+     "players": [
+      "vale_06",
+      "vale_08"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 170000,
+       "event_ref": "evt_00022@1",
+       "label": "Emil Stone drops as Ivo Brook runs beyond (2:50)"
+      }
+     ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "vale_06"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1119600,
+       "event_ref": null,
+       "label": "Emil Stone's run drags Leon Reed (18:39)"
+      }
+     ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "vale_07"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1119600,
+       "event_ref": null,
+       "label": "Sami North's run drags Leon Reed (18:39)"
+      }
+     ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "vale_10"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1119600,
+       "event_ref": null,
+       "label": "Ruben Hart's run drags Noah Fen (18:39)"
+      }
+     ]
+    }
+   ],
+   "corners": 0,
+   "crisscross_corners": 0
+  }
+ },
+ "third_man": {
+  "harbor": {
+   "team_id": "harbor",
+   "combinations": 6,
+   "by_zone": {
+    "build_up": 2,
+    "middle_third": 4,
+    "final_third": 0
+   },
+   "tracked": 6,
+   "lane_blocked": 1,
+   "receiver_free": 5,
+   "progress_m": 15.7,
+   "final_third_10s": 4,
+   "shots_15s": 4,
+   "patterns": [
+    {
+     "first": "harbor_01",
+     "second": "harbor_06",
+     "third": "harbor_04",
+     "count": 1
+    },
+    {
+     "first": "harbor_06",
+     "second": "harbor_04",
+     "third": "harbor_07",
+     "count": 1
+    },
+    {
+     "first": "harbor_08",
+     "second": "harbor_11",
+     "third": "harbor_06",
+     "count": 1
+    },
+    {
+     "first": "harbor_08",
+     "second": "harbor_10",
+     "third": "harbor_07",
+     "count": 1
+    },
+    {
+     "first": "harbor_08",
+     "second": "harbor_09",
+     "third": "harbor_06",
+     "count": 1
+    }
+   ],
+   "moments": [
+    {
+     "time_ms": 224000,
+     "event_ref": "evt_00038@1",
+     "label": "Rafi Moss to Dario Finch, set first time for Asher Pike (direct lane blocked)"
+    },
+    {
+     "time_ms": 344000,
+     "event_ref": "evt_00068@1",
+     "label": "Rafi Moss to Callum Wren, set first time for Leon Reed"
+    },
+    {
+     "time_ms": 384000,
+     "event_ref": "evt_00076@1",
+     "label": "Asher Pike to Kai Lorne, set first time for Rafi Moss"
+    }
+   ]
+  },
+  "vale": {
+   "team_id": "vale",
+   "combinations": 0,
+   "by_zone": {
+    "build_up": 0,
+    "middle_third": 0,
+    "final_third": 0
+   },
+   "tracked": 0,
+   "lane_blocked": 0,
+   "receiver_free": 0,
+   "progress_m": null,
+   "final_third_10s": 0,
+   "shots_15s": 0,
+   "patterns": [],
+   "moments": []
+  }
+ },
+ "match_report": {
+  "harbor": {
+   "team_id": "harbor",
+   "summary": "Harbor Athletic: 62% of the ball, 1.20 xG. Build-up 2+3, rest defence 2+3. Zonal press. Watch Asher Pike.",
+   "phases": [
+    {
+     "topic": "In possession",
+     "text": "Harbor Athletic built up in a 2+3 (78% of build-up time; base RCB, LCB); added most threat through the centre (+0.38 of +0.73 xT); used 6 third-man combinations; Dario Finch played as an inverted winger (98% of attacking time inside); 62% possession and 100% field tilt.",
+     "moments": [
+      {
+       "time_ms": 224000,
+       "event_ref": "evt_00038@1",
+       "label": "Rafi Moss to Dario Finch, set first time for Asher Pike (direct lane blocked)"
+      }
+     ]
+    },
+    {
+     "topic": "Out of possession",
+     "text": "Harbor Athletic defended mostly in a mid block (back four at 35.9 m, 84% of settled defending); pressed zonally; pressed hardest on passes into midfield (5 of 13, 38%); matched the opponent's forwards one for one at the back during its build-up.",
+     "moments": [
+      {
+       "time_ms": 255000,
+       "event_ref": "evt_00044@1",
+       "label": "Sami North pressed 3.0 s after a pass into midfield; ball won back"
+      }
+     ]
+    },
+    {
+     "topic": "Attack to defence",
+     "text": "Harbor Athletic counter-pressed after 20 of 26 losses (77%), winning the ball back within 5 s twice; held a 2+3 rest defence with the ball in the final third (68%), 6.5 players behind the ball on average; conceded 0 counters from 8 final-third losses.",
+     "moments": [
+      {
+       "time_ms": 201000,
+       "event_ref": "evt_00031@1",
+       "label": "Lost in the final third, pressed in 0.2 s, won back in 2.2 s"
+      }
+     ]
+    },
+    {
+     "topic": "Defence to attack",
+     "text": "Harbor Athletic won the ball 26 times in open play; 8 became counters that reached the final third within 10 s and 12 were recycled. Transitions were mostly controlled resets.",
+     "moments": [
+      {
+       "time_ms": 600000,
+       "event_ref": "evt_00104@1",
+       "label": "Won in the middle third, final third in 8.0 s, shot worth 0.35 xG"
+      }
+     ]
+    },
+    {
+     "topic": "Set pieces",
+     "text": "Harbor Athletic took 3 corners; 0 shots (0.00 xG) came from set pieces.",
+     "moments": []
+    }
+   ],
+   "strengths": [
+    {
+     "topic": "Counter-press",
+     "text": "Pressed the ball after 77% of 26 losses; won it back within 5 s twice.",
+     "moments": [
+      {
+       "time_ms": 201000,
+       "event_ref": "evt_00031@1",
+       "label": "Lost in the final third, pressed in 0.2 s, won back in 2.2 s"
+      },
+      {
+       "time_ms": 281000,
+       "event_ref": "evt_00053@1",
+       "label": "Lost in the final third, pressed in 1.0 s, won back in 2.2 s"
+      }
+     ]
+    },
+    {
+     "topic": "Third-man combinations",
+     "text": "6 combinations, the receiver free on arrival 5 of 6 times, gaining 15.7 m on average.",
+     "moments": [
+      {
+       "time_ms": 224000,
+       "event_ref": "evt_00038@1",
+       "label": "Rafi Moss to Dario Finch, set first time for Asher Pike (direct lane blocked)"
+      },
+      {
+       "time_ms": 344000,
+       "event_ref": "evt_00068@1",
+       "label": "Rafi Moss to Callum Wren, set first time for Leon Reed"
+      }
+     ]
+    },
+    {
+     "topic": "Counter-movement",
+     "text": "Callum Wren dropped and then sprinted in behind 16 times; a marker stepped out with the drop once.",
+     "moments": [
+      {
+       "time_ms": 15600,
+       "event_ref": null,
+       "label": "Callum Wren drops, then sprints in behind (0:15)"
+      }
+     ]
+    },
+    {
+     "topic": "Main route to goal",
+     "text": "52% of the expected threat came through the centre.",
+     "moments": []
+    }
+   ],
+   "weaknesses": [
+    {
+     "topic": "Free men between the lines",
+     "text": "Vale United found a free receiver between Harbor Athletic's lines 10 times (21 free receptions of 33 in the middle and final thirds).",
+     "moments": [
+      {
+       "time_ms": 157000,
+       "event_ref": "evt_00021@1",
+       "label": "Ivo Brook free between the lines: nearest defender 14 m away"
+      },
+      {
+       "time_ms": 875000,
+       "event_ref": "evt_00151@1",
+       "label": "Emil Stone free between the lines: nearest defender 13 m away"
+      }
+     ]
+    },
+    {
+     "topic": "Flank left by the inverted winger",
+     "text": "With Dario Finch inside, the right-back gave the width 100% of the time on that flank, so a turnover can leave the flank open.",
+     "moments": []
+    }
+   ],
+   "key_player": "harbor_07",
+   "key_player_reason": "Most expected threat added (+0.533 xT from 8 progressive passes and 3 progressive carries)."
+  },
+  "vale": {
+   "team_id": "vale",
+   "summary": "Vale United: 38% of the ball, 0.05 xG. Build-up 3+2, rest defence 3+2. Hybrid press. Watch Emil Stone.",
+   "phases": [
+    {
+     "topic": "In possession",
+     "text": "Vale United built up in a 3+2 (52% of build-up time; base RB, RCB, LCB); 38% possession and 0% field tilt.",
+     "moments": []
+    },
+    {
+     "topic": "Out of possession",
+     "text": "Vale United defended mostly in a low block (back four at 23.3 m, 93% of settled defending); pressed with a hybrid: front zonal, midfield man, back mixed; Sami North, Ivo Brook followed their man; pressed hardest on passes into midfield (20 of 33, 61%); kept 1.0 spare defenders at the back during the opponent's build-up.",
+     "moments": []
+    },
+    {
+     "topic": "Attack to defence",
+     "text": "Vale United counter-pressed after 12 of 25 losses (48%), never winning it back within 5 s; held a 3+2 rest defence with the ball in the final third (62%), 6.0 players behind the ball on average.",
+     "moments": [
+      {
+       "time_ms": 600000,
+       "event_ref": "evt_00104@1",
+       "label": "Lost in the middle third, not won back: shot conceded worth 0.35 xG"
+      }
+     ]
+    },
+    {
+     "topic": "Defence to attack",
+     "text": "Vale United won the ball 26 times in open play; 0 became counters that reached the final third within 10 s and 12 were recycled. Transitions were mostly controlled resets.",
+     "moments": []
+    },
+    {
+     "topic": "Set pieces",
+     "text": "Vale United have not taken a corner yet.",
+     "moments": []
+    }
+   ],
+   "strengths": [],
+   "weaknesses": [
+    {
+     "topic": "Free men between the lines",
+     "text": "Harbor Athletic found a free receiver between Vale United's lines 8 times (46 free receptions of 91 in the middle and final thirds).",
+     "moments": [
+      {
+       "time_ms": 608000,
+       "event_ref": "evt_00105@1",
+       "label": "Dario Finch free between the lines: nearest defender 14 m away"
+      },
+      {
+       "time_ms": 763000,
+       "event_ref": "evt_00126@1",
+       "label": "Asher Pike free between the lines: nearest defender 10 m away"
+      }
+     ]
+    },
+    {
+     "topic": "Space behind the line",
+     "text": "3 balls played in behind the back four; 2 shots conceded within 10 s.",
+     "moments": [
+      {
+       "time_ms": 608000,
+       "event_ref": "evt_00105@1",
+       "label": "Ball in behind, shot conceded worth 0.35 xG"
+      },
+      {
+       "time_ms": 304000,
+       "event_ref": "evt_00060@1",
+       "label": "Ball in behind, shot conceded worth 0.07 xG"
+      }
+     ]
+    }
+   ],
+   "key_player": "vale_06",
+   "key_player_reason": "Most expected threat added (+0.070 xT from 1 progressive passes and 1 progressive carries)."
+  }
+ },
+ "definitions": {
+  "structure": "The deepest five outfield players, sorted by depth and split into a base line and a screen at their largest depth gap (if it is 4 m or more; otherwise one flat line of five). 3+2 is a back three with two in front of it, 2+3 two centre-backs with three in front. Read every 200 ms in settled possession (outside transitions and set pieces): build-up with the ball in the team's own half, rest defence with the ball in the final third.",
+  "behind_ball": "Rest defence: outfield players 10 m or more goal-side of the ball while the team has it in the final third. Over-committed: 3 or fewer.",
+  "rest_losses": "Open-play losses in the final third, by the rest-defence shape at the moment of the loss: counters conceded (the opponent reached its final third within 10 s), and shots and xG conceded within 15 s.",
+  "winger_role": "From the 5 Hz synthetic positions while the team has the ball in the opponent's half: inverted when the winger spends 40% or more of that time 18 m or more from the touchline; touchline when it averages 8 m or less from it; otherwise balanced. At least 60 s is needed. Opposite foot: a right winger who is left-footed or the reverse (preferred foot is a public player attribute).",
+  "cut_in": "A winger's carry that starts in its wide channel and ends in the centre, or ends 8 m or more further from the touchline.",
+  "fullback_width": "With the ball in the final third on a winger's side, the share of time its full-back is the wider of the two: the width the full-back provides while the winger is inside.",
+  "width": "Attacking width: the outfield spread across the pitch in settled possession with the ball in the final third. Central entries: completed passes and carries into the final third that end in the centre channel. Crosses: passes from a wide channel of the final third into the box.",
+  "press_system": "During the opponent's settled build-up in its own half, each second: does a player's nearest opponent move 3 m or more over the next 2 s, and does the player go with that opponent (moving the same way and staying within 5 m)? A player who follows 55% of the time or more is man-oriented, 35% or less zonal. A unit is man when most of its players are man-oriented, zonal when most are zonal. Man-to-man when every unit with enough samples is man, zonal when every one is zonal, hybrid when they differ.",
+  "spare_at_back": "During the opponent's build-up: the back four minus the opponent's outfield players positioned behind the team's midfield line. +1 means one spare defender.",
+  "left_free": "The opponent outfield player most often without a defender within 8 m during its own build-up (some teams leave one centre-back free on purpose to keep a spare man at the back).",
+  "press_triggers": "Opponent completed passes that end in its own half, by type: back to the keeper, out to a full-back, to a centre-back, into midfield, other. Pressured: a player within 3 m of the receiver within 3 s of the ball arriving. Regained: the team won the ball back within 5 s.",
+  "cover_shadow": "Of pressured receptions by the opponent's keeper or centre-backs, how often the presser's approach came within 30\u00b0 of the line from the receiver to the opponent's holding midfielder, blocking that pass with the run (a cover shadow).",
+  "forced_wide": "Opponent build-ups that start in its own third: the share whose first entry into the middle third ends in a wide channel.",
+  "marking_bands": "In settled defending, each opponent outfield player's distance to the nearest defender, by that opponent's distance from the ball: near (under 15 m), middle (15 to 30 m) and far (over 30 m). Tight near the ball and looser away from it is the usual man-marking rule.",
+  "free_receptions": "Opponent completed passes received in its middle or final third with no defender within 5 m on arrival. Between the lines: received between the team's back four and its midfield line.",
+  "drop_and_sprint": "An attacker in possession drops 4 m or more toward its own goal within 1.6 s, then sprints forward at 6 m/s or more, gaining 8 m or more in 2 s, starting within 2.0 s of the drop. Drew: the nearest defender stepped 2 m or more out with the drop. Found: the runner received the ball within 3 s of the sprint starting.",
+  "opposite_runs": "Two attacking team-mates within 15 m of each other across the pitch: one drops 4 m or more while the other runs 5 m or more forward over 2 s, ending within 8 m of where the dropping player started (into the space it left). Drew: the dropping player's nearest defender stepped 2 m or more out with that player. Read in settled possession (5 s or more after the ball was won), like the other counter-movements. Found: either received the ball within 3 s.",
+  "decoy_run": "An attacker runs 6 m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within 8 m) retreats 3 m or more with the runner (drew). Found: within 3 s a team-mate, not the runner, received a pass within 12 m of where that defender started.",
+  "crisscross": "At a corner: two attackers inside the final 20 m whose order across the pitch swaps in the 3 s before the delivery, each moving 3 m or more.",
+  "third_man": "A completed pass from A to B, then B passes on to C (not A) within 3 s of A's pass, with C receiving further forward than A played from. Lane blocked: an opponent within 2.5 m of the straight line from A to C when A played. Free: no opponent within 5 m of C on arrival. Zones: build-up (A in its own third), middle third or final third (where C receives).",
+  "match_report": "A summary per team in the order a professional analyst works: in possession, out of possession, attack to defence, defence to attack and set pieces, then strengths to keep, weaknesses an opponent could target and the most influential player by expected threat. Each line is built from the numbers in this report and in Phases of play, with its sample. It describes what happened; it does not explain why."
+ },
+ "limitations": [
+  "Synthetic data: the events and the 5 Hz player positions are generated from fictional tendencies. Off-ball movement between events is illustrative.",
+  "Structures use the deepest five outfield players and one depth gap. Real analysts also judge width, the opponent's front line and who is responsible for whom.",
+  "Man-orientation is read from whether a player moves with the nearest opponent, which also happens when two players simply run the same way. Zonal teams can look man-oriented near the ball.",
+  "Counter-movements are read from synthetic positions with fixed distances and windows. They show the pattern of the movement, not the intent behind it.",
+  "Third-man combinations need two passes inside 3 s. The synthetic event stream spaces most passes further apart, so the count is mostly planted build-up combinations.",
+  "The match report applies fixed rules to the numbers; it is a starting point for analysis, not a verdict. One match is a small sample."
+ ]
+}

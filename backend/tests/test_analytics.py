@@ -94,10 +94,11 @@ def test_workload_is_physical_and_recovers_planted_work_rates(full):
     # vale_11's planted low work rate shows in high-speed running. (Total distance is now close to
     # vale_09's, whose planted habit of dropping deep into midfield cuts his runs in behind.)
     assert min(["vale_09", "vale_10", "vale_11"], key=lambda p: rows[p].hsr_m) == "vale_11"
-    # harbor_10's planted runs in behind make him the busiest forward at high speed; the planted
-    # overlapping right-back now covers similar high-speed distance up and down the flank.
-    forwards = [w for w in full["workload"] if w.player_id in ("harbor_09", "harbor_10", "harbor_11")]
-    assert max(forwards, key=lambda w: w.hsr_m).player_id == "harbor_10"
+    # harbor_10's planted runs in behind and harbor_09's planted drop-and-sprint counter-movement
+    # (principles round) make them Harbor's busiest forwards at high speed; the planted overlapping
+    # right-back covers similar high-speed distance up and down the flank.
+    forwards = sorted((w for w in full["workload"] if w.player_id in ("harbor_09", "harbor_10", "harbor_11")), key=lambda w: -w.hsr_m)
+    assert {w.player_id for w in forwards[:2]} == {"harbor_09", "harbor_10"}
     assert [w.player_id for w in full["workload"] if w.flag] == ["vale_08"]
 
 

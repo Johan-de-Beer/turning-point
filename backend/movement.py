@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 
 from .ingest import canonical_order
 from .models import EventEnvelope, Match, PERIOD_MS
-from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, player_for, role, tendencies
+from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, number, player_for, role, tendencies
 from .tracking import FRAME_MS, X_M, Y_M, ATTACK_Y, Episode, metres
 
 DT = FRAME_MS / 1000
@@ -106,6 +106,11 @@ class Movement:
     track: Track | None = None
 
 
+def dropped(t: int) -> bool:
+    """A dropping striker's cycle: 7 s deep in every 12 s, so the team-mate's run into the space repeats."""
+    return t % 12_000 < 7_000
+
+
 def cell(x: float, y: float) -> int:
     return min(GRID_X - 1, int(x / 100 * GRID_X)) * GRID_Y + min(GRID_Y - 1, int(y / 100 * GRID_Y))
 
@@ -138,6 +143,7 @@ class MovementBuilder:
         holders: list[tuple[int, str | None]] = []
         owners: list[tuple[int, str | None]] = []
         shots: list[tuple[int, str]] = []
+        receptions: list[tuple[int, str, str, str, float]] = []   # arrive, team, passer, recipient, end x (team frame)
         for i, e in enumerate(rows):
             t = e.event_time_ms
             following = rows[i + 1].event_time_ms if i + 1 < len(rows) else t + 2_000
@@ -155,6 +161,8 @@ class MovementBuilder:
                 holders.append((t, e.player_id))
                 if e.kind == "PASS":
                     holders.append((arrive, e.detail.recipient_id if e.detail.completed else None))
+                    if e.detail.completed and e.detail.recipient_id:
+                        receptions.append((arrive, team, e.player_id, e.detail.recipient_id, e.detail.end.x))
             elif e.kind == "SHOT":
                 a = to_home(team, self.home, e.detail.position.x, e.detail.position.y)
                 target = e.detail.target or e.detail.position
@@ -173,7 +181,8 @@ class MovementBuilder:
         if not ball or ball[0][0] > start:
             ball.insert(0, (start, 50.0, 50.0))
         ball.sort(key=lambda k: k[0])
-        return ball, holders, owners, shots
+        receptions.sort(key=lambda k: k[0])
+        return ball, holders, owners, shots, receptions
 
     def overrides(self, start: int, end: int) -> dict[int, tuple[Episode, int]]:
         """Frame time -> (episode, index) for times an episode covers; the latest-starting wins."""
@@ -216,7 +225,7 @@ class MovementBuilder:
 
     def run_period(self, period: int, totals, lines, before) -> int:
         start, end = (period - 1) * PERIOD_MS, period * PERIOD_MS
-        ball_keys, holders, owners, shots = self.timelines(period)
+        ball_keys, holders, owners, shots, receptions = self.timelines(period)
         override = self.overrides(start, end)
         home = self.home
         profiles = {team: tendencies(team)["movement"] for team in (self.home, self.away)}
@@ -242,12 +251,16 @@ class MovementBuilder:
             x, y = to_home(team, home, *own)
             state[pid] = [x, y, 0.0, 0.0, 0.0, 0, 0, 0]  # x, y, vx, vy, speed, sprint_ms, accel_ms, decel_ms
 
-        bi = hi = oi = 0
+        markers = {team: profiles[team].get("man_marking", {}) for team in profiles}
+        triggers = {team: profiles[team].get("trigger_hunt") for team in profiles}
+        bi = hi = oi = ri = 0
         holder, owner, live = None, None, True
         slot = {pid: k for k, pid in enumerate(self.players)}
         pressers: dict[str, set[str]] = {self.home: set(), self.away: set()}
         last_change = {self.home: -10**9, self.away: -10**9}
         lost_at = {self.home: -10**9, self.away: -10**9}
+        hunters: dict[str, set[str]] = {self.home: set(), self.away: set()}
+        hunt_at = {self.home: -10**9, self.away: -10**9}
         # The frame one second before each shot (snapped to the frame clock).
         shot_times = {start + (t - 1_000 - start) // FRAME_MS * FRAME_MS: team for t, team in shots}
         # Frames at which to keep everyone's position: the frame nearest each pass and carry.
@@ -278,6 +291,16 @@ class MovementBuilder:
                     pressers[owner] = self.counter_pressers(owner, state, bx, by, profiles[owner].get("counter_press"), owners[oi][0])
                 owner, live = new, new is not None
                 oi += 1
+            while ri < len(receptions) and receptions[ri][0] <= t:
+                at, team, passer, recipient, end_x = receptions[ri]
+                ri += 1
+                defending = self.away if team == self.home else self.home
+                plan = triggers[defending]
+                if plan and plan["players"] and self.trigger(passer, recipient, end_x) in plan["on"] \
+                        and (at // FRAME_MS * 2_246_822_519) % 1000 < plan["rate"] * 1000:
+                    # A pressing trigger: the nearest players hunt the receiver.
+                    hunters[defending] = self.counter_pressers(defending, state, bx, by, {"players": plan["players"], "reach_m": 32.0, "rate": 1.0}, at)
+                    hunt_at[defending] = at
             covered = override.get(t)
             if covered:
                 ep, index = covered
@@ -293,12 +316,23 @@ class MovementBuilder:
                 s = state[pid]
                 ox, oy = (bx, by) if team == home else (100 - bx, 100 - by)
                 wobble = math.sin(t / period_ms * 6.283 + phase) * 1.6
-                habit = self.habit(team, pid, group, ay, ox, oy, fullbacks[team], rotations[team], flank_style) \
+                # Corners keep their staged runs: the rest-defence shape is an open-play habit.
+                habit = self.habit(team, pid, group, ay, ox, oy, fullbacks[team], rotations[team], flank_style,
+                                   profiles[team] if not (covered and ep.kind == "corner") else None, t) \
                     if live and owner == team and holder != pid else None
+                marked = markers[team].get(pid)
                 if live and owner not in (None, team) and pid in pressers[team] \
                         and t - lost_at[team] <= profiles[team]["counter_press"]["window_ms"]:
                     # Counter-press: hunt the ball straight after losing it.
                     tx, ty, cap, amax = bx, by, max(transition, 6.5), 4.5
+                elif live and owner not in (None, team) and pid in hunters[team] and t - hunt_at[team] <= triggers[team]["window_ms"]:
+                    # Pressing trigger: close down the player who has just received.
+                    tx, ty, cap, amax = bx, by, max(transition, 7.0), 5.0
+                elif marked and live and owner not in (None, team) and ox > 50 and t - last_change[team] > TRANSITION_MS:
+                    # Man-marking against the opponent's build-up (in its own half): stay goal-side of the man.
+                    mx, my = state[player_for(owner, marked)][0], state[player_for(owner, marked)][1]
+                    tx, ty = (mx - 1.7, my) if team == home else (mx + 1.7, my)
+                    tx, ty, cap, amax = clamp(tx), clamp(ty), max(transition, 5.8), 4.0
                 elif group == "GK" and live and owner not in (None, team) and profiles[team].get("sweeper") \
                         and (sweep := self.sweep(team, bx, by, base - drop[team])):
                     # Sweeper-keeper: come off the line toward a ball played in behind.
@@ -308,6 +342,7 @@ class MovementBuilder:
                     tx, ty = to_home(team, home, clamp(habit[0] + wobble), clamp(habit[1] + wobble * .8))
                     # Full-backs sprint to get beyond; the other habits are positional drifts.
                     cap, amax = (6.5, 4.0) if group == "BACK" and fullbacks[team].get(pid) in ("overlap", "underlap") \
+                        else (8.5, 6.0) if len(habit) > 2 and habit[2] == "sprint" else (5.0, 4.0) if len(habit) > 2 \
                         else (transition, 4.5) if t - last_change[team] <= TRANSITION_MS else (max(cruise, 4.0), 3.0)
                 elif covered:
                     ex, ey = frame.players[pid]
@@ -427,13 +462,38 @@ class MovementBuilder:
             count += 1
         return count
 
+    @staticmethod
+    def trigger(passer: str, recipient: str, end_x: float) -> str | None:
+        """The pressing-trigger kind of a completed pass ending in the receiving team's own half."""
+        if end_x >= 50:
+            return None
+        if role(recipient) == "GK":
+            return "back_pass_keeper" if role(passer) != "GK" else None
+        if role(recipient) in ("RB", "LB"):
+            return "to_fullback"
+        if role(recipient) in ("RCB", "LCB"):
+            return "to_centre_back"
+        return "into_midfield" if role(recipient) in MIDFIELD else None
+
     def habit(self, team: str, pid: str, group: str, ay: float, ox: float, oy: float, fullbacks: dict, rotations: dict,
-              flank_style: dict) -> tuple[float, float] | None:
+              flank_style: dict, profile: dict | None = None, t: int = 0) -> tuple | None:
         """A planted in-possession habit (team frame), or None. These apply inside tracking episodes too:
-        the episodes stage the defending side and the ball, the continuous layer adds these habits."""
+        the episodes stage the defending side and the ball, the continuous layer adds these habits.
+        A third element "sprint" asks for a sprinting pace."""
+        profile = profile or {}
         lift = max(0.0, ox - 15)
         side = 1 if ay > 0 else -1
         flank = (oy - 50) * side > 4 and ox >= 58
+        rest = profile.get("rest_shape")
+        if rest and ox >= 60 and (pid in rest["base"] or pid in rest["screen"]):
+            # Rest defence while attacking: a base line and a screen in front of it, shifted toward the ball.
+            line = rest["base"] if pid in rest["base"] else rest["screen"]
+            k = line.index(pid)
+            # Listed right to left; a line of three spans 26 units, a pair of centre-backs 22, a pair of midfielders 16.
+            spread = 26.0 if len(line) == 3 else 22.0 if line is rest["base"] else 16.0
+            lateral = 50 + (spread / 2 - k * spread / (len(line) - 1) if len(line) > 1 else 0) + (oy - 50) * .2
+            depth = ox - (42 if line is rest["base"] else 30)
+            return depth, lateral
         if group == "BACK":
             style = fullbacks.get(pid)
             if style == "overlap":
@@ -451,14 +511,29 @@ class MovementBuilder:
         elif group == "MID":
             if rotations.get("drop_in") == pid and ox < 45:
                 return 15 + .45 * lift, 50.0
-            if "drop_deep" in rotations and pid == player_for(team, "LCM") and 30 <= ox <= 75:
-                # The attacking midfielder pushes into the space the striker leaves.
+            if "drop_deep" in rotations and pid == player_for(team, "LCM") and 30 <= ox <= 75 and dropped(t):
+                # The attacking midfielder pushes into the space the striker leaves (an opposite run).
                 return 57 + .4 * lift, 46.0
         elif group == "FWD":
+            winger = profile.get("winger_habits", {}).get(pid)
+            if winger == "invert" and ox >= 40:
+                # Inverted winger: drifts in off the touchline into the half-space.
+                return 55 + .4 * lift, 50 + ay * .4 + (oy - 50) * .15
+            if winger == "hug" and ox >= 40:
+                # Touchline winger: holds the width.
+                return 55 + .4 * lift, 50 + side * 46
+            plan = profile.get("drop_sprint", {}).get(pid)
+            if plan and 35 <= ox <= 72:
+                # Counter-movement: drop toward the ball as if to receive, then sprint in behind.
+                phase = (t + number(pid) * 1_000) % plan["cycle_ms"]
+                if phase < plan["drop_ms"]:
+                    return 47 + .4 * lift, 50.0, "check"
+                if phase < plan["drop_ms"] + plan["sprint_ms"]:
+                    return min(95.0, 69 + .4 * lift), 50.0, "sprint"
             if abs(ay) > 20 and flank and flank_style.get((team, ay > 0)) == "overlap":
                 # Make room on the outside for the overlapping full-back.
                 return 55 + .4 * lift, 50 + ay * .45
-            if rotations.get("drop_deep") == pid and 30 <= ox <= 75:
+            if rotations.get("drop_deep") == pid and 30 <= ox <= 75 and dropped(t):
                 return 38 + .5 * lift, 50.0
         return None
 

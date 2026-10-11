@@ -465,9 +465,9 @@
     "reached_final_third": 0,
     "mean_time_to_middle_ms": 7000.0,
     "mean_time_to_final_ms": null,
-    "passes_attempted": 3,
-    "passes_completed": 2,
-    "pass_accuracy": 66.7,
+    "passes_attempted": 4,
+    "passes_completed": 3,
+    "pass_accuracy": 75.0,
     "lines_broken": 1,
     "mean_lines_broken": 1.0,
     "lost_in_own_half": 0

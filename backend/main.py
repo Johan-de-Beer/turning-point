@@ -21,7 +21,7 @@ from .agents import MicrosoftProvider, MockProvider
 from .generator import load_fixture
 from .http_safety import DemoSafetyMiddleware
 from .limits import ReplayLimits, integer
-from .models import Control, EvidenceResponse, MatchMetadata, OverlayResponse, PreferencesPatch, RecapResponse, SessionCreate, SessionState, TacticalReport, MatchAnalytics, GamePhases
+from .models import Control, EvidenceResponse, MatchMetadata, OverlayResponse, PreferencesPatch, RecapResponse, SessionCreate, SessionState, TacticalReport, MatchAnalytics, GamePhases, PlayPrinciples
 from .replay import ReplayService, ServiceError
 from .storage import Storage
 
@@ -72,8 +72,8 @@ def create_app(service: ReplayService | None = None, background_clock: bool = Tr
                     if ticks % 100 == 0:
                         active.maintenance()
         ticker = asyncio.create_task(tick()) if background_clock else None
-        # Build the synthetic tracking (and the per-frame phase figures) off the event loop so the first report is quick.
-        warm = asyncio.create_task(asyncio.to_thread(application.state.service.phases.features)) if service is None else None
+        # Build the synthetic tracking (and the per-frame phase and principle figures) off the event loop so the first report is quick.
+        warm = asyncio.create_task(asyncio.to_thread(application.state.service.principles.layout)) if service is None else None
         yield
         if warm:
             with contextlib.suppress(Exception):
@@ -241,6 +241,13 @@ def create_app(service: ReplayService | None = None, background_clock: bool = Tr
         with service.lock:
             session = service.authorize(session_id, capability(authorization))
             return service.phases_report(session)
+
+    @application.get("/api/sessions/{session_id}/principles", response_model=PlayPrinciples)
+    async def principles(session_id: str, request: Request, authorization: str | None = Header(default=None)):
+        service = active(request)
+        with service.lock:
+            session = service.authorize(session_id, capability(authorization))
+            return service.principles_report(session)
 
     @application.get("/api/sessions/{session_id}/overlay", response_model=OverlayResponse)
     async def overlay(session_id: str, request: Request, authorization: str | None = Header(default=None)):
