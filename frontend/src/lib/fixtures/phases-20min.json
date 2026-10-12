@@ -235,16 +235,16 @@
    "defensive": {
     "losses": 26,
     "tracked": 26,
-    "pressed": 20,
-    "press_rate": 76.9,
-    "median_pressure_s": 1.1,
-    "pack_2s": 3.0,
+    "pressed": 21,
+    "press_rate": 80.8,
+    "median_pressure_s": 1.2,
+    "pack_2s": 3.1,
     "regained_5s": 2,
     "regained_10s": 17,
     "bypassed": 7,
     "shots_conceded": 0,
     "xg_conceded": 0.0,
-    "rest_defence": 6.3,
+    "rest_defence": 6.1,
     "rest_defenders": 3.5,
     "by_third": {
      "defensive": 0,
@@ -290,16 +290,16 @@
    "defensive": {
     "losses": 26,
     "tracked": 25,
-    "pressed": 12,
-    "press_rate": 48.0,
-    "median_pressure_s": 0.9,
+    "pressed": 13,
+    "press_rate": 52.0,
+    "median_pressure_s": 0.8,
     "pack_2s": 2.3,
     "regained_5s": 0,
     "regained_10s": 2,
     "bypassed": 7,
     "shots_conceded": 7,
     "xg_conceded": 1.2,
-    "rest_defence": 5.4,
+    "rest_defence": 5.6,
     "rest_defenders": 4.0,
     "by_third": {
      "defensive": 1,
@@ -333,12 +333,12 @@
    "rows": [
     {
      "block": "high",
-     "seconds": 8.0,
-     "share": 4.1,
-     "back_four_m": 43.2,
-     "length_m": 28.8,
-     "width_m": 33.4,
-     "line_gap_m": 15.4,
+     "seconds": 6.6,
+     "share": 3.4,
+     "back_four_m": 43.1,
+     "length_m": 28.5,
+     "width_m": 33.6,
+     "line_gap_m": 15.7,
      "box_defenders": null,
      "opponent_entries": 0,
      "wide_entry_share": null,
@@ -353,12 +353,12 @@
     },
     {
      "block": "mid",
-     "seconds": 162.0,
-     "share": 83.5,
-     "back_four_m": 35.9,
-     "length_m": 31.4,
-     "width_m": 33.8,
-     "line_gap_m": 15.4,
+     "seconds": 114.0,
+     "share": 58.8,
+     "back_four_m": 36.0,
+     "length_m": 30.4,
+     "width_m": 34.4,
+     "line_gap_m": 17.9,
      "box_defenders": 0.7,
      "opponent_entries": 1,
      "wide_entry_share": 0.0,
@@ -367,18 +367,18 @@
      "xg_against": 0.05,
      "goals_against": 0,
      "crosses_faced": 0,
-     "ppda": 1.4,
-     "regains": 9,
+     "ppda": 3.0,
+     "regains": 5,
      "counters": 2
     },
     {
      "block": "low",
-     "seconds": 24.0,
-     "share": 12.4,
-     "back_four_m": 27.6,
-     "length_m": 34.2,
-     "width_m": 33.9,
-     "line_gap_m": 15.7,
+     "seconds": 73.4,
+     "share": 37.8,
+     "back_four_m": 26.2,
+     "length_m": 40.0,
+     "width_m": 34.5,
+     "line_gap_m": 21.4,
      "box_defenders": 0.0,
      "opponent_entries": 0,
      "wide_entry_share": null,
@@ -387,8 +387,8 @@
      "xg_against": 0.0,
      "goals_against": 0,
      "crosses_faced": 0,
-     "ppda": null,
-     "regains": 0,
+     "ppda": 0.7,
+     "regains": 4,
      "counters": 0
     }
    ],
@@ -396,9 +396,9 @@
     {
      "situation": "settled",
      "seconds": 194.0,
-     "back_four_m": 35.2,
-     "front_line_m": 60.5,
-     "length_m": 31.6
+     "back_four_m": 32.5,
+     "front_line_m": 53.3,
+     "length_m": 34.0
     },
     {
      "situation": "opponent_build_up",
@@ -409,10 +409,10 @@
     },
     {
      "situation": "high_press",
-     "seconds": 36.6,
-     "back_four_m": 50.7,
-     "front_line_m": 81.1,
-     "length_m": 50.1
+     "seconds": 37.2,
+     "back_four_m": 50.9,
+     "front_line_m": 81.2,
+     "length_m": 50.2
     }
    ],
    "recovery": {
@@ -455,10 +455,10 @@
      "block": "mid",
      "seconds": 30.4,
      "share": 7.1,
-     "back_four_m": 33.3,
-     "length_m": 32.5,
-     "width_m": 33.3,
-     "line_gap_m": 19.0,
+     "back_four_m": 33.4,
+     "length_m": 32.4,
+     "width_m": 35.0,
+     "line_gap_m": 18.1,
      "box_defenders": null,
      "opponent_entries": 0,
      "wide_entry_share": null,
@@ -476,8 +476,8 @@
      "seconds": 397.6,
      "share": 92.9,
      "back_four_m": 23.3,
-     "length_m": 31.3,
-     "width_m": 33.9,
+     "length_m": 30.2,
+     "width_m": 35.6,
      "line_gap_m": 17.4,
      "box_defenders": 4.7,
      "opponent_entries": 0,
@@ -496,16 +496,16 @@
     {
      "situation": "settled",
      "seconds": 428.0,
-     "back_four_m": 24.0,
-     "front_line_m": 51.4,
-     "length_m": 31.4
+     "back_four_m": 24.1,
+     "front_line_m": 43.8,
+     "length_m": 30.4
     },
     {
      "situation": "opponent_build_up",
      "seconds": 8.2,
-     "back_four_m": 38.4,
+     "back_four_m": 38.5,
      "front_line_m": 67.4,
-     "length_m": 37.3
+     "length_m": 37.1
     },
     {
      "situation": "high_press",
@@ -1106,10 +1106,10 @@
    "side": "right",
    "style": "overlapping",
    "seconds": 722.8,
-   "depth_m": 57.8,
+   "depth_m": 57.6,
    "attack_depth_m": 78.7,
    "touchline_m": 11.6,
-   "inside_share": 1.8,
+   "inside_share": 2.0,
    "overlaps": 8,
    "underlaps": 0,
    "depth_at_loss_m": 65.2,
@@ -1140,10 +1140,10 @@
    "side": "left",
    "style": "inverted",
    "seconds": 722.8,
-   "depth_m": 48.1,
+   "depth_m": 47.9,
    "attack_depth_m": 53.3,
    "touchline_m": 25.4,
-   "inside_share": 95.3,
+   "inside_share": 95.2,
    "overlaps": 0,
    "underlaps": 0,
    "depth_at_loss_m": 50.5,
@@ -1193,7 +1193,7 @@
    "style": "balanced",
    "seconds": 438.4,
    "depth_m": 36.1,
-   "attack_depth_m": 61.0,
+   "attack_depth_m": 61.2,
    "touchline_m": 17.0,
    "inside_share": 31.9,
    "overlaps": 0,
@@ -1231,7 +1231,7 @@
       "harbor_03"
      ],
      "episodes": 31,
-     "seconds": 559.8,
+     "seconds": 555.2,
      "possessions": 25,
      "final_third_rate": 28.0,
      "baseline_rate": 83.3,
@@ -1260,16 +1260,16 @@
       "harbor_07",
       "harbor_08"
      ],
-     "episodes": 9,
-     "seconds": 29.0,
-     "possessions": 9,
-     "final_third_rate": 55.6,
-     "baseline_rate": 31.8,
+     "episodes": 12,
+     "seconds": 59.8,
+     "possessions": 10,
+     "final_third_rate": 60.0,
+     "baseline_rate": 28.6,
      "moments": [
       {
-       "time_ms": 220000,
-       "event_ref": "evt_00037@1",
-       "label": "Striker drops behind the midfield (3:40\u20133:43)"
+       "time_ms": 241000,
+       "event_ref": "evt_00042@1",
+       "label": "Striker drops behind the midfield (4:01\u20134:09)"
       },
       {
        "time_ms": 260000,
@@ -1277,9 +1277,9 @@
        "label": "Striker drops behind the midfield (4:20\u20134:22)"
       },
       {
-       "time_ms": 300000,
-       "event_ref": "evt_00059@1",
-       "label": "Striker drops behind the midfield (5:00\u20135:02)"
+       "time_ms": 287000,
+       "event_ref": null,
+       "label": "Striker drops behind the midfield (4:47\u20134:49)"
       }
      ]
     },
@@ -1291,23 +1291,23 @@
       "harbor_05"
      ],
      "episodes": 8,
-     "seconds": 40.4,
+     "seconds": 42.0,
      "possessions": 8,
      "final_third_rate": 25.0,
      "baseline_rate": 43.5,
      "moments": [
       {
-       "time_ms": 69200,
+       "time_ms": 69800,
        "event_ref": null,
-       "label": "Holding midfielder drops between the centre-backs (1:09\u20131:13)"
+       "label": "Holding midfielder drops between the centre-backs (1:09\u20131:12)"
       },
       {
-       "time_ms": 184800,
-       "event_ref": "evt_00025@1",
-       "label": "Holding midfielder drops between the centre-backs (3:04\u20133:07)"
+       "time_ms": 183400,
+       "event_ref": "evt_00024@1",
+       "label": "Holding midfielder drops between the centre-backs (3:03\u20133:07)"
       },
       {
-       "time_ms": 403400,
+       "time_ms": 403600,
        "event_ref": "evt_00083@1",
        "label": "Holding midfielder drops between the centre-backs (6:43\u20136:49)"
       }
@@ -1355,7 +1355,7 @@
       "vale_08"
      ],
      "episodes": 16,
-     "seconds": 95.0,
+     "seconds": 97.2,
      "possessions": 14,
      "final_third_rate": 7.1,
      "baseline_rate": 0.0,
@@ -1363,7 +1363,7 @@
       {
        "time_ms": 39600,
        "event_ref": "evt_00007@1",
-       "label": "Striker drops behind the midfield (0:39\u20130:46)"
+       "label": "Striker drops behind the midfield (0:39\u20130:48)"
       },
       {
        "time_ms": 99400,
@@ -1605,7 +1605,7 @@
    "note_id": "harbor_01",
    "team_id": "harbor",
    "topic": "Counter-press after losing the ball",
-   "quantitative": "Harbor Athletic pressed the ball within 3 s after 20 of 26 tracked losses (77%), with 3.0 players within 10 m of the ball after 2 s on average. They won it back within 5 s twice and the opponent moved it 20 m upfield within 10 s 7 times.",
+   "quantitative": "Harbor Athletic pressed the ball within 3 s after 21 of 26 tracked losses (81%), with 3.1 players within 10 m of the ball after 2 s on average. They won it back within 5 s twice and the opponent moved it 20 m upfield within 10 s 7 times.",
    "look_for": "Whether the nearest players press together or one at a time, and whether the players behind squeeze up or leave gaps (compactness) and how many stay goal-side as rest defence.",
    "moments": [
     {
@@ -1650,7 +1650,7 @@
    "note_id": "harbor_03",
    "team_id": "harbor",
    "topic": "Defensive block",
-   "quantitative": "Harbor Athletic sat in a mid block for 84% of settled defending (back four at 35.9 m, 31.4 m from deepest to highest player); 0% of the opponent's final-third entries against it went wide; 1 shot faced, 100% from outside the box.",
+   "quantitative": "Harbor Athletic sat in a mid block for 59% of settled defending (back four at 36.0 m, 30.4 m from deepest to highest player); 0% of the opponent's final-third entries against it went wide; 1 shot faced, 100% from outside the box.",
    "look_for": "How the lines shift together toward the ball, whether the block lets passes through the middle or only around it, and who steps out to press and who covers.",
    "moments": [
     {
@@ -1740,7 +1740,7 @@
    "note_id": "harbor_07",
    "team_id": "harbor",
    "topic": "Rotation: full-back steps inside",
-   "quantitative": "Seen 31 times (560 s). Possessions with it reached the final third 28% of the time, against 83% without it.",
+   "quantitative": "Seen 31 times (555 s). Possessions with it reached the final third 28% of the time, against 83% without it.",
    "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
    "moments": [
     {
@@ -1765,13 +1765,13 @@
    "note_id": "harbor_08",
    "team_id": "harbor",
    "topic": "Rotation: striker drops deep",
-   "quantitative": "Seen 9 times (29 s). Possessions with it reached the final third 56% of the time, against 32% without it.",
+   "quantitative": "Seen 12 times (60 s). Possessions with it reached the final third 60% of the time, against 29% without it.",
    "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
    "moments": [
     {
-     "time_ms": 220000,
-     "event_ref": "evt_00037@1",
-     "label": "Striker drops behind the midfield (3:40\u20133:43)"
+     "time_ms": 241000,
+     "event_ref": "evt_00042@1",
+     "label": "Striker drops behind the midfield (4:01\u20134:09)"
     },
     {
      "time_ms": 260000,
@@ -1779,9 +1779,9 @@
      "label": "Striker drops behind the midfield (4:20\u20134:22)"
     },
     {
-     "time_ms": 300000,
-     "event_ref": "evt_00059@1",
-     "label": "Striker drops behind the midfield (5:00\u20135:02)"
+     "time_ms": 287000,
+     "event_ref": null,
+     "label": "Striker drops behind the midfield (4:47\u20134:49)"
     }
    ],
    "caveat": null
@@ -1840,7 +1840,7 @@
    "note_id": "vale_11",
    "team_id": "vale",
    "topic": "Counter-press after losing the ball",
-   "quantitative": "Vale United pressed the ball within 3 s after 12 of 25 tracked losses (48%), with 2.3 players within 10 m of the ball after 2 s on average. They won it back within 5 s 0 times and the opponent moved it 20 m upfield within 10 s 7 times.",
+   "quantitative": "Vale United pressed the ball within 3 s after 13 of 25 tracked losses (52%), with 2.3 players within 10 m of the ball after 2 s on average. They won it back within 5 s 0 times and the opponent moved it 20 m upfield within 10 s 7 times.",
    "look_for": "Whether the nearest players press together or one at a time, and whether the players behind squeeze up or leave gaps (compactness) and how many stay goal-side as rest defence.",
    "moments": [
     {
@@ -1874,7 +1874,7 @@
    "note_id": "vale_13",
    "team_id": "vale",
    "topic": "Defensive block",
-   "quantitative": "Vale United sat in a low block for 93% of settled defending (back four at 23.3 m, 31.3 m from deepest to highest player); 1 shot faced, 0% from outside the box.",
+   "quantitative": "Vale United sat in a low block for 93% of settled defending (back four at 23.3 m, 30.2 m from deepest to highest player); 1 shot faced, 0% from outside the box.",
    "look_for": "How the lines shift together toward the ball, whether the block lets passes through the middle or only around it, and who steps out to press and who covers.",
    "moments": [
     {
@@ -1923,13 +1923,13 @@
    "note_id": "vale_16",
    "team_id": "vale",
    "topic": "Rotation: striker drops deep",
-   "quantitative": "Seen 16 times (95 s). Possessions with it reached the final third 7% of the time, against 0% without it.",
+   "quantitative": "Seen 16 times (97 s). Possessions with it reached the final third 7% of the time, against 0% without it.",
    "look_for": "Which opponent follows the rotating player and what space that opens; a rotation can work without the ball ever going there.",
    "moments": [
     {
      "time_ms": 39600,
      "event_ref": "evt_00007@1",
-     "label": "Striker drops behind the midfield (0:39\u20130:46)"
+     "label": "Striker drops behind the midfield (0:39\u20130:48)"
     },
     {
      "time_ms": 99400,

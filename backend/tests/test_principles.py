@@ -18,7 +18,8 @@ from .test_tactics import records_until
 
 FULL = 2 * PERIOD_MS
 SAMPLE = Path(__file__).resolve().parents[2] / "frontend" / "src" / "lib" / "fixtures" / "principles-20min.json"
-HIDDEN = ("rest_shape", "drop_sprint", "man_marking", "trigger_hunt", "winger_habits", "lay_off_rate", "cycle_ms", "sprint_ms")
+HIDDEN = ("rest_shape", "drop_sprint", "man_marking", "trigger_hunt", "winger_habits", "lay_off_rate", "cycle_ms", "sprint_ms",
+          "defensive_shape", "attack_shape", "free_ball_drop")
 
 
 @pytest.fixture(scope="module")
@@ -98,6 +99,39 @@ def test_third_man_recovers_the_planted_lay_off(full):
 def test_lane_distance_ignores_the_ends():
     assert segment_distance((10, 1), (0, 0), (20, 0)) == pytest.approx(1)
     assert segment_distance((1, 0), (0, 0), (20, 0)) > 100
+
+
+def test_formations_recover_the_planted_shapes(full):
+    harbor = {row.phase: row for row in full["structures"]["harbor"].formations}
+    vale = {row.phase: row for row in full["structures"]["vale"].formations}
+    assert full["structures"]["harbor"].team_sheet == full["structures"]["vale"].team_sheet == "4-3-3"
+    # Harbor's 4-3-3 attacks as a 2-3-5 (full-back and left eight in the front five) and defends as a 4-4-2.
+    assert harbor["attack"].shape == "2-3-5" and set(harbor["attack"].lines[-1]) == {"RB", "RW", "ST", "LCM", "LW"}
+    assert harbor["defending"].shape == "4-4-2" and set(harbor["defending"].lines[-1]) == {"ST", "LCM"}
+    # Vale's attacks as a 3-2-5 behind a back three with the held right-back, and defends as a 4-5-1.
+    assert vale["attack"].shape == "3-2-5" and set(vale["attack"].lines[0]) == {"RB", "RCB", "LCB"}
+    assert vale["defending"].shape == "4-5-1" and vale["defending"].lines[-1] == ["ST"]
+    for rows in (harbor, vale):
+        for row in rows.values():
+            assert sum(len(line) for line in row.lines) == 10 and row.shape == "-".join(str(len(line)) for line in row.lines)
+    assert "2-3-5 in attack, 4-4-2 out of possession" in full["match_report"]["harbor"].summary
+
+
+def test_control_depth_recovers_the_planted_drop(full):
+    harbor, vale = full["pressing"]["harbor"], full["pressing"]["vale"]
+    # Harbor's high line steps off when nobody presses the ball; Vale's low line stays put.
+    assert harbor.depth_read == "drops_when_free" and harbor.drop_when_free_m >= 3.5
+    assert vale.depth_read == "holds_line" and abs(vale.drop_when_free_m) < 2.5
+    assert harbor.line_pressed_m > harbor.line_free_m
+    assert any(line.topic == "Line height follows the pressure" for line in full["match_report"]["harbor"].strengths)
+
+
+def test_support_options_are_consistent(full):
+    for team in ("harbor", "vale"):
+        sup = full["structures"][team].support
+        assert sup.samples > 300 and 0 < sup.options_mean < 10
+        assert sup.triangle_share <= min(sup.vertical_share, sup.diagonal_share, sup.horizontal_share)
+        assert sup.two_plus_share >= sup.triangle_share
 
 
 def test_match_report_lines_carry_numbers_and_past_moments(full):

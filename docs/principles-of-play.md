@@ -11,6 +11,20 @@ Every 200 ms in settled possession (outside transitions and set pieces), the dee
 - **Build-up:** with the ball in the team's own half.
 - **Rest defence:** with the ball in the final third. Also reported: the average number of outfield players 10 m or more goal-side of the ball, the share of time with three or fewer (over-committed), and each final-third loss by the shape at that moment, with counters, shots and xG conceded.
 
+## Formations by phase
+
+Each team names a formation on its team sheet (both demo sides name 4-3-3). The report measures what it becomes in three phases, from the ten outfield players' **average positions** in the team's own frame:
+
+- **Build-up:** settled possession with the ball in the team's own half.
+- **Attack:** settled possession with the ball in the final third for 3 s or more, so the players have arrived.
+- **Defending:** the opponent in settled possession.
+
+Sorted by depth, the players split into lines at the two largest depth gaps, and into four lines when the third-largest gap is 9 m or more. Read back to front, so a 4-3-3 whose full-back and eight push on reads **2-3-5**. Each phase needs 60 s. The lines list the roles in each, right to left. See [football concepts](football-concepts.md) for the shapes and why teams change them.
+
+## Support around the ball
+
+Once a second in settled possession, the report counts the **open passing options** around the player on the ball: team-mates 5 to 30 m away with no opponent within 3 m of them and none within 2.5 m of the straight pass. Each is **vertical** (within 30° of straight ahead), **diagonal** (30° to 70°), **horizontal** (70° to 110°, square for security) or **back**. It reports the average number of open options, the share of seconds with two or more, with each kind, and with the full support triangle (vertical, diagonal and horizontal at once).
+
 ## Wingers and width
 
 While the team has the ball in the opponent's half, a winger is **inverted** when they spend 40% or more of that time 18 m or more from the touchline, a **touchline** winger when they average 8 m or less from it, and **balanced** otherwise. The row also shows the preferred foot (a public player attribute), so an inverted winger on the opposite foot stands out, plus cut-ins (carries from the wide channel into the centre), shots, how many of them were central, and the share of time the full-back on that side was wider than the winger. **Width** is the outfield spread in settled final-third possession, with central entries and crosses.
@@ -21,6 +35,7 @@ While the team has the ball in the opponent's half, a winger is **inverted** whe
 - **Spare at the back:** the back four minus the opponent's players positioned behind the team's midfield line. **Most often left free:** the opponent player most often without a defender within 8 m during its build-up, which is how leaving one centre-back free shows up.
 - **Triggers:** opponent passes ending in its own half, by type (back to the keeper, to a full-back, to a centre-back, into midfield, other), and how often the receiver was pressured within 3 s. A trigger shows up as a much higher rate on one kind of pass.
 - **Cover shadow:** of pressured receptions by the keeper or a centre-back, how often the presser's approach came within 30° of the line to the holding midfielder. **Forced wide:** the share of opponent build-ups whose first entry into the middle third was wide.
+- **Control depth:** while the opponent has settled possession, the back four's height with the ball **pressed** (a defender within 5 m of it) and **free** (nobody that close for 1 s). A defender who has stepped out to press is left out of the line. Because the line also follows the ball, the drop is the free-ball effect from a least-squares fit of line height on ball depth and free/pressed: the comparison at the same ball position. 2.5 m or more deeper when free is **drops when free**; otherwise **holds its line**. 10 s of each is needed.
 - **Marking tightness:** the distance from each opponent to the nearest defender by distance from the ball (under 15 m, 15 to 30 m, over 30 m). **Free receptions:** passes received in the middle or final third with no defender within 5 m, and how many of those came between the back four and the midfield line.
 
 ## Counter-movements and third man
@@ -48,13 +63,16 @@ The generator plants these habits in the hidden tactical profiles. The analysis 
 
 | Habit | Harbor Athletic | Vale United | Measured result (full match) |
 | --- | --- | --- | --- |
-| Rest defence | 2+3 (CBs base; LB, DM, RCM screen) | 3+2 (RB and CBs base; DM, RCM screen) | Harbor 2+3 41% of rest-defence time; Vale 3+2 63% |
-| Build-up | DM drops in (from phases_v1) | Back four | Harbor 2+3 70%; Vale 4+1 52% |
+| Rest defence | 2+3 (CBs base; LB, DM, RCM screen) | 3+2 (RB and CBs base; DM, RCM screen) | Harbor 2+3 33% of rest-defence time; Vale 3+2 65% |
+| Build-up | DM drops in (from phases_v1) | Back four | Harbor 2+3 69%; Vale 4+1 52% |
 | Wingers | RW inverts (left-footed) | LW hugs the touchline | harbor_10 inverted, 98% inside, opposite foot; vale_11 touchline, 5.2 m from the line |
 | Pressing system | Zonal | Two central midfielders man-mark Harbor's eights | Harbor zonal in every unit; Vale hybrid, midfield man (vale_07, vale_08 follow) |
 | Pressing triggers | Hunt back passes to the keeper and passes to a centre-back | None | Back pass to the keeper pressured 15 of 21 (71%) vs Vale 0 of 6 |
 | Counter-movement | Striker drop-and-sprint every 25 s | Striker drops while the CAM runs past (opposite runs) | harbor_09 54 drop-and-sprints (next 8); vale_08 + vale_09 72 opposite runs (next 12) |
 | Third man | Keeper to the dropping DM, set first time for a CB, 75% of short goal kicks | None | Harbor 25 combinations (top pattern GK, DM, LCB 7) vs Vale 5 |
+| Attacking shape (formations round) | LCM joins the front line in the final third, beside the overlapping RB, inverted RW, ST and LW | LB and CAM push into the half-spaces beside the ST behind a back three | Harbor 2-3-5 (front RB, RW, ST, LCM, LW); Vale 3-2-5 (back RB, RCB, LCB) |
+| Defending shape (formations round) | 4-4-2: LCM steps up beside the ST, wingers drop into a midfield four | 4-5-1: wingers drop level with the midfield three | Harbor 4-4-2, Vale 4-5-1 |
+| Control depth (formations round) | The back two lines ease back 8 units when nobody has pressed the ball for 1 s | Holds its low line | Harbor drops 4.9 m when free (26.6 m against 32.4 m pressed); Vale holds (0.9 m) |
 
 The man-marking midfielders explain why Vale press passes into midfield hard (72% pressured) without any trigger being planted: they are already next to their man.
 
@@ -62,7 +80,12 @@ The man-marking midfielders explain why Vale press passes into midfield hard (72
 
 The new habits change some running: Harbor's drop-and-sprint striker and inverted right winger are now the top two in high-speed running, and the workload test says so with a comment. Vale's striker drop (phases_v1) now runs in a 12 s cycle (7 s dropped, 5 s up) so the opposite runs read as movements rather than a fixed position. The xT grid and contract samples were refitted and regenerated; the tests that compare them still pass.
 
+The formations round leaves the measures above unchanged but the new movement shifts some numbers: Harbor's rest defence reads 2+3 less often (33%, from 41%) because its left eight now leaves the screen for the front line, and Harbor's striker covers more ground (about 13.6 km) in the 4-4-2. The free-ball drop moves only the back four and midfield; the front line stays up to press, which keeps the forwards' running realistic. No measured habit from earlier rounds changed reading.
+
 ## Limitations
+
+- Formations come from average positions, which smooth over moments when players swap places; the shape at any one moment can differ. The engine reads one shape per phase over the observed match, not changes after a substitution or a goal.
+- Support options are straight-line checks against positions; real passing lanes also depend on body shape, pass speed and the receiver's movement.
 
 - Off-ball movement between events is illustrative; the 5 Hz positions are generated.
 - Structures use the deepest five outfield players and one depth gap. Real analysts also judge width, the opponent's front line and who is responsible for whom.

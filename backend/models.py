@@ -1509,8 +1509,31 @@ class RestLossRow(StrictModel):
     xg_conceded: float
 
 
+class FormationRow(StrictModel):
+    """The whole outfield shape in one phase, read from the players' average positions."""
+    phase: Literal["build_up", "attack", "defending"]
+    shape: str                      # lines from back to front, e.g. "2-3-5"
+    seconds: float
+    lines: list[list[str]]          # roles in each line, back to front, right to left
+
+
+class SupportRow(StrictModel):
+    """Open passing options around the player on the ball in settled possession, sampled once a second."""
+    samples: int
+    options_mean: float | None
+    two_plus_share: float | None    # samples with two or more open options
+    vertical_share: float | None    # samples with an open option ahead
+    diagonal_share: float | None
+    horizontal_share: float | None
+    back_share: float | None
+    triangle_share: float | None    # vertical, diagonal and horizontal options all open at once
+
+
 class TeamStructure(StrictModel):
     team_id: str
+    team_sheet: str                 # the formation named on the team sheet (public)
+    formations: list[FormationRow]
+    support: SupportRow
     build_up_seconds: float
     build_up: list[ShapeRow]
     rest_seconds: float
@@ -1580,6 +1603,13 @@ class TeamPressSystem(StrictModel):
     build_ups: int
     forced_wide_share: float | None
     regains_by_channel: dict[str, int]
+    # Control depth: back-four height (m from own goal) with the ball pressed or free, compared at the same ball depth.
+    depth_seconds: float
+    free_share: float | None
+    line_pressed_m: float | None
+    line_free_m: float | None
+    drop_when_free_m: float | None
+    depth_read: Literal["drops_when_free", "holds_line", "insufficient_evidence"]
     moments: list[Moment]
 
 

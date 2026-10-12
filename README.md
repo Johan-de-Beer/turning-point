@@ -16,7 +16,7 @@ A Live analytics panel adds field tilt (live and by 15 minutes, against possessi
 
 A Phases of play panel splits each team's time into possession, defending, transitions and set pieces, and reports counters and counter-pressing after each loss, the defensive block and line height (also during the opponent's build-up and a high press), recovery runs and keeper sweeps behind the line, progressive carries and expected threat (xT, fitted on other synthetic matches), full-back roles and rotations, and possession against control. Analyst notes pair each number with moments to show on the pitch. See [phases of play](docs/game-phases.md).
 
-A Principles of play panel reads each team's structure in build-up and rest defence (2+3, 3+2), winger roles and width, whether the press is man, zonal or hybrid, pressing triggers and cover shadows, marking tightness and free men, counter-movements (drop-and-sprint, opposite runs, decoy and crisscross runs), third-man combinations, and a match report written phase by phase with strengths, weaknesses and a key player. See [principles of play](docs/principles-of-play.md).
+A Principles of play panel reads each team's shape by phase against its team sheet (a 4-3-3 that attacks as a 2-3-5 and defends as a 4-4-2), its structure in build-up and rest defence (2+3, 3+2), the passing options around the ball, whether the back line drops when nobody presses the ball, winger roles and width, whether the press is man, zonal or hybrid, pressing triggers and cover shadows, marking tightness and free men, counter-movements (drop-and-sprint, opposite runs, decoy and crisscross runs), third-man combinations, and a match report written phase by phase with strengths, weaknesses and a key player. See [principles of play](docs/principles-of-play.md).
 
 ## Run on Windows
 
@@ -102,6 +102,7 @@ Automatic deployment retains the named replay volume, takes a consistent private
 - [Live match analytics method and limitations](docs/match-analytics.md)
 - [Phases of play, xT and analyst notes](docs/game-phases.md)
 - [Principles of play and the match report](docs/principles-of-play.md)
+- [Football concepts reference: formations and principles](docs/football-concepts.md)
 - [Blender stadium source and animation behavior](docs/stadium-assets.md)
 - [Technical decisions and verified primary sources](docs/technical-decisions.md)
 - [Public hosting and release procedure](docs/deployment.md) and [public backend bounds](docs/public-demo-backend.md)

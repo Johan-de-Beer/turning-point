@@ -37,6 +37,7 @@ SPRINT_MIN_MS = 1_000    # a sprint effort lasts at least this long
 ACCEL_MPS2 = 3.0         # acceleration / deceleration effort threshold
 ACCEL_MIN_MS = 400
 TRANSITION_MS = 5_000
+FREE_BALL_M = 5.0        # the ball is pressed while a defender is this close to it
 SECONDS = 2 * PERIOD_MS // 1000
 
 GRID_X, GRID_Y = 12, 8   # heatmap cells along and across the pitch
@@ -261,6 +262,9 @@ class MovementBuilder:
         lost_at = {self.home: -10**9, self.away: -10**9}
         hunters: dict[str, set[str]] = {self.home: set(), self.away: set()}
         hunt_at = {self.home: -10**9, self.away: -10**9}
+        pressed_at = {self.home: -10**9, self.away: -10**9}
+        free_level = {self.home: 0.0, self.away: 0.0}
+        shapes = {team: profiles[team].get("defensive_shape", {}) for team in profiles}
         # The frame one second before each shot (snapped to the frame clock).
         shot_times = {start + (t - 1_000 - start) // FRAME_MS * FRAME_MS: team for t, team in shots}
         # Frames at which to keep everyone's position: the frame nearest each pass and carry.
@@ -311,6 +315,18 @@ class MovementBuilder:
             # Game management: a leading side drops its line by its planted amount.
             drop = {team: profiles[team].get("lead_drop", 0.0) if self.leading(team, t) else 0.0
                     for team in (self.home, self.away)}
+            # Control depth: a side may drop its back two lines (not the front line, which stays to press)
+            # while nobody has pressed the ball for a second.
+            free_drop = {self.home: 0.0, self.away: 0.0}
+            for team in (self.home, self.away):
+                if live and owner not in (None, team) and any(
+                        math.hypot((state[pid][0] - bx) * X_M, (state[pid][1] - by) * Y_M) <= FREE_BALL_M
+                        for pid in self.players if self.team_of[pid] == team and role(pid) != "GK"):
+                    pressed_at[team] = t
+                # The line eases back over 2 s once the ball has been free for 1 s, and up again as the pressure returns.
+                free = live and owner not in (None, team) and t - pressed_at[team] >= 1_000
+                free_level[team] = min(1.0, free_level[team] + DT / 2) if free else max(0.0, free_level[team] - DT / 2)
+                free_drop[team] = profiles[team].get("free_ball_drop", 0.0) * free_level[team]
 
             for pid, (team, r, group, ay, base, transition, cruise, fade, period_ms, phase) in setup.items():
                 s = state[pid]
@@ -370,8 +386,13 @@ class MovementBuilder:
                     else:
                         if not live:
                             ox, oy = 50.0, 50.0
-                        back = clamp(base - drop[team] + .45 * (ox - 50), 8, 52)
-                        if group == "GK":
+                        spot = shapes[team].get(pid)
+                        front = spot[0] == "front" if spot else group == "FWD"
+                        back = clamp(base - drop[team] - (0.0 if front else free_drop[team]) + .45 * (ox - 50), 8, 52)
+                        if spot:
+                            # The planted out-of-possession shape: this player's line and lateral spot.
+                            px, py = back + (13 if spot[0] == "midfield" else 29), 50 + spot[1] + (oy - 50) * .35
+                        elif group == "GK":
                             px, py = min(14.0, 3 + .12 * back), 50 + (oy - 50) * .1
                         elif group == "BACK":
                             px, py = back, 50 + ay * .95 + (oy - 50) * .3
@@ -494,6 +515,10 @@ class MovementBuilder:
             lateral = 50 + (spread / 2 - k * spread / (len(line) - 1) if len(line) > 1 else 0) + (oy - 50) * .2
             depth = ox - (42 if line is rest["base"] else 30)
             return depth, lateral
+        spot = profile.get("attack_shape", {}).get(pid)
+        if spot and ox >= 66:
+            # The attacking shape: this player joins the front line in the final third.
+            return min(92.0, ox + spot[0]), 50 + spot[1] + (oy - 50) * .2
         if group == "BACK":
             style = fullbacks.get(pid)
             if style == "overlap":
