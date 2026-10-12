@@ -17,6 +17,9 @@ POSITIONS = {"GK": "GK", "RB": "RB", "LB": "LB", "RCB": "CB", "LCB": "CB", "DM":
 POSITION_OVERRIDES = {"vale_08": "CAM"}
 FORWARDS = ("RW", "ST", "LW")
 MIDFIELD = ("RCM", "DM", "LCM")
+# The formation each side names on its team sheet (public). How the shape changes in and out of
+# possession is not public: the analysis measures it from the positions.
+TEAM_SHEET = {"harbor": "4-3-3", "vale": "4-3-3"}
 
 # Harbor's right winger is left-footed: an inverted winger who cuts inside onto the stronger foot.
 LEFT_FOOTED = {"harbor_03", "harbor_08", "harbor_10", "harbor_11", "vale_03", "vale_11"}
@@ -87,7 +90,17 @@ _TENDENCIES = {
                      "rest_shape": {"base": ("harbor_04", "harbor_05"), "screen": ("harbor_07", "harbor_06", "harbor_03")},
                      "drop_sprint": {"harbor_09": {"cycle_ms": 25_000, "drop_ms": 1_200, "sprint_ms": 2_400}},
                      "man_marking": {},
-                     "trigger_hunt": {"on": ("back_pass_keeper", "to_centre_back"), "players": 2, "window_ms": 3_500, "rate": .85}},
+                     "trigger_hunt": {"on": ("back_pass_keeper", "to_centre_back"), "players": 2, "window_ms": 3_500, "rate": .85},
+                     # Formations round: the out-of-possession shape (line and lateral spot of the players who
+                     # leave their 4-3-3 places; the left eight steps up beside the striker and the wingers drop
+                     # into a midfield four, a 4-4-2) and how far the back four drops (units) when nobody is
+                     # pressing the ball: Harbor's high line steps off when the pressure on the ball is late.
+                     "defensive_shape": {"harbor_08": ("front", -5), "harbor_09": ("front", 5), "harbor_11": ("midfield", -25),
+                                         "harbor_06": ("midfield", -8), "harbor_07": ("midfield", 8), "harbor_10": ("midfield", 25)},
+                     "free_ball_drop": 8.0,
+                     # In the final third the left eight joins the front line (depth ahead of the ball, lateral spot):
+                     # with the inverted left-back beside the holding midfielder, the 4-3-3 attacks as a 2-3-5.
+                     "attack_shape": {"harbor_08": (6.0, -12.0)}},
         # Share of the saves this side's goalkeeper makes from well-placed, hard-hit shots.
         "goalkeeping": {"hard_save_rate": .55},
     },
@@ -111,7 +124,13 @@ _TENDENCIES = {
                      # Vale's two central midfielders follow Harbor's two central midfielders while Harbor
                      # builds in its own half; the front three and the back four stay zonal (a hybrid press).
                      "man_marking": {"vale_07": "LCM", "vale_08": "RCM"},
-                     "trigger_hunt": {"on": (), "players": 0, "window_ms": 0, "rate": 0.0}},
+                     "trigger_hunt": {"on": (), "players": 0, "window_ms": 0, "rate": 0.0},
+                     # The wingers drop level with the midfield three (a 4-5-1); the low line stays put either way.
+                     "defensive_shape": {"vale_11": ("midfield", -26), "vale_10": ("midfield", 26)},
+                     "free_ball_drop": 0.0,
+                     # Behind a back three (the held right-back and the centre-backs) the left-back and the attacking
+                     # midfielder push into the half-spaces beside the striker: a 3-2-5 in the final third.
+                     "attack_shape": {"vale_03": (8.0, -14.0), "vale_08": (6.0, 12.0)}},
         "goalkeeping": {"hard_save_rate": .15},
     },
 }

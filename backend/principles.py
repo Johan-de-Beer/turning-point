@@ -23,13 +23,13 @@ from collections import Counter
 from statistics import median
 
 from .chances import X_M, Y_M, in_box
-from .models import (FreeReceiver, MarkingBand, MatchReportTeam, Moment, MovementRow, PressUnit, ReportLine, RestLossRow, ShapeRow,
-                     TeamMarking, TeamMovements, TeamPressSystem, TeamStructure, TeamThirdMan, TeamWidth, ThirdManRow, TriggerRow, WingerRow)
+from .models import (FormationRow, FreeReceiver, MarkingBand, MatchReportTeam, Moment, MovementRow, PressUnit, ReportLine, RestLossRow, ShapeRow,
+                     SupportRow, TeamMarking, TeamMovements, TeamPressSystem, TeamStructure, TeamThirdMan, TeamWidth, ThirdManRow, TriggerRow, WingerRow)
 from .movement import Movement
 from .advanced import ratio
 from .phases import COUNTER_SHOT_MS, MOMENTS, Features, PhaseEngine, PhaseReport, channel, clock, mean, plural, r1
 from .phases import times as _times
-from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, foot, role
+from .tactical_profiles import BACK_FOUR, FORWARDS, MIDFIELD, TEAM_SHEET, foot, role
 from .tracking import FRAME_MS
 
 OUTFIELD_ROLES = ("RB", "RCB", "LCB", "LB", "DM", "RCM", "LCM", "RW", "ST", "LW")
@@ -66,6 +66,19 @@ FINAL_THIRD_MS = 10_000
 BANDS = (("near", 0.0, 15.0), ("middle", 15.0, 30.0), ("far", 30.0, 1e9))
 TRIGGERS = ("back_pass_keeper", "to_fullback", "to_centre_back", "into_midfield", "other")
 UNITS = (("front", FORWARDS), ("midfield", MIDFIELD), ("back", BACK_FOUR))
+FOURTH_LINE_M = 9.0         # formations: a fourth line needs its gap to be this big
+ARRIVED_FRAMES = 15         # the attacking shape is read once the ball has been in the final third for 3 s
+FORMATION_PHASES = ("build_up", "attack", "defending")
+MIN_FORMATION_S = 60
+FREE_BALL_M = 5.0           # control depth: the ball is pressed while a defender is this close to it
+FREE_AFTER_FRAMES = 5       # and free once nobody has been that close for 1 s
+MIN_DEPTH_FRAMES = 50      # 10 s of both pressed and free
+DROPS_M = 2.5               # a line that sits this much deeper when the ball is free drops when free
+SUPPORT_MIN_M, SUPPORT_MAX_M = 5.0, 30.0
+MARKED_M = 3.0              # a team-mate with an opponent this close is not an open option
+MIN_SUPPORT_S = 120
+FEW_FORWARD = 40.0          # report: an open option ahead less often than this (%) is a weakness
+HIGH_LINE_M = 33.0          # report: a back four this far from goal with the ball free is a high line
 
 DEFINITIONS = {
     "structure": f"The deepest five outfield players, sorted by depth and split into a base line and a screen at their largest depth gap (if it is {LINE_GAP_M:.0f} m or more; otherwise one flat line of five). 3+2 is a back three with two in front of it, 2+3 two centre-backs with three in front. Read every 200 ms in settled possession (outside transitions and set pieces): build-up with the ball in the team's own half, rest defence with the ball in the final third.",
@@ -88,11 +101,15 @@ DEFINITIONS = {
     "decoy_run": f"An attacker runs {DECOY_RUN_M:.0f} m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within {DECOY_NEAR_M:.0f} m) retreats {DECOY_DRAG_M:.0f} m or more with the runner (drew). Found: within 3 s a team-mate, not the runner, received a pass within {DECOY_SPACE_M:.0f} m of where that defender started.",
     "crisscross": f"At a corner: two attackers inside the final 20 m whose order across the pitch swaps in the {CRISS_MS // 1000} s before the delivery, each moving {CRISS_MOVE_M:.0f} m or more.",
     "third_man": f"A completed pass from A to B, then B passes on to C (not A) within {LAY_OFF_MS // 1000} s of A's pass, with C receiving further forward than A played from. Lane blocked: an opponent within {LANE_M} m of the straight line from A to C when A played. Free: no opponent within {RECEPTION_FREE_M:.0f} m of C on arrival. Zones: build-up (A in its own third), middle third or final third (where C receives).",
+    "formations": f"The whole outfield shape in each phase, from the ten outfield players' average positions in the team's own frame: build-up (settled possession, ball in its own half), attack (settled possession, ball in the final third for 3 s or more, so the players have arrived) and defending (the opponent in settled possession). Sorted by depth, the players split into lines at the two largest depth gaps, and into four lines when the third-largest gap is {FOURTH_LINE_M:.0f} m or more. Read back to front, so a 4-3-3 that pushes its full-backs on and its wingers high reads 2-3-5. At least {MIN_FORMATION_S} s per phase is needed. The team sheet is the formation the side names before kick-off.",
+    "support": f"Once a second in settled possession, the open passing options around the player on the ball: team-mates {SUPPORT_MIN_M:.0f} to {SUPPORT_MAX_M:.0f} m away with no opponent within {MARKED_M:.0f} m of them and none within {LANE_M} m of the straight pass. Vertical: within 30° of straight ahead; diagonal: 30° to 70°; horizontal: 70° to 110° (square, for security); back: further back than that. The support triangle is a vertical, a diagonal and a horizontal option open at the same time.",
+    "control_depth": f"While the opponent has settled possession: the back four's average height (metres from its own goal) with the ball pressed (a defender within {FREE_BALL_M:.0f} m of it) and free (nobody that close for 1 s). The drop is the free-ball effect at the same ball depth (a least-squares fit of line height on ball depth and free), because the line also follows the ball; 10 s of each is needed. A line that sits {DROPS_M} m or more deeper when the ball is free drops when free; otherwise it holds its line.",
     "match_report": "A summary per team in the order a professional analyst works: in possession, out of possession, attack to defence, defence to attack and set pieces, then strengths to keep, weaknesses an opponent could target and the most influential player by expected threat. Each line is built from the numbers in this report and in Phases of play, with its sample. It describes what happened; it does not explain why.",
 }
 
 LIMITATIONS = [
     "Synthetic data: the events and the 5 Hz player positions are generated from fictional tendencies. Off-ball movement between events is illustrative.",
+    "Formations come from average positions, which smooth over moments when players swap places; the shape at any single moment can differ.",
     "Structures use the deepest five outfield players and one depth gap. Real analysts also judge width, the opponent's front line and who is responsible for whom.",
     "Man-orientation is read from whether a player moves with the nearest opponent, which also happens when two players simply run the same way. Zonal teams can look man-oriented near the ball.",
     "Counter-movements are read from synthetic positions with fixed distances and windows. They show the pattern of the movement, not the intent behind it.",
@@ -126,6 +143,9 @@ class Layout:
         self.screen = {team: array("H", [0]) * self.frames for team in teams}
         self.behind = {team: bytearray(self.frames) for team in teams}
         self.touch = {pid: array("f", [0.0]) * self.frames for pid in players if role(pid) in ("RW", "LW")}
+        # Control depth, per frame: is the ball pressed by this team, and the back four's height (m from own goal).
+        self.pressed = {team: bytearray(self.frames) for team in teams}
+        self.line = {team: array("f", [0.0]) * self.frames for team in teams}
         xy, ball = track.xy, track.ball
         slots = {team: [k for k, pid in enumerate(players) if pid.startswith(team + "_") and role(pid) != "GK"] for team in teams}
         bit = {k: 1 << OUTFIELD_ROLES.index(role(players[k])) for team in teams for k in slots[team]}
@@ -134,9 +154,17 @@ class Layout:
             ks = slots[team]
             shape, base, screen, behind = self.shape[team], self.base[team], self.screen[team], self.behind[team]
             wingers = [(k, players[k]) for k in ks if role(players[k]) in ("RW", "LW")]
+            backs = [k for k in ks if role(players[k]) in BACK_FOUR]
+            pressed, line = self.pressed[team], self.line[team]
             for f in range(self.frames):
                 b = f * n * 2
                 bx = ball[2 * f]
+                by = ball[2 * f + 1]
+                close = {k for k in ks if math.hypot((xy[b + 2 * k] - bx) * X_M, (xy[b + 2 * k + 1] - by) * Y_M) <= FREE_BALL_M}
+                pressed[f] = bool(close)
+                # The line without a defender who has stepped out to press the ball himself.
+                holding = [k for k in backs if k not in close] or backs
+                line[f] = sum((100 - xy[b + 2 * k] if flip else xy[b + 2 * k]) for k in holding) / len(holding) * X_M
                 if flip:
                     bx = 100 - bx
                 pts = sorted(((100 - xy[b + 2 * k] if flip else xy[b + 2 * k]) * X_M, k) for k in ks)
@@ -164,6 +192,10 @@ class Layout:
         self.bands = {team: {name: (array("d", [0.0]) * self.seconds, array("H", [0]) * self.seconds) for name, *_ in BANDS} for team in teams}
         self.spare = {team: array("f", [0.0]) * self.seconds for team in teams}
         self.free = {pid: bytearray(self.seconds) for pid in players if role(pid) != "GK"}
+        # Per second, for the team on the ball: how many open passing options the holder has, and which kinds (bit mask).
+        self.options = {team: bytearray(self.seconds) for team in teams}
+        self.kinds = {team: bytearray(self.seconds) for team in teams}
+        self.held = {team: bytearray(self.seconds) for team in teams}
         everyone = {team: [k for k, pid in enumerate(players) if pid.startswith(team + "_")] for team in teams}
 
         def at(f: int, k: int) -> tuple[float, float]:
@@ -211,6 +243,28 @@ class Layout:
                 mid_line = sum(depth(now[k][0]) for k in mids) / len(mids)
                 behind_mid = sum(1 for j in theirs if depth(now[j][0]) < mid_line)
                 self.spare[team][s] = len(back) - behind_mid
+                # Support around the ball: open options for this team's player on the ball.
+                h = track.holder[f]
+                if h != 255 and h in mine:
+                    self.held[team][s] = 1
+                    hx, hy = now[h]
+                    forward = -1.0 if flip else 1.0
+                    count, mask = 0, 0
+                    for k in mine:
+                        if k == h:
+                            continue
+                        mx, my = now[k]
+                        dist = math.hypot(mx - hx, my - hy)
+                        if not SUPPORT_MIN_M <= dist <= SUPPORT_MAX_M:
+                            continue
+                        if any(math.hypot(now[j][0] - mx, now[j][1] - my) <= MARKED_M or
+                               segment_distance(now[j], (hx, hy), (mx, my)) <= LANE_M for j in theirs):
+                            continue
+                        angle = math.degrees(math.atan2(abs(my - hy), (mx - hx) * forward))
+                        count += 1
+                        mask |= 1 if angle <= 30 else 2 if angle <= 70 else 4 if angle <= 110 else 8
+                    self.options[team][s] = min(count, 255)
+                    self.kinds[team][s] = mask
         self.episodes = {team: detect_episodes(track, home, team, teams[1] if team == teams[0] else teams[0]) for team in teams}
 
 
@@ -400,12 +454,48 @@ class PrincipleReport(PhaseReport):
                                  base=self.roles_of(base), screen=self.roles_of(screen)))
         return rows
 
+    def formation(self, team: str, phase: str, frames: list[int]) -> FormationRow | None:
+        """The outfield shape from average positions over the frames (team frame, metres)."""
+        if len(frames) * FRAME_MS / 1000 < MIN_FORMATION_S:
+            return None
+        outfield = [pid for pid in self.track.players if pid.startswith(team + "_") and role(pid) != "GK"]
+        sums = {pid: [0.0, 0.0] for pid in outfield}
+        for f in frames:
+            for pid in outfield:
+                x, y = self.where(team, f, pid)
+                sums[pid][0] += x
+                sums[pid][1] += y
+        avg = sorted((v[0] / len(frames) * X_M, v[1] / len(frames) * Y_M, role(pid)) for pid, v in sums.items())
+        gaps = sorted(((avg[i + 1][0] - avg[i][0], i) for i in range(len(avg) - 1)), reverse=True)
+        cuts = sorted(i for _, i in gaps[:3 if gaps[2][0] >= FOURTH_LINE_M else 2])
+        lines, start = [], 0
+        for i in cuts + [len(avg) - 1]:
+            lines.append([r for _, _, r in sorted(avg[start:i + 1], key=lambda a: -a[1])])
+            start = i + 1
+        return FormationRow(phase=phase, shape="-".join(str(len(line)) for line in lines), seconds=round(len(frames) * FRAME_MS / 1000, 1), lines=lines)
+
+    def support(self, team: str) -> SupportRow:
+        layout = self.layout
+        codes = self.attacking_codes(team) if layout else bytearray()
+        seconds = [s for s in range(layout.seconds) if s * 1000 // FRAME_MS <= self.last_frame and layout.held[team][s]
+                   and codes[s * 1000 // FRAME_MS]] if layout else []
+        n = len(seconds)
+        options = [layout.options[team][s] for s in seconds] if layout else []
+        kinds = [layout.kinds[team][s] for s in seconds] if layout else []
+
+        def share(test) -> float | None:
+            return ratio(100 * sum(1 for k in kinds if test(k)), n, 1)
+        return SupportRow(samples=n, options_mean=r1(mean(options)), two_plus_share=ratio(100 * sum(1 for o in options if o >= 2), n, 1),
+                          vertical_share=share(lambda k: k & 1), diagonal_share=share(lambda k: k & 2), horizontal_share=share(lambda k: k & 4),
+                          back_share=share(lambda k: k & 8), triangle_share=share(lambda k: k & 7 == 7))
+
     def structures(self) -> dict[str, TeamStructure]:
         result = {}
         for team in self.teams:
+            sheet = TEAM_SHEET.get(team, "")
             if not self.layout:
-                result[team] = TeamStructure(team_id=team, build_up_seconds=0, build_up=[], rest_seconds=0, rest_defence=[], behind_ball=None,
-                                             overcommitted_share=None, losses=[], moments=[])
+                result[team] = TeamStructure(team_id=team, team_sheet=sheet, formations=[], support=self.support(team), build_up_seconds=0, build_up=[],
+                                             rest_seconds=0, rest_defence=[], behind_ball=None, overcommitted_share=None, losses=[], moments=[])
                 continue
             codes = self.attacking_codes(team)
             build, rest = [], []
@@ -418,6 +508,11 @@ class PrincipleReport(PhaseReport):
                         rest.append(f)
             behind = [self.layout.behind[team][f] for f in rest]
             rival = self.other(team)
+            theirs = self.attacking_codes(rival)
+            defending = [f for f in range(self.last_frame + 1) if theirs[f]]
+            arrived = [f for f in rest if f >= ARRIVED_FRAMES and all(codes[g] and self.ball(team, g)[0] >= 66.67 for g in range(f - ARRIVED_FRAMES, f))]
+            formations = [row for row in (self.formation(team, "build_up", build), self.formation(team, "attack", arrived),
+                                          self.formation(team, "defending", defending)) if row]
             losses: dict[int, list] = {}
             examples = []
             for p in self.plays:
@@ -437,7 +532,7 @@ class PrincipleReport(PhaseReport):
                     examples.append(Moment(time_ms=p["start"], event_ref=p["ref"],
                                            label=f"Lost in the final third with a {SHAPES[code]} rest defence ({self.layout.behind[team][f]} behind the ball): countered"))
             result[team] = TeamStructure(
-                team_id=team, build_up_seconds=round(len(build) * FRAME_MS / 1000, 1), build_up=self.shape_rows(team, build),
+                team_id=team, team_sheet=sheet, formations=formations, support=self.support(team), build_up_seconds=round(len(build) * FRAME_MS / 1000, 1), build_up=self.shape_rows(team, build),
                 rest_seconds=round(len(rest) * FRAME_MS / 1000, 1), rest_defence=self.shape_rows(team, rest), behind_ball=r1(mean(behind)),
                 overcommitted_share=ratio(100 * sum(1 for b in behind if b <= OVERCOMMITTED), len(behind), 1),
                 losses=[RestLossRow(shape=SHAPES[code], losses=v[0], counters_conceded=v[1], shots_conceded=v[2], xg_conceded=round(v[3], 2))
@@ -621,12 +716,52 @@ class PrincipleReport(PhaseReport):
             for p in self.plays:
                 if p["team"] == team and p["regain"] and p["spot"][0] >= 50:
                     by_channel[channel(p["spot"][1])] += 1
+            depth = self.control_depth(team)
             result[team] = TeamPressSystem(
                 team_id=team, seconds=float(len(seconds)), system=system, units=units, spare_at_back=r1(mean(spare)),
                 left_free=left, left_free_share=ratio(100 * free[left], len(seconds), 1) if left else None, triggers=triggers,
                 cover_shadow=shadow, cover_shadow_tracked=shadow_tracked, build_ups=build_ups, forced_wide_share=ratio(100 * wide, build_ups, 1),
-                regains_by_channel=by_channel, moments=examples[:MOMENTS])
+                regains_by_channel=by_channel, **depth, moments=examples[:MOMENTS])
         return result
+
+    def control_depth(self, team: str) -> dict:
+        """Back-four height with the ball pressed against free, compared at the same ball depth."""
+        empty = {"depth_seconds": 0.0, "free_share": None, "line_pressed_m": None, "line_free_m": None, "drop_when_free_m": None,
+                 "depth_read": "insufficient_evidence"}
+        if not self.layout:
+            return empty
+        theirs = self.attacking_codes(self.other(team))
+        pressed, line = self.layout.pressed[team], self.layout.line[team]
+        on, off = [], []                  # (ball depth, line height), metres from this team's own goal
+        since = FREE_AFTER_FRAMES
+        for f in range(self.last_frame + 1):
+            since = 0 if pressed[f] else since + 1
+            if not theirs[f]:
+                continue
+            sample = (self.ball(team, f)[0] * X_M, line[f])
+            if pressed[f]:
+                on.append(sample)
+            elif since >= FREE_AFTER_FRAMES:
+                off.append(sample)
+        total = len(on) + len(off)
+        if not total:
+            return empty
+        drop = None
+        if min(len(on), len(off)) >= MIN_DEPTH_FRAMES:
+            # Least squares: line = a + b * ball depth + c * free; the drop is -c, the free-ball effect at the same ball depth.
+            rows = [(x, h, 0.0) for x, h in on] + [(x, h, 1.0) for x, h in off]
+            mx, mh, mf = (sum(r[i] for r in rows) / total for i in range(3))
+            sxx = sum((r[0] - mx) ** 2 for r in rows)
+            sff = sum((r[2] - mf) ** 2 for r in rows)
+            sxf = sum((r[0] - mx) * (r[2] - mf) for r in rows)
+            sxh = sum((r[0] - mx) * (r[1] - mh) for r in rows)
+            sfh = sum((r[2] - mf) * (r[1] - mh) for r in rows)
+            det = sxx * sff - sxf * sxf
+            drop = -(sfh * sxx - sxh * sxf) / det if det > 1e-9 else None
+        read = "insufficient_evidence" if drop is None else "drops_when_free" if drop >= DROPS_M else "holds_line"
+        on_m, off_m = [h for _, h in on], [h for _, h in off]
+        return {"depth_seconds": round(total * FRAME_MS / 1000, 1), "free_share": ratio(100 * len(off), total, 1),
+                "line_pressed_m": r1(mean(on_m)), "line_free_m": r1(mean(off_m)), "drop_when_free_m": r1(drop), "depth_read": read}
 
     # --------------------------------------------------------------- marking
     def marking(self) -> dict[str, TeamMarking]:
@@ -806,14 +941,22 @@ class PrincipleReport(PhaseReport):
             blocks = [r for r in ph["blocks"][team].rows if r.seconds]
             s = structures[team]
 
+            shape = {row.phase: row for row in s.formations}
+
             # In possession.
             parts = []
+            if "attack" in shape:
+                row = shape["attack"]
+                parts.append(f"lined up {s.team_sheet} and attacked in a {row.shape} ({unit_name(row.lines[-1])} across the front)")
             if s.build_up:
                 top = s.build_up[0]
                 parts.append(f"built up in a {top.shape} ({top.share:.0f}% of build-up time; base {unit_name(top.base)})")
             if prog.xt >= .05:
                 flank = max(prog.xt_by_channel, key=lambda k: prog.xt_by_channel[k])
                 parts.append(f"added most threat through the {flank} ({prog.xt_by_channel[flank]:+.2f} of {prog.xt:+.2f} xT)")
+            sup = s.support
+            if sup.samples >= MIN_SUPPORT_S and sup.two_plus_share is not None:
+                parts.append(f"the player on the ball had two or more open passing options {sup.two_plus_share:.0f}% of the time and a forward one {sup.vertical_share:.0f}%")
             tm = third[team]
             if tm.combinations:
                 parts.append(f"used {plural(tm.combinations, 'third-man combination')}")
@@ -828,6 +971,9 @@ class PrincipleReport(PhaseReport):
             # Out of possession.
             parts = []
             p = pressing[team]
+            if "defending" in shape:
+                row = shape["defending"]
+                parts.append(f"defended in a {row.shape} ({unit_name(row.lines[-1])} up front)")
             if blocks:
                 main = max(blocks, key=lambda r: r.seconds)
                 parts.append(f"defended mostly in a {main.block} block (back four at {main.back_four_m} m, {main.share:.0f}% of settled defending)")
@@ -842,6 +988,12 @@ class PrincipleReport(PhaseReport):
             if hot:
                 best = max(hot, key=lambda t: t.rate)
                 parts.append(f"pressed hardest on passes {trigger_text(best.trigger)} ({best.pressured} of {best.tracked}, {best.rate:.0f}%)")
+            if p.build_ups >= 5 and p.forced_wide_share is not None:
+                parts.append(f"forced {p.forced_wide_share:.0f}% of the opponent's build-ups wide")
+            if p.depth_read == "drops_when_free":
+                parts.append(f"dropped its back four {p.drop_when_free_m} m when nobody was pressing the ball")
+            elif p.depth_read == "holds_line":
+                parts.append(f"held its back four at the same height whether or not the ball was pressed ({p.line_free_m} m from goal with the ball free)")
             if p.spare_at_back is not None:
                 spare = p.spare_at_back
                 parts.append("matched the opponent's forwards one for one at the back during its build-up" if abs(spare) < .25 else
@@ -902,6 +1054,9 @@ class PrincipleReport(PhaseReport):
                 share = 100 * max(0.0, prog.xt_by_channel[flank]) / positive
                 if share >= 45:
                     strengths.append(ReportLine(topic="Main route to goal", text=f"{share:.0f}% of the expected threat came through the {flank}.", moments=[]))
+            if p.depth_read == "drops_when_free" and p.depth_seconds >= 60:
+                strengths.append(ReportLine(topic="Line height follows the pressure", text=f"The back four sat {p.drop_when_free_m} m deeper when the ball was free than when it was pressed, at the same ball position ({p.line_free_m} m against {p.line_pressed_m} m from goal).",
+                                            moments=[]))
             if s.overcommitted_share is not None and s.rest_seconds >= 30 and s.overcommitted_share >= 25:
                 weaknesses.append(ReportLine(topic="Rest defence", text=f"Only {OVERCOMMITTED} or fewer players stayed {BEHIND_BALL_M:.0f} m behind the ball for {s.overcommitted_share:.0f}% of final-third possession.",
                                              moments=s.moments[:2]))
@@ -912,6 +1067,12 @@ class PrincipleReport(PhaseReport):
             if m.receptions >= 10 and m.free_between_lines >= 3:
                 weaknesses.append(ReportLine(topic="Free men between the lines", text=f"{them} found a free receiver between {who}'s lines {times(m.free_between_lines)} ({m.free} free receptions of {m.receptions} in the middle and final thirds).",
                                              moments=m.moments[:2]))
+            if p.depth_read == "holds_line" and p.line_free_m is not None and p.line_free_m >= HIGH_LINE_M:
+                weaknesses.append(ReportLine(topic="High line with the ball free", text=f"The back four held {p.line_free_m} m from goal even when nobody was pressing the ball, leaving space in behind for a forward pass.",
+                                             moments=[]))
+            if sup.samples >= MIN_SUPPORT_S and sup.vertical_share is not None and sup.vertical_share < FEW_FORWARD:
+                weaknesses.append(ReportLine(topic="Few forward options", text=f"The player on the ball had an open option ahead only {sup.vertical_share:.0f}% of the time in settled possession, so the ball often went sideways or back.",
+                                             moments=[]))
             rec = ph["blocks"][team].recovery
             if rec.balls_in_behind >= 3:
                 weaknesses.append(ReportLine(topic="Space behind the line", text=f"{plural(rec.balls_in_behind, 'ball')} played in behind the back four; {plural(rec.shots_conceded, 'shot')} conceded within 10 s.",
@@ -933,6 +1094,7 @@ class PrincipleReport(PhaseReport):
                       f"{key[0].progressive_carries} progressive carries).") if key_player else None
             summary = " ".join(filter(None, [
                 f"{who}: {control.possession_share:.0f}% of the ball, {control.xg:.2f} xG." if control.read != "insufficient_evidence" else None,
+                f"{s.team_sheet} on the team sheet: {shape['attack'].shape} in attack, {shape['defending'].shape} out of possession." if "attack" in shape and "defending" in shape else None,
                 f"Build-up {s.build_up[0].shape}, rest defence {s.rest_defence[0].shape}." if s.build_up and s.rest_defence else None,
                 {"man_to_man": "Man-to-man press.", "zonal": "Zonal press.", "hybrid": "Hybrid press."}.get(p.system),
                 f"Watch {self.names[key_player]}." if key_player else None]))

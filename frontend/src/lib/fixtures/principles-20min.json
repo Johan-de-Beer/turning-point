@@ -9,12 +9,71 @@
  "structures": {
   "harbor": {
    "team_id": "harbor",
+   "team_sheet": "4-3-3",
+   "formations": [
+    {
+     "phase": "build_up",
+     "shape": "2-5-3",
+     "seconds": 137.4,
+     "lines": [
+      [
+       "RCB",
+       "LCB"
+      ],
+      [
+       "RB",
+       "RCM",
+       "DM",
+       "LCM",
+       "LB"
+      ],
+      [
+       "RW",
+       "ST",
+       "LW"
+      ]
+     ]
+    },
+    {
+     "phase": "defending",
+     "shape": "4-4-2",
+     "seconds": 194.0,
+     "lines": [
+      [
+       "RB",
+       "RCB",
+       "LCB",
+       "LB"
+      ],
+      [
+       "RW",
+       "RCM",
+       "DM",
+       "LW"
+      ],
+      [
+       "ST",
+       "LCM"
+      ]
+     ]
+    }
+   ],
+   "support": {
+    "samples": 386,
+    "options_mean": 4.5,
+    "two_plus_share": 99.5,
+    "vertical_share": 53.4,
+    "diagonal_share": 43.5,
+    "horizontal_share": 73.3,
+    "back_share": 93.3,
+    "triangle_share": 12.2
+   },
    "build_up_seconds": 137.4,
    "build_up": [
     {
      "shape": "2+3",
-     "seconds": 107.2,
-     "share": 78.0,
+     "seconds": 107.6,
+     "share": 78.3,
      "base": [
       "RCB",
       "LCB"
@@ -27,8 +86,8 @@
     },
     {
      "shape": "3+2",
-     "seconds": 26.6,
-     "share": 19.4,
+     "seconds": 26.2,
+     "share": 19.1,
      "base": [
       "RCB",
       "LCB",
@@ -58,8 +117,8 @@
    "rest_defence": [
     {
      "shape": "2+3",
-     "seconds": 32.4,
-     "share": 67.5,
+     "seconds": 30.4,
+     "share": 63.3,
      "base": [
       "RCB",
       "LCB"
@@ -72,8 +131,8 @@
     },
     {
      "shape": "4+1",
-     "seconds": 12.6,
-     "share": 26.2,
+     "seconds": 14.6,
+     "share": 30.4,
      "base": [
       "RCB",
       "LCB",
@@ -99,7 +158,7 @@
      ]
     }
    ],
-   "behind_ball": 6.5,
+   "behind_ball": 5.8,
    "overcommitted_share": 0.0,
    "losses": [
     {
@@ -121,6 +180,42 @@
   },
   "vale": {
    "team_id": "vale",
+   "team_sheet": "4-3-3",
+   "formations": [
+    {
+     "phase": "defending",
+     "shape": "4-5-1",
+     "seconds": 428.0,
+     "lines": [
+      [
+       "RB",
+       "RCB",
+       "LCB",
+       "LB"
+      ],
+      [
+       "RW",
+       "RCM",
+       "DM",
+       "LCM",
+       "LW"
+      ],
+      [
+       "ST"
+      ]
+     ]
+    }
+   ],
+   "support": {
+    "samples": 192,
+    "options_mean": 3.9,
+    "two_plus_share": 93.2,
+    "vertical_share": 40.1,
+    "diagonal_share": 69.8,
+    "horizontal_share": 62.0,
+    "back_share": 81.2,
+    "triangle_share": 16.7
+   },
    "build_up_seconds": 49.8,
    "build_up": [
     {
@@ -211,7 +306,7 @@
      ]
     }
    ],
-   "behind_ball": 6.0,
+   "behind_ball": 5.8,
    "overcommitted_share": 0.0,
    "losses": [],
    "moments": []
@@ -226,8 +321,8 @@
    "opposite_foot": true,
    "style": "inverted",
    "seconds": 462.6,
-   "touchline_m": 25.4,
-   "inside_share": 97.9,
+   "touchline_m": 25.3,
+   "inside_share": 98.2,
    "cut_ins": 0,
    "shots": 1,
    "central_shots": 1,
@@ -243,8 +338,8 @@
    "opposite_foot": false,
    "style": "balanced",
    "seconds": 462.6,
-   "touchline_m": 16.1,
-   "inside_share": 18.6,
+   "touchline_m": 16.0,
+   "inside_share": 17.8,
    "cut_ins": 0,
    "shots": 0,
    "central_shots": 0,
@@ -260,8 +355,8 @@
    "opposite_foot": false,
    "style": "balanced",
    "seconds": 200.8,
-   "touchline_m": 15.3,
-   "inside_share": 9.5,
+   "touchline_m": 14.9,
+   "inside_share": 5.2,
    "cut_ins": 0,
    "shots": 0,
    "central_shots": 0,
@@ -277,8 +372,8 @@
    "opposite_foot": false,
    "style": "touchline",
    "seconds": 200.8,
-   "touchline_m": 5.1,
-   "inside_share": 5.8,
+   "touchline_m": 5.0,
+   "inside_share": 2.0,
    "cut_ins": 0,
    "shots": 0,
    "central_shots": 0,
@@ -297,7 +392,7 @@
   },
   "vale": {
    "team_id": "vale",
-   "width_m": 50.9,
+   "width_m": 51.0,
    "entries": 1,
    "central_entry_share": 100.0,
    "crosses": 0
@@ -311,30 +406,30 @@
    "units": [
     {
      "unit": "front",
-     "samples": 49,
-     "follow_share": 20.4,
-     "distance_m": 7.2,
-     "marking": "insufficient_evidence",
+     "samples": 71,
+     "follow_share": 21.1,
+     "distance_m": 7.9,
+     "marking": "zonal",
      "markers": []
     },
     {
      "unit": "midfield",
-     "samples": 59,
-     "follow_share": 11.9,
-     "distance_m": 5.4,
-     "marking": "insufficient_evidence",
+     "samples": 70,
+     "follow_share": 7.1,
+     "distance_m": 6.5,
+     "marking": "zonal",
      "markers": []
     },
     {
      "unit": "back",
-     "samples": 110,
-     "follow_share": 14.5,
-     "distance_m": 9.3,
+     "samples": 103,
+     "follow_share": 19.4,
+     "distance_m": 11.7,
      "marking": "zonal",
      "markers": []
     }
    ],
-   "spare_at_back": -0.1,
+   "spare_at_back": 0.3,
    "left_free": "vale_02",
    "left_free_share": 100.0,
    "triggers": [
@@ -360,9 +455,9 @@
      "trigger": "into_midfield",
      "passes": 13,
      "tracked": 13,
-     "pressured": 5,
-     "rate": 38.5,
-     "median_s": 0.8,
+     "pressured": 4,
+     "rate": 30.8,
+     "median_s": 1.6,
      "regained_5s": 8
     }
    ],
@@ -375,6 +470,12 @@
     "centre": 8,
     "right": 2
    },
+   "depth_seconds": 178.2,
+   "free_share": 57.2,
+   "line_pressed_m": 36.3,
+   "line_free_m": 29.1,
+   "drop_when_free_m": 7.2,
+   "depth_read": "drops_when_free",
    "moments": [
     {
      "time_ms": 255000,
@@ -400,17 +501,17 @@
    "units": [
     {
      "unit": "front",
-     "samples": 224,
-     "follow_share": 24.6,
-     "distance_m": 6.0,
-     "marking": "zonal",
+     "samples": 192,
+     "follow_share": 32.3,
+     "distance_m": 7.7,
+     "marking": "mixed",
      "markers": []
     },
     {
      "unit": "midfield",
-     "samples": 239,
-     "follow_share": 51.0,
-     "distance_m": 5.3,
+     "samples": 236,
+     "follow_share": 50.0,
+     "distance_m": 5.4,
      "marking": "man",
      "markers": [
       "vale_07",
@@ -419,14 +520,14 @@
     },
     {
      "unit": "back",
-     "samples": 230,
-     "follow_share": 31.7,
+     "samples": 226,
+     "follow_share": 33.2,
      "distance_m": 9.4,
      "marking": "mixed",
      "markers": []
     }
    ],
-   "spare_at_back": 1.0,
+   "spare_at_back": 0.9,
    "left_free": "harbor_04",
    "left_free_share": 97.9,
    "triggers": [
@@ -443,9 +544,9 @@
      "trigger": "into_midfield",
      "passes": 33,
      "tracked": 33,
-     "pressured": 20,
-     "rate": 60.6,
-     "median_s": 0.4,
+     "pressured": 17,
+     "rate": 51.5,
+     "median_s": 0.6,
      "regained_5s": 0
     }
    ],
@@ -458,6 +559,12 @@
     "centre": 2,
     "right": 1
    },
+   "depth_seconds": 388.4,
+   "free_share": 60.9,
+   "line_pressed_m": 23.2,
+   "line_free_m": 24.5,
+   "drop_when_free_m": 0.7,
+   "depth_read": "holds_line",
    "moments": []
   }
  },
@@ -467,38 +574,38 @@
    "bands": [
     {
      "band": "near",
-     "samples": 569,
-     "distance_m": 5.3
+     "samples": 565,
+     "distance_m": 6.6
     },
     {
      "band": "middle",
-     "samples": 859,
-     "distance_m": 9.5
+     "samples": 866,
+     "distance_m": 9.8
     },
     {
      "band": "far",
-     "samples": 512,
-     "distance_m": 16.2
+     "samples": 509,
+     "distance_m": 17.1
     }
    ],
    "receptions": 33,
-   "free": 21,
-   "free_between_lines": 10,
+   "free": 24,
+   "free_between_lines": 12,
    "free_players": [
     {
-     "player_id": "vale_08",
+     "player_id": "vale_07",
      "free": 9,
-     "between_lines": 4
+     "between_lines": 5
     },
     {
-     "player_id": "vale_07",
-     "free": 7,
+     "player_id": "vale_08",
+     "free": 10,
      "between_lines": 4
     },
     {
      "player_id": "vale_06",
      "free": 5,
-     "between_lines": 2
+     "between_lines": 3
     }
    ],
    "moments": [
@@ -524,22 +631,22 @@
    "bands": [
     {
      "band": "near",
-     "samples": 1337,
-     "distance_m": 5.6
+     "samples": 1350,
+     "distance_m": 6.2
     },
     {
      "band": "middle",
-     "samples": 2056,
-     "distance_m": 9.9
+     "samples": 2054,
+     "distance_m": 10.6
     },
     {
      "band": "far",
-     "samples": 887,
-     "distance_m": 12.0
+     "samples": 876,
+     "distance_m": 12.6
     }
    ],
    "receptions": 91,
-   "free": 46,
+   "free": 48,
    "free_between_lines": 8,
    "free_players": [
     {
@@ -559,12 +666,12 @@
     },
     {
      "player_id": "harbor_07",
-     "free": 13,
+     "free": 14,
      "between_lines": 1
     },
     {
      "player_id": "harbor_08",
-     "free": 10,
+     "free": 11,
      "between_lines": 1
     }
    ],
@@ -596,8 +703,8 @@
      "players": [
       "harbor_09"
      ],
-     "episodes": 16,
-     "drew": 1,
+     "episodes": 17,
+     "drew": 2,
      "found": 0,
      "moments": [
       {
@@ -640,38 +747,6 @@
      ]
     },
     {
-     "kind": "drop_and_sprint",
-     "players": [
-      "harbor_08"
-     ],
-     "episodes": 1,
-     "drew": 1,
-     "found": 0,
-     "moments": [
-      {
-       "time_ms": 65000,
-       "event_ref": "cmb_0001@1",
-       "label": "Rafi Moss drops, then sprints in behind, marker steps out (1:05)"
-      }
-     ]
-    },
-    {
-     "kind": "drop_and_sprint",
-     "players": [
-      "harbor_11"
-     ],
-     "episodes": 1,
-     "drew": 0,
-     "found": 0,
-     "moments": [
-      {
-       "time_ms": 65000,
-       "event_ref": "cmb_0001@1",
-       "label": "Kai Lorne drops, then sprints in behind (1:05)"
-      }
-     ]
-    },
-    {
      "kind": "opposite_runs",
      "players": [
       "harbor_06",
@@ -685,6 +760,23 @@
        "time_ms": 307000,
        "event_ref": "evt_00061@1",
        "label": "Leon Reed drops as Asher Pike runs beyond (5:07)"
+      }
+     ]
+    },
+    {
+     "kind": "opposite_runs",
+     "players": [
+      "harbor_06",
+      "harbor_08"
+     ],
+     "episodes": 1,
+     "drew": 0,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 356000,
+       "event_ref": "evt_00071@1",
+       "label": "Leon Reed drops as Rafi Moss runs beyond (5:56)"
       }
      ]
     },
@@ -763,22 +855,6 @@
     {
      "kind": "drop_and_sprint",
      "players": [
-      "vale_10"
-     ],
-     "episodes": 2,
-     "drew": 0,
-     "found": 0,
-     "moments": [
-      {
-       "time_ms": 1115200,
-       "event_ref": "evt_00202@1",
-       "label": "Ruben Hart drops, then sprints in behind (18:35)"
-      }
-     ]
-    },
-    {
-     "kind": "drop_and_sprint",
-     "players": [
       "vale_06"
      ],
      "episodes": 1,
@@ -809,12 +885,28 @@
      ]
     },
     {
+     "kind": "drop_and_sprint",
+     "players": [
+      "vale_10"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 1185400,
+       "event_ref": null,
+       "label": "Ruben Hart drops, then sprints in behind, marker steps out (19:45)"
+      }
+     ]
+    },
+    {
      "kind": "opposite_runs",
      "players": [
       "vale_08",
       "vale_09"
      ],
-     "episodes": 19,
+     "episodes": 18,
      "drew": 2,
      "found": 2,
      "moments": [
@@ -921,6 +1013,22 @@
        "label": "Ruben Hart's run drags Noah Fen (18:39)"
       }
      ]
+    },
+    {
+     "kind": "decoy_run",
+     "players": [
+      "vale_03"
+     ],
+     "episodes": 1,
+     "drew": 1,
+     "found": 0,
+     "moments": [
+      {
+       "time_ms": 47600,
+       "event_ref": "evt_00008@1",
+       "label": "Luca Briar's run drags Jules Carden (0:47)"
+      }
+     ]
     }
    ],
    "corners": 0,
@@ -1017,7 +1125,7 @@
    "phases": [
     {
      "topic": "In possession",
-     "text": "Harbor Athletic built up in a 2+3 (78% of build-up time; base RCB, LCB); added most threat through the centre (+0.38 of +0.73 xT); used 6 third-man combinations; Dario Finch played as an inverted winger (98% of attacking time inside); 62% possession and 100% field tilt.",
+     "text": "Harbor Athletic built up in a 2+3 (78% of build-up time; base RCB, LCB); added most threat through the centre (+0.38 of +0.73 xT); the player on the ball had two or more open passing options 100% of the time and a forward one 53%; used 6 third-man combinations; Dario Finch played as an inverted winger (98% of attacking time inside); 62% possession and 100% field tilt.",
      "moments": [
       {
        "time_ms": 224000,
@@ -1028,7 +1136,7 @@
     },
     {
      "topic": "Out of possession",
-     "text": "Harbor Athletic defended mostly in a mid block (back four at 35.9 m, 84% of settled defending); pressed zonally; pressed hardest on passes into midfield (5 of 13, 38%); matched the opponent's forwards one for one at the back during its build-up.",
+     "text": "Harbor Athletic defended in a 4-4-2 (ST, LCM up front); defended mostly in a mid block (back four at 36.0 m, 59% of settled defending); pressed zonally; pressed hardest on passes into midfield (4 of 13, 31%); forced 33% of the opponent's build-ups wide; dropped its back four 7.2 m when nobody was pressing the ball; kept 0.3 spare defenders at the back during the opponent's build-up.",
      "moments": [
       {
        "time_ms": 255000,
@@ -1039,7 +1147,7 @@
     },
     {
      "topic": "Attack to defence",
-     "text": "Harbor Athletic counter-pressed after 20 of 26 losses (77%), winning the ball back within 5 s twice; held a 2+3 rest defence with the ball in the final third (68%), 6.5 players behind the ball on average; conceded 0 counters from 8 final-third losses.",
+     "text": "Harbor Athletic counter-pressed after 21 of 26 losses (81%), winning the ball back within 5 s twice; held a 2+3 rest defence with the ball in the final third (63%), 5.8 players behind the ball on average; conceded 0 counters from 8 final-third losses.",
      "moments": [
       {
        "time_ms": 201000,
@@ -1068,7 +1176,7 @@
    "strengths": [
     {
      "topic": "Counter-press",
-     "text": "Pressed the ball after 77% of 26 losses; won it back within 5 s twice.",
+     "text": "Pressed the ball after 81% of 26 losses; won it back within 5 s twice.",
      "moments": [
       {
        "time_ms": 201000,
@@ -1100,7 +1208,7 @@
     },
     {
      "topic": "Counter-movement",
-     "text": "Callum Wren dropped and then sprinted in behind 16 times; a marker stepped out with the drop once.",
+     "text": "Callum Wren dropped and then sprinted in behind 17 times; a marker stepped out with the drop twice.",
      "moments": [
       {
        "time_ms": 15600,
@@ -1113,12 +1221,17 @@
      "topic": "Main route to goal",
      "text": "52% of the expected threat came through the centre.",
      "moments": []
+    },
+    {
+     "topic": "Line height follows the pressure",
+     "text": "The back four sat 7.2 m deeper when the ball was free than when it was pressed, at the same ball position (29.1 m against 36.3 m from goal).",
+     "moments": []
     }
    ],
    "weaknesses": [
     {
      "topic": "Free men between the lines",
-     "text": "Vale United found a free receiver between Harbor Athletic's lines 10 times (21 free receptions of 33 in the middle and final thirds).",
+     "text": "Vale United found a free receiver between Harbor Athletic's lines 12 times (24 free receptions of 33 in the middle and final thirds).",
      "moments": [
       {
        "time_ms": 157000,
@@ -1147,17 +1260,17 @@
    "phases": [
     {
      "topic": "In possession",
-     "text": "Vale United built up in a 3+2 (52% of build-up time; base RB, RCB, LCB); 38% possession and 0% field tilt.",
+     "text": "Vale United built up in a 3+2 (52% of build-up time; base RB, RCB, LCB); the player on the ball had two or more open passing options 93% of the time and a forward one 40%; 38% possession and 0% field tilt.",
      "moments": []
     },
     {
      "topic": "Out of possession",
-     "text": "Vale United defended mostly in a low block (back four at 23.3 m, 93% of settled defending); pressed with a hybrid: front zonal, midfield man, back mixed; Sami North, Ivo Brook followed their man; pressed hardest on passes into midfield (20 of 33, 61%); kept 1.0 spare defenders at the back during the opponent's build-up.",
+     "text": "Vale United defended in a 4-5-1 (ST up front); defended mostly in a low block (back four at 23.3 m, 93% of settled defending); pressed with a hybrid: front mixed, midfield man, back mixed; Sami North, Ivo Brook followed their man; pressed hardest on passes into midfield (17 of 33, 52%); held its back four at the same height whether or not the ball was pressed (24.5 m from goal with the ball free); kept 0.9 spare defenders at the back during the opponent's build-up.",
      "moments": []
     },
     {
      "topic": "Attack to defence",
-     "text": "Vale United counter-pressed after 12 of 25 losses (48%), never winning it back within 5 s; held a 3+2 rest defence with the ball in the final third (62%), 6.0 players behind the ball on average.",
+     "text": "Vale United counter-pressed after 13 of 25 losses (52%), never winning it back within 5 s; held a 3+2 rest defence with the ball in the final third (62%), 5.8 players behind the ball on average.",
      "moments": [
       {
        "time_ms": 600000,
@@ -1181,7 +1294,7 @@
    "weaknesses": [
     {
      "topic": "Free men between the lines",
-     "text": "Harbor Athletic found a free receiver between Vale United's lines 8 times (46 free receptions of 91 in the middle and final thirds).",
+     "text": "Harbor Athletic found a free receiver between Vale United's lines 8 times (48 free receptions of 91 in the middle and final thirds).",
      "moments": [
       {
        "time_ms": 608000,
@@ -1237,10 +1350,14 @@
   "decoy_run": "An attacker runs 6 m or more forward in 1 s with the ball in the attacking 60%, and the nearest defender (within 8 m) retreats 3 m or more with the runner (drew). Found: within 3 s a team-mate, not the runner, received a pass within 12 m of where that defender started.",
   "crisscross": "At a corner: two attackers inside the final 20 m whose order across the pitch swaps in the 3 s before the delivery, each moving 3 m or more.",
   "third_man": "A completed pass from A to B, then B passes on to C (not A) within 3 s of A's pass, with C receiving further forward than A played from. Lane blocked: an opponent within 2.5 m of the straight line from A to C when A played. Free: no opponent within 5 m of C on arrival. Zones: build-up (A in its own third), middle third or final third (where C receives).",
+  "formations": "The whole outfield shape in each phase, from the ten outfield players' average positions in the team's own frame: build-up (settled possession, ball in its own half), attack (settled possession, ball in the final third for 3 s or more, so the players have arrived) and defending (the opponent in settled possession). Sorted by depth, the players split into lines at the two largest depth gaps, and into four lines when the third-largest gap is 9 m or more. Read back to front, so a 4-3-3 that pushes its full-backs on and its wingers high reads 2-3-5. At least 60 s per phase is needed. The team sheet is the formation the side names before kick-off.",
+  "support": "Once a second in settled possession, the open passing options around the player on the ball: team-mates 5 to 30 m away with no opponent within 3 m of them and none within 2.5 m of the straight pass. Vertical: within 30\u00b0 of straight ahead; diagonal: 30\u00b0 to 70\u00b0; horizontal: 70\u00b0 to 110\u00b0 (square, for security); back: further back than that. The support triangle is a vertical, a diagonal and a horizontal option open at the same time.",
+  "control_depth": "While the opponent has settled possession: the back four's average height (metres from its own goal) with the ball pressed (a defender within 5 m of it) and free (nobody that close for 1 s). The drop is the free-ball effect at the same ball depth (a least-squares fit of line height on ball depth and free), because the line also follows the ball; 10 s of each is needed. A line that sits 2.5 m or more deeper when the ball is free drops when free; otherwise it holds its line.",
   "match_report": "A summary per team in the order a professional analyst works: in possession, out of possession, attack to defence, defence to attack and set pieces, then strengths to keep, weaknesses an opponent could target and the most influential player by expected threat. Each line is built from the numbers in this report and in Phases of play, with its sample. It describes what happened; it does not explain why."
  },
  "limitations": [
   "Synthetic data: the events and the 5 Hz player positions are generated from fictional tendencies. Off-ball movement between events is illustrative.",
+  "Formations come from average positions, which smooth over moments when players swap places; the shape at any single moment can differ.",
   "Structures use the deepest five outfield players and one depth gap. Real analysts also judge width, the opponent's front line and who is responsible for whom.",
   "Man-orientation is read from whether a player moves with the nearest opponent, which also happens when two players simply run the same way. Zonal teams can look man-oriented near the ball.",
   "Counter-movements are read from synthetic positions with fixed distances and windows. They show the pattern of the movement, not the intent behind it.",
